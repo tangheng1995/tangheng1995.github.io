@@ -415,4 +415,4 @@ cd /usr/sbin/
 
 访问 http://supervisor.heygolang.cn/ ,结果如下
 
-![](../img/post-js-version/2019-07-25-supervisor.png)
+![](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-07-25-supervisor.png?raw=true)
