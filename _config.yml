@@ -1,20 +1,20 @@
 # Site settings
-title: Your Blog
+title: Archer's Blog
 SEOTitle: 你的博客 | Your Blog
 header-img: img/home-bg.jpg
-email: huxpro@gmail.com
+email: 347420070@qq.com
 description: ""
 keyword: ""
-url: "http://huangxuan.me"              # your host, for absolute URL
-baseurl: "/huxblog-boilerplate"         # for example, '/blog' if your blog hosted on 'host/blog'
+url: "http://blog.heygolang.cn"              # your host, for absolute URL
+baseurl: ""         # for example, '/blog' if your blog hosted on 'host/blog'
 
 
 
 # SNS settings
 RSS: false
 weibo_username:     huxpro
-zhihu_username:     huxpro
-github_username:    huxpro
+zhihu_username:     liangyue
+github_username:    tangheng1995
 #twitter_username:  huxpro
 facebook_username:  huxpro
 
@@ -50,7 +50,7 @@ kramdown:
 #disqus_username: _your_disqus_short_name_
 
 # Duoshuo settings
-duoshuo_username: huxblog
+duoshuo_username: tangheng1995
 # Share component is depend on Comment so we can NOT use share only.
 duoshuo_share: true                     # set to false if you want to use Comment without Sharing
 
@@ -82,8 +82,8 @@ featured-condition-size: 1              # A tag will be featured if the size of 
 # Friends
 friends: [
     {
-        title: "Hux Blog",
-        href: "http://huangxuan.me"
+        title: "Archer's Blog",
+        href: "http://blog.heygolang.cn"
     },{
         title: "Foo",
         href: "#"
