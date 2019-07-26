@@ -3,7 +3,7 @@ title: Archer Blog
 SEOTitle: Coding...
 header-img: img/home-bg.jpg
 email: 347420070@qq.com
-description: ""
+description: "简单 乐观 爱创造"
 keyword: ""
 url: "http://blog.heygolang.cn"              # your host, for absolute URL
 baseurl: ""         # for example, '/blog' if your blog hosted on 'host/blog'
@@ -50,9 +50,9 @@ kramdown:
 #disqus_username: _your_disqus_short_name_
 
 # Duoshuo settings
-duoshuo_username: tangheng1995
+#duoshuo_username: tangheng1995
 # Share component is depend on Comment so we can NOT use share only.
-duoshuo_share: true                     # set to false if you want to use Comment without Sharing
+#duoshuo_share: true                     # set to false if you want to use Comment without Sharing
 
 
 
@@ -80,21 +80,21 @@ featured-condition-size: 1              # A tag will be featured if the size of 
 
 
 # Friends
-friends: [
-    {
-        title: "Archer Blog",
-        href: "http://blog.heygolang.cn"
-    },{
-        title: "Foo",
-        href: "#"
-    },{
-        title: "Bar",
-        href: "#"
-    },{
-        title: "Example Friends",
-        href: "#"
-    },{
-        title: "It helps SEO",
-        href: "#"
-    }
-]
+#friends: [
+#    {
+#        title: "Archer Blog",
+#        href: "http://blog.heygolang.cn"
+#    },{
+#        title: "Foo",
+#        href: "#"
+#    },{
+#        title: "Bar",
+#        href: "#"
+#    },{
+#        title: "Example Friends",
+#        href: "#"
+#    },{
+#        title: "It helps SEO",
+#        href: "#"
+#    }
+#]
