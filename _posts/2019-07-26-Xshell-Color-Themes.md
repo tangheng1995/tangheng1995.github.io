@@ -1,10 +1,10 @@
 ---
+layout: post
 title: Xshell 配置配色方案
-published: true
+subtitle: 'Xshell 配置配色方案'
 date:       2019-07-26 12:00:00
 author:     "Archer"
-header-img: ""
-catalog: true
+categories: xshell
 tags:
     - xshell
     - tools

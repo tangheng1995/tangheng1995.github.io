@@ -1,15 +1,12 @@
 ---
-title: CentOS 安装 jekyll
-published: true
-date:       2019-06-01 12:00:00
-author:     "Archer"
-header-img: ""
-catalog: true
-tags:
-    - centos
-    - jekyll
-    - blog
-    - github
+layout: post
+title: 'CentOS 安装 jekyll'
+subtitle: 'CentOS 安装 jekyll'
+date: 2019-06-01
+author: Archer
+categories: centos
+cover: ''
+tags: centos jekyll blog github
 ---
 
 1. 安装依赖
