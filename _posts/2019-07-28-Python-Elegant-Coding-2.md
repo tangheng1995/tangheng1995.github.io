@@ -4,7 +4,7 @@ title: Python优雅编程-字典
 subtitle: 'Python优雅编程'
 date:       2019-07-28 12:00:00
 author:     "Archer"
-header-img: "img/post-bg-python.png"
+header-img: ""
 categories: python
 tags:
     - python

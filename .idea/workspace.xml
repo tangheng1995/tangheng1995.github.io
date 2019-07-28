@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-2.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/post-bg-go.png" beforeDir="false" afterPath="$PROJECT_DIR$/img/post-bg-go.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-2.md" beforeDir="false" afterPath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-2.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -27,24 +25,24 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="FIRST">
-              <first_editor relative-caret-position="209">
-                <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+              <first_editor relative-caret-position="114">
+                <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
               </first_editor>
               <second_editor />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-2.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="FIRST">
-              <first_editor relative-caret-position="536">
-                <caret line="102" column="38" lean-forward="true" selection-start-line="102" selection-start-column="38" selection-end-line="102" selection-end-column="38" />
+              <first_editor relative-caret-position="114">
+                <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
               </first_editor>
               <second_editor />
             </state>
@@ -85,8 +83,8 @@
         <option value="$PROJECT_DIR$/_posts/2019-06-01-CentOS-install-jekyll.md" />
         <option value="$PROJECT_DIR$/_posts/2019-07-26-Xshell-Color-Themes.md" />
         <option value="$PROJECT_DIR$/about.html" />
-        <option value="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md" />
         <option value="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-2.md" />
+        <option value="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md" />
       </list>
     </option>
   </component>
@@ -166,18 +164,18 @@
       <updated>1564140868488</updated>
       <workItem from="1564140873895" duration="9733000" />
       <workItem from="1564232882847" duration="408000" />
-      <workItem from="1564278701201" duration="2969000" />
+      <workItem from="1564278701201" duration="3278000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13110000" />
+    <option name="totallyTimeSpent" value="13419000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22493573" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22493573" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -431,16 +429,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="FIRST">
-          <first_editor relative-caret-position="209">
-            <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharm2019.1/system/python_stubs/-1949569017/builtins.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="237">
@@ -451,8 +439,18 @@
     <entry file="file://$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-2.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="FIRST">
-          <first_editor relative-caret-position="536">
-            <caret line="102" column="38" lean-forward="true" selection-start-line="102" selection-start-column="38" selection-end-line="102" selection-end-column="38" />
+          <first_editor relative-caret-position="114">
+            <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-1.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="FIRST">
+          <first_editor relative-caret-position="114">
+            <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
           </first_editor>
           <second_editor />
         </state>
