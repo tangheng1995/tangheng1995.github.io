@@ -4,7 +4,6 @@ title: Ubuntu18.04下更改apt源为阿里云源
 subtitle: 'Ubuntu更换apt源'
 date:       2019-08-04 12:00:00
 author:     "Archer"
-header-img: ""
 categories: Ubuntu
 tags:
     - Ubuntu

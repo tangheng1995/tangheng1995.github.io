@@ -4,7 +4,6 @@ title: Ubuntu里apt-get update与sudo apt-get upgrade区别
 subtitle: 'apt-get update与sudo apt-get upgrade区别'
 date:       2019-08-04 12:00:00
 author:     "Archer"
-header-img: ""
 categories: Ubuntu
 tags:
     - Ubuntu
