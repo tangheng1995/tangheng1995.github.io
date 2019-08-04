@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-5.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-28-Python-Elegant-Coding-6.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-29-Ubuntu-Create-Application-DesktopIcon.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-30-Linux-Config-Service-AutoStart.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-30-Ubuntu-install-ssrcli-polipo.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-31-Linux-ssh-login-without-pwd.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-07-31-Ubuntu-install- sysv-rc-conf-ERROR.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/Demo.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_posts/2019-08-04-Diff-apt-get-update-upgrade.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_posts/2019-08-04-Ubuntu-Change-apt-source.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,6 +28,11 @@
     </findStrings>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Archer &lt;347420070@qq.com&gt;" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1Ogzn4NscBz7FgMy11nGCN2F8pk" />
@@ -88,8 +87,17 @@
       <workItem from="1564572787322" duration="4048000" />
       <workItem from="1564666053675" duration="611000" />
       <workItem from="1564667148752" duration="13235000" />
-      <workItem from="1564822905618" duration="698000" />
+      <workItem from="1564822905618" duration="1429000" />
+      <workItem from="1564930263433" duration="3586000" />
     </task>
+    <task id="LOCAL-00001" summary="add *.md">
+      <created>1564830160076</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1564830160076</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -107,6 +115,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add *.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="add *.md" />
   </component>
   <component name="masterDetails">
     <states>
