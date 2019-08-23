@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_posts/2019-08-23-Windows-git- access-github.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-08-23-git-access-github-02.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-08-23-git-access-github.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/about.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/img/home-bg.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/img/home-bg.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tags.html" beforeDir="false" afterPath="$PROJECT_DIR$/tags.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,26 +13,11 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>avatar-hux</find>
-      <find>img</find>
-      <find>title</find>
-      <find>site.title</find>
-      <find>share</find>
-      <find>tff</find>
-      <find>anchor</find>
-      <find>about-bg</find>
-      <find>about</find>
-      <find>icon_wec</find>
-      <find>we</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
       <list>
-        <option value="brook &lt;347420070@qq.com&gt;" />
         <option value="Archer &lt;347420070@qq.com&gt;" />
+        <option value="brook &lt;347420070@qq.com&gt;" />
       </list>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -44,7 +29,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/_posts" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/img" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -55,11 +40,11 @@
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img" />
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\_posts" />
       <recent name="$PROJECT_DIR$/_posts" />
       <recent name="E:\Workspace\tangheng1995.github.io\_posts" />
       <recent name="E:\Workspace\tangheng1995.github.io\img" />
-      <recent name="E:\Workspace\tangheng1995.github.io\img\in-post\post-js-version" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -95,7 +80,7 @@
       <workItem from="1564667148752" duration="13235000" />
       <workItem from="1564822905618" duration="1429000" />
       <workItem from="1564930263433" duration="3586000" />
-      <workItem from="1566567823599" duration="946000" />
+      <workItem from="1566567823599" duration="2667000" />
     </task>
     <task id="LOCAL-00001" summary="add *.md">
       <created>1564830160076</created>
@@ -104,7 +89,14 @@
       <option name="project" value="LOCAL" />
       <updated>1564830160076</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add *.md">
+      <created>1566568924799</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1566568924799</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
