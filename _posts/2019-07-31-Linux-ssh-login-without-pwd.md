@@ -19,7 +19,8 @@ tags:
 就是A想要连接B免密登录B，需要把A的id_rsa.pub文件内容写进B的authorized_keys里面
 
 1. 生成公钥密钥(此处我默认生成在/home/brook/.ssh/目录)
-```text
+```
+
 ssh-keygen -t rsa -P ""
 Generating public/private rsa key pair.
 Enter file in which to save the key (/home/brook/.ssh/id_rsa): 
