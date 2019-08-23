@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_posts/2019-08-04-Diff-apt-get-update-upgrade.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_posts/2019-08-04-Ubuntu-Change-apt-source.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_posts/2019-08-23-Windows-git- access-github.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-08-23-git-access-github-02.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-08-23-git-access-github.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -47,10 +48,14 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\_posts" />
       <recent name="$PROJECT_DIR$/_posts" />
       <recent name="E:\Workspace\tangheng1995.github.io\_posts" />
       <recent name="E:\Workspace\tangheng1995.github.io\img" />
@@ -90,6 +95,7 @@
       <workItem from="1564667148752" duration="13235000" />
       <workItem from="1564822905618" duration="1429000" />
       <workItem from="1564930263433" duration="3586000" />
+      <workItem from="1566567823599" duration="946000" />
     </task>
     <task id="LOCAL-00001" summary="add *.md">
       <created>1564830160076</created>
