@@ -46,10 +46,8 @@ tags: docker centos
 }
 ```
 方法二:
+修改或创建vim /etc/sysconfig/docker
 ```text
-$ cat /etc/sysconfig/docker
-
-# /etc/sysconfig/docker
 OPTIONS='--selinux-enabled \
 --log-driver=journald \
 --signature-verification=false \
@@ -57,11 +55,9 @@ OPTIONS='--selinux-enabled \
 if [ -z "${DOCKER_CERT_PATH}" ]; then
     DOCKER_CERT_PATH=/etc/docker
 fi
-
-##主要是配置这个参数 --registry-mirror ，指向阿里云镜像地址即可。
-
-#重启docker服务
-$ sudo systemctl restart docker
+```
+```text
+sudo systemctl restart docker
 ```
 
 7. 安装docker
