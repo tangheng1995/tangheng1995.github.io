@@ -54,7 +54,7 @@ fastboot boot <recovery_filename>.img
 8. 命令行 `adb reboot`，完成
 
 
-#### Q&A
+#### 五、Q&A
 1. **Q**:WIFI 链接后显示已连接无网络
 **A**: 进入开发者选项 一律不使用`HDCP检查`，确认勾选启用WLAN详细日志记录功能，拨号 `*#*#4636#*#*` , 进入 `Wi-Fi information` --> `Wi-Fi status`,
 能看到wifi的ping主机是www.google.com，国内连不上是正常的，浏览器搜索换下国内网址就可以
@@ -77,5 +77,13 @@ pm enable com.google.android.setupwizard
 ```text
 am start -n com.google.android.setupwizard/.SetupWizardTestActivity
 ```
+
+3. **Q**:去掉lineageos wifi叉号
+**A**:
+```text
+adb shell "settings put global captive_portal_http_url http://captive.lineageos.org.cn/generate_204";
+adb shell "settings put global captive_portal_https_url https://captive.lineageos.org.cn/generate_204";
+```
+然后打开飞行模式，关闭飞行模式，即可去掉叉号或叹号
 
 
