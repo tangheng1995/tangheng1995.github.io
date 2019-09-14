@@ -28,11 +28,19 @@ sudo apt install apt-transport-https ca-certificates curl software-properties-co
 
 添加GPG key 官方仓库公钥
 ```text
+# 国内源
+curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+
+# 官方源
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 ```
 
 添加Docker仓库到apt源：
 ```text
+# 国内源
+sudo add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+
+# 官方源
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 ```
 
@@ -80,7 +88,15 @@ Output
            └─10113 docker-containerd --config /var/run/docker/containerd/containerd.toml
 ```
 
-#### 二、安装Portainer
+#### 二、脚本自动安装
+Docker 官方为了简化安装流程，提供了一套便捷的安装脚本，Ubuntu 系统上可以使用这套脚本安装：
+```text
+curl -fsSL get.docker.com -o get-docker.sh
+
+sudo sh get-docker.sh --mirror Aliyun
+```
+
+#### 三、安装Portainer
 
 创建卷：
 ```text
