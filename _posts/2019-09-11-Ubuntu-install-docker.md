@@ -96,7 +96,32 @@ curl -fsSL get.docker.com -o get-docker.sh
 sudo sh get-docker.sh --mirror Aliyun
 ```
 
-#### 三、安装Portainer
+#### 三、镜像加速
+```text
+{
+  "registry-mirrors": [
+    "https://dockerhub.azk8s.cn",
+    "https://reg-mirror.qiniu.com"
+  ]
+}
+```
+```text
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+检查镜像是否生效：
+```text
+docker info
+```
+从结果中看到了如下内容，说明配置成功
+```text
+Registry Mirrors:
+  https://dockerhub.azk8s.cn/
+  https://reg-mirror.qiniu.com/
+```
+
+#### 四、安装Portainer
 
 创建卷：
 ```text
@@ -110,6 +135,6 @@ docker run -d -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.
 
 访问端口9000，进入Portainer配置页面
 
-#### 三、扩展
+#### 五、扩展
 Ubuntu18.04安装docker参考文档：[How To Install and Use Docker on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
 Portainer安装参考文档：[How simple is it to deploy Portainer?](https://www.portainer.io/installation/
