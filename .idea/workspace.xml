@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/_posts/2019-09-26-Ubuntu-install-k8s.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_posts/2019-09-11-Ubuntu-install-docker.md" beforeDir="false" afterPath="$PROJECT_DIR$/_posts/2019-09-11-Ubuntu-install-docker.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,22 +30,22 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ansible" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/_posts" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\_posts" />
+      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img" />
       <recent name="$PROJECT_DIR$/_posts" />
       <recent name="E:\Workspace\tangheng1995.github.io\_posts" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -86,7 +86,7 @@
       <workItem from="1567916472803" duration="6146000" />
       <workItem from="1568207533550" duration="4587000" />
       <workItem from="1568353062370" duration="6606000" />
-      <workItem from="1569411463446" duration="1160000" />
+      <workItem from="1569411463446" duration="2270000" />
     </task>
     <task id="LOCAL-00001" summary="add *.md">
       <created>1564830160076</created>
@@ -172,7 +172,14 @@
       <option name="project" value="LOCAL" />
       <updated>1569411995802</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="update *.md">
+      <created>1569420640179</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1569420640179</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
