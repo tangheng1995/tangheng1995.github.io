@@ -98,6 +98,7 @@ sudo sh get-docker.sh --mirror Aliyun
 
 #### 三、镜像加速
 ```text
+修改 /etc/docker/daemon.json 文件
 {
   "registry-mirrors": [
     "https://dockerhub.azk8s.cn",
