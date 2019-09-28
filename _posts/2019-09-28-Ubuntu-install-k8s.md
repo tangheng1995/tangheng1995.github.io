@@ -43,7 +43,7 @@ minikube start
 ```text
 minikube start --vm-driver=none
 ```
-![]()
+![](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-09-28-minilube-start.png?raw=true)
 
 #### 三、启动镜像
 ```text
@@ -151,4 +151,4 @@ External Traffic Policy:  Cluster
 Events:                   <none>
 ```
 
-![]()
+![](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-09-28-kubia-run.png?raw=true)
