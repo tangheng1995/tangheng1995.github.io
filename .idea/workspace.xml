@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_posts/2019-09-28-Ubuntu-install-k8s.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-09-28-kubia-pod.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-09-28-kubia-run.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/in-post/post-js-version/2019-09-28-minilube-start.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_posts/2019-10-01-Ubuntu-install-k8s-cluster.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_posts/2019-09-26-Ubuntu-install-k8s.md" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,15 +37,15 @@
     <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\_posts" />
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
       <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img" />
       <recent name="$PROJECT_DIR$/_posts" />
       <recent name="E:\Workspace\tangheng1995.github.io\_posts" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\WorkSpace\PycharmProject\tangheng1995.github.io\img\in-post\post-js-version" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -91,7 +87,9 @@
       <workItem from="1568207533550" duration="4587000" />
       <workItem from="1568353062370" duration="6606000" />
       <workItem from="1569411463446" duration="2270000" />
-      <workItem from="1569611267177" duration="7747000" />
+      <workItem from="1569611267177" duration="9588000" />
+      <workItem from="1569916282977" duration="3798000" />
+      <workItem from="1569994959685" duration="15454000" />
     </task>
     <task id="LOCAL-00001" summary="add *.md">
       <created>1564830160076</created>
@@ -184,7 +182,14 @@
       <option name="project" value="LOCAL" />
       <updated>1569420640179</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="update *.md">
+      <created>1569679806798</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1569679806798</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
