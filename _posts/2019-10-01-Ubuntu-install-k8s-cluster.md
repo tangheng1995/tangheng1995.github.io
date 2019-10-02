@@ -10,10 +10,10 @@ tags:
     - k8s
 ---
 
-### Ubuntu 安装k8s集群
+## Ubuntu 安装k8s集群
 
-#### 一、环境准备
-- docker环境
+### 一、环境准备
+#### docker环境
 ```text
 curl -fsSL get.docker.com -o get-docker.sh
 
@@ -36,7 +36,7 @@ vim /etc/docker/daemon.json
 ```text
 sudo systemctl daemon-reload && sudo systemctl restart docker
 ```
-- k8s环境
+#### k8s环境
 ```text
 apt-get update && apt-get upgrade && apt-get install -y apt-transport-https
 curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
@@ -50,6 +50,7 @@ apt-get install -y kubelet kubeadm kubectl
 ```
 
 > 官方源：
+
 ```text
 sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
 sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
@@ -133,6 +134,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 > 因为用的kubuctl版本是v1.16.0，所以这里kube-flannel.yml需要修改一个值
+
+
 ```text
 # 下载 kube-flannel.yml
 wget https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
@@ -162,8 +165,8 @@ mkdir -p $HOME/.kube
 vim mkdir -p $HOME/.kube/config
 ```
 
-### 扩展
-- CentOS / RHEL / Fedora 配置k8s环境
+### 七、扩展
+#### CentOS / RHEL / Fedora 配置k8s环境
 ```text
 sudo bash -c 'cat << EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
@@ -179,7 +182,7 @@ sudo yum install -y kubelet kubeadm kubectl && \
 sudo systemctl enable kubelet && sudo systemctl start kubelet
 ```
 
-- 报错一：
+#### 报错一：
 ```text
 # 执行kubeadm reset后，重新kubeadm init
 kubectl get nodes 

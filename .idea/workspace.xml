@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="773adc5b-ca30-483f-a917-1be7eb6846d3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_posts/2019-10-01-Ubuntu-install-k8s-cluster.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_posts/2019-10-01-Ubuntu-install-k8s-cluster.md" beforeDir="false" afterPath="$PROJECT_DIR$/_posts/2019-10-01-Ubuntu-install-k8s-cluster.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -89,7 +89,7 @@
       <workItem from="1569411463446" duration="2270000" />
       <workItem from="1569611267177" duration="9588000" />
       <workItem from="1569916282977" duration="3798000" />
-      <workItem from="1569994959685" duration="15454000" />
+      <workItem from="1569994959685" duration="15952000" />
     </task>
     <task id="LOCAL-00001" summary="add *.md">
       <created>1564830160076</created>
@@ -189,7 +189,14 @@
       <option name="project" value="LOCAL" />
       <updated>1569679806798</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="update *.md">
+      <created>1570028444895</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1570028444895</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
