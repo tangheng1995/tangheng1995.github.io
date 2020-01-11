@@ -38,7 +38,6 @@ tags: VPN
 * [谷歌镜像网址6](http://www.searx.cn/)
 * 基于 searx 元搜索引擎，搜索结果来自谷歌
 
-
 ## 谷歌学术镜像
 
 * [谷歌学术镜像网站1](https://scholar.fdwwr.cn/)

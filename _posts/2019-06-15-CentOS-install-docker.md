@@ -33,6 +33,7 @@ tags: docker centos
 
 6. 更换镜像源，修改或创建vim /etc/docker/daemon.json文件：vim /etc/docker/daemon.json
 方法一:
+
 ```text
 {
     "registry-mirrors": [
@@ -45,8 +46,10 @@ tags: docker centos
     "dns": ["8.8.8.8","8.8.4.4"]
 }
 ```
+
 方法二:
 修改或创建vim /etc/sysconfig/docker
+
 ```text
 OPTIONS='--selinux-enabled \
 --log-driver=journald \
@@ -56,25 +59,21 @@ if [ -z "${DOCKER_CERT_PATH}" ]; then
     DOCKER_CERT_PATH=/etc/docker
 fi
 ```
+
 ```text
 sudo systemctl restart docker
 ```
 
 7. 安装docker
 
-   `sudo yum install docker-ce `
+   ```sudo yum install docker-ce```
 
 8. 启动并加入开机启动
 
-   `systemctl start docker`
+   ```systemctl start docker
 
-   `systemctl enable docker`
+        systemctl enable docker```
 
 9. 验证安装是否成功(有client和service两部分表示docker安装启动都成功了)
 
-   `docker version`
-
-   
-
-   
-
+   ```docker version```
