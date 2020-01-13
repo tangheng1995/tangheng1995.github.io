@@ -6,7 +6,7 @@ email: 347420070@qq.com
 description: "简单 乐观 爱创造"
 keyword: ""
 url: "https://blog.heygolang.cn"              # your host, for absolute URL
-baseurl: "https://blog.heygolang.cn"         # for example, '/blog' if your blog hosted on 'host/blog'
+baseurl: ""         # for example, '/blog' if your blog hosted on 'host/blog'
 
 
 
