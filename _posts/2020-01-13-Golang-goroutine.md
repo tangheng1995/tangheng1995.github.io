@@ -49,7 +49,7 @@ cpu切换多个进程的时候，会花费不少的时间，因为切换进程�
 
 groutine能拥有强大的并发实现是通过GPM调度模型实现，下面就来解释下goroutine的调度模型。
 
-![模型]()
+![模型](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-our-cast.jpg?raw=true)
 
 Go的调度器内部有四个重要的结构：M，P，S，Sched，如上图所示（Sched未给出）
 M:M代表内核级线程，一个M就是一个线程，goroutine就是跑在M之上的；M是一个很大的结构，里面维护小对象内存cache（mcache）、当前执行的goroutine、随机数发生器等等非常多的信息
@@ -58,7 +58,7 @@ P:P全称是Processor，处理器，它的主要用途就是用来执行goroutin
 
 ##### 调度实现
 
-![实现]()
+![实现](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-in-motion.jpg?raw=true)
 
 从上图中看，有2个物理线程M，每一个M都拥有一个处理器P，每一个也都有一个正在运行的goroutine。
 P的数量可以通过GOMAXPROCS()来设置，它其实也就代表了真正的并发度，即有多少个goroutine可以同时运行。
@@ -68,12 +68,12 @@ goroutine，在下一个调度点，就从runqueue中取出（如何决定取哪
  
 当一个OS线程M0陷入阻塞时（如下图)，P转而在运行M1，图中的M1可能是正被创建，或者从线程缓存中取出。
 
-！[阻塞]()
+！[阻塞](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-syscall.jpg?raw=true)
 
 当MO返回时，它必须尝试取得一个P来运行goroutine，一般情况下，它会从其他的OS线程那里拿一个P过来，
 如果没有拿到的话，它就把goroutine放在一个global runqueue里，然后自己睡眠（放入线程缓存里）。所有的P也会周期性的检查global runqueue并运行其中的goroutine，否则global runqueue上的goroutine永远无法执行。   另一种情况是P所分配的任务G很快就执行完了（分配不均），这就导致了这个处理器P很忙，但是其他的P还有任务，此时如果global runqueue没有任务G了，那么P不得不从其他的P里拿一些G来执行。一般来说，如果P从其他的P那里要拿任务的话，一般就拿run queue的一半，这就确保了每个OS线程都能充分的使用，如下图：
 
-![图4]()
+![图4](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-steal.jpg?raw=true)
 
 #### 三、使用goroutine
 
