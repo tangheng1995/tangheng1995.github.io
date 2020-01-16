@@ -118,7 +118,7 @@ main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 
 显示了0xc00006df48代表第一个参数[]string的指针，0x2代表slice长度，0x4代表容量。这三个值代表第一个参数。
 
-![图一]()
+![图一](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-10-04-1.png?raw=true)
 
 ```text
 // String parameter value
@@ -134,7 +134,7 @@ main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 
 显示堆栈跟踪信息中的第4个和第5个参数代表字符串的参数。0x4abd9e是指向这个字符串底层数组的指针，0x5是"hello"字符串的长度，他们俩作为第二个参数。
 
-![图二]()
+![图二](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-10-04-2.png?raw=true)
 
 第三个参数是一个整数，它是一个简单的word值
 
@@ -151,7 +151,7 @@ main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 
 显示堆栈中的最后一个参数就是Example声明中的第三个参数，它的值是0xa，也就是整数10。
 
-![图三]()
+![图三](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-10-04-3.png?raw=true)
 
 ##### Methods
 
