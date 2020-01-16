@@ -29,7 +29,7 @@ tags:
 
 // 可传数字、字符串等类型
 def sum(a, b):
-	print(a + b)
+ 	print(a + b)
 	
 if __name__ == "__main__":
 	a, b = "1", "2"
@@ -54,7 +54,7 @@ import "fmt"
 
 //只能传入int类型
 func sum(a, b int){
-	fmt.Println(a + b)
+ 	fmt.Println(a + b)
 }
 
 func main() {

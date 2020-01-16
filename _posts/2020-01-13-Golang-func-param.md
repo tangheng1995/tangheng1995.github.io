@@ -100,6 +100,23 @@ func main() {
 
 和其他语言不同的是，go语言在将数组名作为函数参数的时候，参数传递即是对数组的复制。在形参中对数组元素的修改都不会影响到数组元素原来的值。这个和上面的类似，就不贴代码了，有兴趣的自行编写代码测试下吧。
 
+```text
+package main
+import (
+    "fmt"
+)
+func function(s1 [5]int) {
+    fmt.Printf("%T,%p \n", s1, &s1)  //[5]int,0xc4200140c0
+    s1[0] += 100
+}
+func main() {
+    var a = [5]int{1, 2, 3, 4, 5}
+    fmt.Printf("%T,%p \n", a, &a)    //[5]int,0xc420014060
+    function(a)
+    fmt.Println(a[0])               //1
+}
+```
+
 #### 5、slice作为函数参数
 
 在使用slice作为函数参数时，进行参数传递将是一个地址拷贝，即将底层数组的内存地址复制给参数slice。这时，对slice元素的操作就是对底层数组元素的操作。例如：
@@ -149,3 +166,29 @@ func main() {
 运行结果：11
 
 函数sum作为函数function的形参，而变量f是一个函数类型，作为function（）调用时的实参。
+
+#### 7、管道作为参数
+
+在使用channel作为函数参数时，进行参数传递将是一个地址拷贝，即将内存地址复制给参数ch。例如：
+
+```text
+package main
+
+import "fmt"
+
+func function(ch chan int) {
+    fmt.Printf("写入 %p\n", ch)  //写入 0xc000054070
+    ch <- 1
+    fmt.Println("写入 1")    //1
+}
+
+func main() {
+    ch := make(chan int, 1) //这里就是创建了一个channel，缓冲管道
+
+    go function(ch)
+
+    fmt.Printf("读出 %p\n", ch)   //读出 0xc000054070
+    fmt.Println("读出", <-ch)    //1
+}
+
+```
