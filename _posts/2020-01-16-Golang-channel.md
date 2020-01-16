@@ -62,7 +62,7 @@ func main(){
 
 先创建了一个匿名函数的子go程，和main的主go程一起争夺cpu，但是我们在里面创建了一个管道，无缓冲管道有一个规则那就是必须读写同时操作才会有效果，所以上述输出是成对出现，如果只进行读或者只进行写那么会被阻塞，被暂时停顿等待另外一方的操作，在这里我们定义了一个容量为0的通道，这就是无缓冲通道，如下图
 
-![无缓冲channel]()
+![无缓冲channel](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-16-1.png?raw=true)
 
 无缓冲通道就是这样，一次只能传输一个数据
 总结一下就是无缓冲特性：
@@ -113,7 +113,7 @@ func main(){
 
 ```
 
-![有缓冲channel]()
+![有缓冲channel](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-16-2.png?raw=true)
 
 在第 1 步，右侧的 goroutine 正在从通道接收一个值。
 在第 2 步，右侧的这个 goroutine独立完成了接收值的动作，而左侧的 goroutine 正在发送一个新值到通道里。
