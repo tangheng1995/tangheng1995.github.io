@@ -48,3 +48,8 @@ tags:
 行级锁：可以最大程度的支持并发处理，同时锁的开销比表级锁要大。目前innodb和其他的存储引擎中实现了行级锁，行级锁只在存储引擎中进行实现，而mysql服务层并没有实现。
 
 > [参考：MySQL常用存储引擎之Innodb](https://segmentfault.com/a/1190000015468361)
+
+#### 引用
+
+- [1] [事务的概念](https://hit-alibaba.github.io/interview/Server/db/Transaction.html)
+- [2] [MySQL常用存储引擎之Innodb](https://segmentfault.com/a/1190000015468361)

@@ -361,7 +361,7 @@ func main() {
 
 Go 编译器自行决定变量分配在堆栈或堆上，以保证程序的正确性。
 
-参考：
+#### 引用
 
-[1] [Stack Traces In Go](https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html)
-[2] [Go堆栈的理解](https://segmentfault.com/a/1190000017498101)
+- [1] [Stack Traces In Go](https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html)
+- [2] [Go堆栈的理解](https://segmentfault.com/a/1190000017498101)

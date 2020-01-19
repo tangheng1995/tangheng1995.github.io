@@ -640,7 +640,7 @@ requets 3 2018-07-06 10:17:37.980869517 +0800 CST m=+3.004544250
 requets 4 2018-07-06 10:17:38.976868836 +0800 CST m=+4.000533569
 ```
 
-#### 参考
+#### 引用
 
-[1] [参考：知乎Yi Wang的回答](https://www.zhihu.com/question/20862617/answer/27964865)
-[2] [参考：Goroutine 浅析](https://zhuanlan.zhihu.com/p/22297799)
+- [1] [知乎Yi Wang的回答](https://www.zhihu.com/question/20862617/answer/27964865)
+- [2] [Goroutine 浅析](https://zhuanlan.zhihu.com/p/22297799)
