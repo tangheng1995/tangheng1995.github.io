@@ -54,20 +54,35 @@ groutine能拥有强大的并发实现是通过GPM调度模型实现，下面就
 ![模型](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-our-cast.jpg?raw=true)
 
 Go的调度器内部有四个重要的结构：M，P，S，Sched，如上图所示（Sched未给出）
-M:M代表内核级线程，一个M就是一个线程，goroutine就是跑在M之上的；M是一个很大的结构，里面维护小对象内存cache（mcache）、当前执行的goroutine、随机数发生器等等非常多的信息
-G:代表一个goroutine，它有自己的栈，instruction pointer和其他信息（正在等待的channel等等），用于调度。
-P:P全称是Processor，处理器，它的主要用途就是用来执行goroutine的，所以它也维护了一个goroutine队列，里面存储了所有需要它来执行的goroutine Sched：代表调度器，它维护有存储M和G的队列以及调度器的一些状态信息等。 
+
+> M代表系统线程，G代表goroutine，P代表处理器，上下文(可理解为context)，Sched存储闲置未使用的P
+
+- M:M代表内核级线程，一个M就是一个线程，goroutine就是跑在M之上的；M是一个很大的结构，里面维护小对象内存cache（mcache）、当前执行的goroutine、随机数发生器等等非常多的信息
+
+- G:代表一个goroutine，它有自己的栈，instruction pointer和其他信息（正在等待的channel等等），用于调度。
+
+- P:P全称是Processor，处理器，它的主要用途就是用来执行goroutine的，所以它也维护了一个goroutine队列，里面存储了所有需要它来执行的goroutine Sched：代表调度器，它维护有存储M和G的队列以及调度器的一些状态信息等。
+
+> 为什么要Go调度器？
+> 用户空间线程和内核空间线程之间的映射关系有：N:1,1:1和M:N
+> N:1是说，多个（N）用户线程始终在一个内核线程上跑，context上下文切换确实很快，但是无法真正的利用多核。
+> 1：1是说，一个用户线程就只在一个内核线程上跑，这时可以利用多核，但是上下文switch很慢。M:N是说， 多个goroutine在多个内核线程上跑，这个看似可以集齐上面两者的优势，但是无疑增加了调度的难度。
+> [参考：知乎Yi Wang的回答](https://www.zhihu.com/question/20862617/answer/27964865)
 
 ##### 调度实现
 
 ![实现](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-in-motion.jpg?raw=true)
 
 从上图中看，有2个物理线程M，每一个M都拥有一个处理器P，每一个也都有一个正在运行的goroutine。
-P的数量可以通过GOMAXPROCS()来设置，它其实也就代表了真正的并发度，即有多少个goroutine可以同时运行。
-图中灰色的那些goroutine并没有运行，而是出于ready的就绪态，正在等待被调度。P维护着这个队列（称之为runqueue），
+
+P的数量可以通过GOMAXPROCS()来设置，它其实也就代表了真正的并发度，即有多少个goroutine可以同时运行。P的最大为256个，即默认最大处理器为256核
+
+图中灰色的那些goroutine并没有运行，而是出于ready的就绪态，正在等待被调度。P维护着这个队列（称之为runqueue）
+
 Go语言里，启动一个goroutine很容易：go function 就行，所以每有一个go语句被执行，runqueue队列就在其末尾加入一个
+
 goroutine，在下一个调度点，就从runqueue中取出（如何决定取哪个goroutine？）一个goroutine执行。
- 
+
 当一个OS线程M0陷入阻塞时（如下图)，P转而在运行M1，图中的M1可能是正被创建，或者从线程缓存中取出。
 
 ![阻塞](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-syscall.jpg?raw=true)
@@ -76,6 +91,11 @@ goroutine，在下一个调度点，就从runqueue中取出（如何决定取哪
 如果没有拿到的话，它就把goroutine放在一个global runqueue里，然后自己睡眠（放入线程缓存里）。所有的P也会周期性的检查global runqueue并运行其中的goroutine，否则global runqueue上的goroutine永远无法执行。   另一种情况是P所分配的任务G很快就执行完了（分配不均），这就导致了这个处理器P很忙，但是其他的P还有任务，此时如果global runqueue没有任务G了，那么P不得不从其他的P里拿一些G来执行。一般来说，如果P从其他的P那里要拿任务的话，一般就拿run queue的一半，这就确保了每个OS线程都能充分的使用，如下图：
 
 ![图4](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-steal.jpg?raw=true)
+
+> goroutine在 system call 和 channel call 发生阻塞时，有不同处理方式：
+> 当程序发起system call时，M会发生阻塞，同时唤起(或创建)一个新的M继续执行其他的G
+> 当程序发起channel call时，程序可能会发生阻塞，但是不会阻塞M，G的状态会设置为waiting，M继续执行其他的G。当G调用完成，会有一个可用的M继续执行它
+> [参考：Goroutine 浅析](https://zhuanlan.zhihu.com/p/22297799)
 
 #### 三、使用goroutine
 
