@@ -363,5 +363,5 @@ Go 编译器自行决定变量分配在堆栈或堆上，以保证程序的正�
 
 参考：
 
-[1]: <https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html> Stack Traces In Go
-[2]: <https://segmentfault.com/a/1190000017498101> Go堆栈的理解
+[1] [Stack Traces In Go](https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html)
+[2] [Go堆栈的理解](https://segmentfault.com/a/1190000017498101)

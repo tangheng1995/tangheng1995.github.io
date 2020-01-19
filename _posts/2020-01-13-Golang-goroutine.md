@@ -63,11 +63,12 @@ Go的调度器内部有四个重要的结构：M，P，S，Sched，如上图所�
 
 - P:P全称是Processor，处理器，它的主要用途就是用来执行goroutine的，所以它也维护了一个goroutine队列，里面存储了所有需要它来执行的goroutine Sched：代表调度器，它维护有存储M和G的队列以及调度器的一些状态信息等。
 
-> 为什么要Go调度器？
-> 用户空间线程和内核空间线程之间的映射关系有：N:1,1:1和M:N
-> N:1是说，多个（N）用户线程始终在一个内核线程上跑，context上下文切换确实很快，但是无法真正的利用多核。
-> 1：1是说，一个用户线程就只在一个内核线程上跑，这时可以利用多核，但是上下文switch很慢。M:N是说， 多个goroutine在多个内核线程上跑，这个看似可以集齐上面两者的优势，但是无疑增加了调度的难度。
-> [参考：知乎Yi Wang的回答](https://www.zhihu.com/question/20862617/answer/27964865)
+为什么要Go调度器？
+
+用户空间线程和内核空间线程之间的映射关系有：N:1,1:1和M:N
+N:1是说，多个（N）用户线程始终在一个内核线程上跑，context上下文切换确实很快，但是无法真正的利用多核。
+1：1是说，一个用户线程就只在一个内核线程上跑，这时可以利用多核，但是上下文switch很慢。
+M:N是说， 多个goroutine在多个内核线程上跑，这个看似可以集齐上面两者的优势，但是无疑增加了调度的难度。
 
 ##### 调度实现
 
@@ -92,10 +93,10 @@ goroutine，在下一个调度点，就从runqueue中取出（如何决定取哪
 
 ![图4](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-01-13-steal.jpg?raw=true)
 
-> goroutine在 system call 和 channel call 发生阻塞时，有不同处理方式：
-> 当程序发起system call时，M会发生阻塞，同时唤起(或创建)一个新的M继续执行其他的G
-> 当程序发起channel call时，程序可能会发生阻塞，但是不会阻塞M，G的状态会设置为waiting，M继续执行其他的G。当G调用完成，会有一个可用的M继续执行它
-> [参考：Goroutine 浅析](https://zhuanlan.zhihu.com/p/22297799)
+goroutine在 system call 和 channel call 发生阻塞时，有不同处理方式：
+
+当程序发起system call时，M会发生阻塞，同时唤起(或创建)一个新的M继续执行其他的G
+当程序发起channel call时，程序可能会发生阻塞，但是不会阻塞M，G的状态会设置为waiting，M继续执行其他的G。当G调用完成，会有一个可用的M继续执行它
 
 #### 三、使用goroutine
 
@@ -638,3 +639,8 @@ requets 2 2018-07-06 10:17:36.978123472 +0800 CST m=+2.001798205
 requets 3 2018-07-06 10:17:37.980869517 +0800 CST m=+3.004544250
 requets 4 2018-07-06 10:17:38.976868836 +0800 CST m=+4.000533569
 ```
+
+#### 参考
+
+[1] [参考：知乎Yi Wang的回答](https://www.zhihu.com/question/20862617/answer/27964865)
+[2] [参考：Goroutine 浅析](https://zhuanlan.zhihu.com/p/22297799)
