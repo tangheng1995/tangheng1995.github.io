@@ -1,11 +1,11 @@
 ---
 layout: post
-title: '科学上网，VPN'
+title: '科学上网工具'
 subtitle: '科学上网'
 date: 2019-06-15
 author: Archer
 categories: 工具
-tags: VPN
+tags: vpn
 ---
 
 分享一个谷歌浏览器的镜像，不用繁琐的VPS配置，点击即可实现科学上网；

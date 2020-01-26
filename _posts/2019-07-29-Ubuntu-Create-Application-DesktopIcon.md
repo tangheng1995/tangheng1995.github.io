@@ -7,7 +7,7 @@ author:     "Archer"
 categories: golang
 tags:
     - golang
-    - IDE
+    - ide
 ---
 
 ### Ubuntu创建应用桌面快捷图标

@@ -6,7 +6,7 @@ date:       2019-08-04 12:00:00
 author:     "Archer"
 categories: Ubuntu
 tags:
-    - Ubuntu
+    - ubuntu
     - apt
 ---
 
