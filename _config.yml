@@ -5,7 +5,7 @@ header-img: img/home-bg.jpg
 email: 347420070@qq.com
 description: "简单 乐观 爱创造"
 keyword: ""
-url: "https://blog.heygolang.cn"              # your host, for absolute URL
+url: "https://importpkg.com"              # your host, for absolute URL
 baseurl: ""         # for example, '/blog' if your blog hosted on 'host/blog'
 
 
@@ -15,8 +15,8 @@ RSS: false
 #weibo_username:     saymololy
 zhihu_username:     saymololy
 github_username:    tangheng1995
-#twitter_username:  huxpro
-#facebook_username:  huxpro
+#twitter_username:  saymololy
+#facebook_username:  saymololy
 
 
 
