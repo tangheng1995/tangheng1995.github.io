@@ -18,6 +18,22 @@ tags:
 
 我们在mysql中常用两种索引算法BTree和Hash，两种算法检索方式不一样，对查询的作用也不一样。
 
+Mysql索引主要有两种结构：B+树和hash.
+
+hash:hash索引在mysql比较少用,他以把数据的索引以hash形式组织起来,因此当查找某一条记录的时候,速度非常快.当时因为是hash结构,每个键只对应一个值,而且是散列的方式分布.所以他并不支持范围查找和排序等功能.
+
+B+树:b+tree是mysql使用最频繁的一个索引数据结构,数据结构以平衡树的形式来组织,因为是树型结构,所以更适合用来处理排序,范围查找等功能.相对hash索引,B+树在查找单条记录的速度虽然比不上hash索引,但是因为更适合排序等操作,所以他更受用户的欢迎.毕竟不可能只对数据库进行单条记录的操作.
+
+Mysql自动使用索引规则：
+
+btree索引
+
+当使用 <，<=，=，>=，>，BETWEEN，IN，!=或者<>，以及某些时候的LIKE才会使用btree索引，因为在以通配符%和_开头作查询时，MySQL不会使用索引。btree索引能用于加速ORDER BY操作
+
+hash索引
+
+当使用=，<=>，IN，IS NULL或者IS NOT NULL操作符时才会使用hash索引，并且不能用于加速ORDER BY操作，并且条件值必须是索引列查找某行该列的整个值
+
 #### BTree
 
 BTree索引是最常用的mysql数据库索引算法，因为它不仅可以被用在=,>,>=,<,<=和between这些比较操作符上，而且还可以用于like操作符，只要它的查询条件是一个不以通配符开头的常量，例如：
@@ -63,29 +79,41 @@ Hash索引遇到大量Hash值相等的情况后性能并不一定会比BTree高
 3. 对于btree支持的联合索引的最优前缀，hash也是无法支持的，联合索引中的字段要么全用要么全不用。提起最优前缀居然都泛起迷糊了，看来有时候放空得太厉害；
 4. hash不支持索引排序，索引值和计算出来的hash值大小并不一定一致。
 
-Mysql索引主要有两种结构：B+树和hash.
-
-hash:hsah索引在mysql比较少用,他以把数据的索引以hash形式组织起来,因此当查找某一条记录的时候,速度非常快.当时因为是hash结构,每个键只对应一个值,而且是散列的方式分布.所以他并不支持范围查找和排序等功能.
-
-B+树:b+tree是mysql使用最频繁的一个索引数据结构,数据结构以平衡树的形式来组织,因为是树型结构,所以更适合用来处理排序,范围查找等功能.相对hash索引,B+树在查找单条记录的速度虽然比不上hash索引,但是因为更适合排序等操作,所以他更受用户的欢迎.毕竟不可能只对数据库进行单条记录的操作. 
-
 Mysql常见索引有：主键索引、唯一索引、普通索引、全文索引、组合索引
 
-PRIMARY KEY（主键索引）  ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` ) UNIQUE(唯一索引)     ALTER TABLE `table_name` ADD UNIQUE (`column`)
-INDEX(普通索引)     ALTER TABLE `table_name` ADD INDEX index_name ( `column` ) FULLTEXT(全文索引)      ALTER TABLE `table_name` ADD FULLTEXT ( `column` )
-组合索引   ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` ) 
+PRIMARY KEY（主键索引）  
+
+```text
+ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` )
+```
+
+UNIQUE(唯一索引)
+
+```text
+ALTER TABLE `table_name` ADD UNIQUE (`column`)
+```
+
+INDEX(普通索引)
+
+```text
+ALTER TABLE `table_name` ADD INDEX index_name ( `column` )
+```
+
+FULLTEXT(全文索引)
+
+```text
+ALTER TABLE `table_name` ADD FULLTEXT ( `column` )
+```
+
+组合索引
+
+```text
+ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+```
 
 Mysql各种索引区别：
 普通索引：最基本的索引，没有任何限制
 唯一索引：与"普通索引"类似，不同的就是：索引列的值必须唯一，但允许有空值。
-主键索引：它 是一种特殊的唯一索引，不允许有空值。 
+主键索引：它 是一种特殊的唯一索引，不允许有空值。
 全文索引：仅可用于 MyISAM 表，针对较大的数据，生成全文索引很耗时好空间。
 组合索引：为了更多的提高mysql效率可建立组合索引，遵循”最左前缀“原则。
-
-Mysql自动使用索引规则：
-btree索引
-当使用 <，<=，=，>=，>，BETWEEN，IN，!=或者<>，以及某些时候的LIKE才会使用btree索引，因为在以通配符%和_开头作查询时，MySQL不会使用索引。btree索引能用于加速ORDER BY操作
-hash索引
-当使用=，<=>，IN，IS NULL或者IS NOT NULL操作符时才会使用hash索引，并且不能用于加速ORDER BY操作，并且条件值必须是索引列查找某行该列的整个值
-
-#### 引用
