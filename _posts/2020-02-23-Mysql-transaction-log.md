@@ -45,7 +45,7 @@ redo log 组成：
 
 为了确保每次日志都能写入到事务日志文件中，在每次将log buffer中的日志写入日志文件的过程中都会调用一次操作系统的fsync操作(即fsync()系统调用)。因为MariaDB/MySQL是工作在用户空间的，MariaDB/MySQL的log buffer处于用户空间的内存中。要写入到磁盘上的log file中(redo:ib_logfileN文件,undo:share tablespace或.ibd文件)，中间还要经过操作系统内核空间的os buffer，调用fsync()的作用就是将OS buffer中的日志刷到磁盘上的log file中。
 
-也就是说，从redo log buffer写日志到磁盘的redo log file中，过程如下： 
+也就是说，从redo log buffer写日志到磁盘的redo log file中，过程如下：
 ![redo log buffer](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-02-23-redo-log-buffer.png?raw=true)
 
 MySQL通过 `innodb_flush_log_at_trx_commit` 的值(0，1，2)可以自定义在commit时如何将log buffer中的日志刷log file中
