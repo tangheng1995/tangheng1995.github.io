@@ -122,3 +122,7 @@ Mysql各种索引区别：
 全文索引：仅可用于 MyISAM 表，针对较大的数据，生成全文索引很耗时好空间。
 
 组合索引：为了更多的提高mysql效率可建立组合索引，遵循”最左前缀“原则。
+
+#### 引用
+
+- [1] [mysql索引(btree索引和hash索引的区别)](https://www.cnblogs.com/kenshinobiy/p/4360371.html)
