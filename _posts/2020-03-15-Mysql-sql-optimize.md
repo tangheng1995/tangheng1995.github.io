@@ -92,7 +92,7 @@ set profiling=on
 - show profiles; 能看到Query的SQL、Query_ID、Duration
 - show profiles for query Query_ID; 能查看到SQL执行过程中每个线程的状态和消耗时间
 
-![SQL执行过程的线程状态和消耗时间]()
+![SQL执行过程的线程状态和消耗时间](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-03-15-show-profile-query.png?raw=true)
 
 > Sending data状态表示MySQL线程开始访问数据并行把结果返回给客户端，而不仅仅是返回结果给客户端。由于在Sending data状态下，MySQL线程往往需要做大量的磁盘读取操作，所以经常是整个查询中耗时最长的状态。
 
@@ -124,13 +124,13 @@ ORDER BY
     TR DESC;
 ```
 
-![SQL执行过程详情]()
+![SQL执行过程详情](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-03-15-show-profile-query-detail.png?raw=true)
 
 - 进一步获取all、cpu、block io、context switch、page faults等明细类型来查看MySQL在使用什么资源上耗费了过高的时间，例如，选择查看CPU的耗费时间。
 
 此时可获取到sending data时间主要消耗在CPU上
 
-![SQL执行过程CPU详情]()
+![SQL执行过程CPU详情](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2020-03-15-show-profile-query-cpu.png?raw=true)
 
 > 提示：InnoDB引擎count(*)没有MyISAM执行速度快，就是因为InnoDB引擎经历了Sending data状态，存在访问数据的过程，而MyISAM引擎的表在executing之后直接就结束查询，完全不需要访问数据。
 
