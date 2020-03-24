@@ -49,13 +49,20 @@ Slow_queries：慢查询的次数
 - table：输出结果的表
 - type：表示MySQL在表中找到所需行的方式，或者叫访问类
   常见的有：ALL index range ref eq_ref const,system NULL，从右，性能由最差到最好
+
   type=ALL：全表扫描
+
   type=index：索引全扫描，MySQL遍历整个索引来查询
+
   type=range：索引范围扫描，常见于<、<=、>、 >=、 between
+
   type=ref：使用非唯一索引扫描或唯一索引的前缀扫描，返回匹配某个单独记录
+
   type=eq_ref：类似ref，区别就在使用的索引是唯一索引，对于每个索引键表中只有一条记录匹配，简单来说，就是多表连接中使用primary key unique index作为关联条件
+
   type=const/system：单表中最多有一个匹配行，查询起来非常迅速，一般primary key或者唯一索引unique index进行的查询，通过唯一索引uk_ema访问的时候，类型type为const；而从我们构造的仅有一条记录的a表中检索类型type为system
   type=NULL：MySQL不用访问表或者索引，就能直接得到结果
+  
   类型type还有其他值，如ref_or_null(与ref类似，区别在于条件中包NULL的查询)、index_merge(索引合并优化)、unique_subquery(in的后一个查询主键字段的子查询)、index_subquery(与unique_subquery类似别在于in的后面是查询非唯一索引字段的子查询
 - possible_keys：表示查询时可能使用的索引
 - key：表示实际使用的索引
