@@ -61,8 +61,9 @@ Slow_queries：慢查询的次数
   type=eq_ref：类似ref，区别就在使用的索引是唯一索引，对于每个索引键表中只有一条记录匹配，简单来说，就是多表连接中使用primary key unique index作为关联条件
 
   type=const/system：单表中最多有一个匹配行，查询起来非常迅速，一般primary key或者唯一索引unique index进行的查询，通过唯一索引uk_ema访问的时候，类型type为const；而从我们构造的仅有一条记录的a表中检索类型type为system
-  type=NULL：MySQL不用访问表或者索引，就能直接得到结果
   
+  type=NULL：MySQL不用访问表或者索引，就能直接得到结果
+
   类型type还有其他值，如ref_or_null(与ref类似，区别在于条件中包NULL的查询)、index_merge(索引合并优化)、unique_subquery(in的后一个查询主键字段的子查询)、index_subquery(与unique_subquery类似别在于in的后面是查询非唯一索引字段的子查询
 - possible_keys：表示查询时可能使用的索引
 - key：表示实际使用的索引
