@@ -8,7 +8,6 @@ header-img: ""
 categories: python
 tags:
     - python
-    - type
 ---
 
 ### Python优雅编程-类型校验

@@ -14,19 +14,23 @@ tags:
 ### Ubuntu 安装 docker
 
 #### 一、安装Docker
+
 Ubuntu版本为18.04
 
 更新包
+
 ```text
 sudo apt update
 ```
 
 安装一些必备包，让apt可以使用https
+
 ```text
 sudo apt install apt-transport-https ca-certificates curl software-properties-common
 ```
 
 添加GPG key 官方仓库公钥
+
 ```text
 # 国内源
 curl -fsSL https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
@@ -36,6 +40,7 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 ```
 
 添加Docker仓库到apt源：
+
 ```text
 # 国内源
 sudo add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
@@ -45,16 +50,19 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 ```
 
 从docker最新仓库上更新包：
+
 ```text
 sudo apt update
 ```
 
 确认安装Docker是从最新的docker仓库而不是默认Ubuntu仓库：
+
 ```text
 apt-cache policy docker-ce
 ```
 
 可以看到终端输出结果：
+
 ```text
 docker-ce:
   Installed: (none)
@@ -65,16 +73,19 @@ docker-ce:
 ```
 
 安装docker：
+
 ```text
 sudo apt install docker-ce
 ```
 
 设置开机自启：
+
 ```text
 sudo systemctl status docker
 ```
 
 可以看到终端输出为：
+
 ```text
 Output
 ● docker.service - Docker Application Container Engine
@@ -89,7 +100,9 @@ Output
 ```
 
 #### 二、脚本自动安装
+
 Docker 官方为了简化安装流程，提供了一套便捷的安装脚本，Ubuntu 系统上可以使用这套脚本安装：
+
 ```text
 curl -fsSL get.docker.com -o get-docker.sh
 
@@ -97,6 +110,7 @@ sudo sh get-docker.sh --mirror Aliyun
 ```
 
 #### 三、镜像加速
+
 ```text
 修改 /etc/docker/daemon.json 文件
 {
@@ -106,16 +120,20 @@ sudo sh get-docker.sh --mirror Aliyun
   ]
 }
 ```
+
 ```text
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
 检查镜像是否生效：
+
 ```text
 docker info
 ```
+
 从结果中看到了如下内容，说明配置成功
+
 ```text
 Registry Mirrors:
   https://dockerhub.azk8s.cn/
@@ -125,11 +143,13 @@ Registry Mirrors:
 #### 四、安装Portainer
 
 创建卷：
+
 ```text
 docker volume create portainer_data
 ```
 
 运行Portainer容器：
+
 ```text
 docker run -d -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
 ```
@@ -137,5 +157,6 @@ docker run -d -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.
 访问端口9000，进入Portainer配置页面
 
 #### 五、扩展
+
 Ubuntu18.04安装docker参考文档：[How To Install and Use Docker on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
-Portainer安装参考文档：[How simple is it to deploy Portainer?](https://www.portainer.io/installation/
+Portainer安装参考文档：[How simple is it to deploy Portainer?](https://www.portainer.io/installation/)

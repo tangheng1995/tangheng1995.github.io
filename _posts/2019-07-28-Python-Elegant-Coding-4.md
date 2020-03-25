@@ -8,8 +8,6 @@ header-img: ""
 categories: python
 tags:
     - python
-    - for
-    - while
 ---
 
 ### Python优雅编程-优化循环

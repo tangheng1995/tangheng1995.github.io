@@ -11,11 +11,10 @@ tags: redis centos docker
 
 ### CentOS安装Redis docker
 
-
 1. 切换root用户
 
 ```text
-su root 
+su root
 ```
 
 2. 启动docker
@@ -47,4 +46,3 @@ docker pull redis
 ```text
 docker run --name redis -p 6379:6379 --restart=always -v "$PWD/data":/data -d redis redis-server --appendonly yes
 ```
-

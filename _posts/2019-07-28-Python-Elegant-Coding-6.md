@@ -7,7 +7,6 @@ author:     "Archer"
 categories: python
 tags:
     - python
-    - string
 ---
 
 ### Python优雅编程-字符串的格式化

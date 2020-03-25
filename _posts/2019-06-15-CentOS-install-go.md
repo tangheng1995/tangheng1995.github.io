@@ -46,4 +46,3 @@ tags: go centos
 7. 验证go版本
 
    `go version`
-

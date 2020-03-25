@@ -9,7 +9,7 @@ cover: ''
 tags: gitbucket centos
 ---
 
-```
+```text
 Installation
 GitBucket requires Java8. You have to install it, if it is not already installed.
 

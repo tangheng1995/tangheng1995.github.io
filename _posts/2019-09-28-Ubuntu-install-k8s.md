@@ -13,47 +13,62 @@ tags:
 ### Ubuntu 安装 K8S
 
 #### 一、安装kubectl
+
 ```text
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 ```
+
 ```text
 chmod +x ./kubectl
 ```
+
 ```text
 sudo mv ./kubectl /usr/local/bin/
 ```
+
 ```text
 kubectl version
 ```
 
 #### 二、安装 minikube
+
 ```text
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
   && chmod +x minikube
 ```
+
 ```text
 sudo mv ./minikube /usr/local/bin/
 ```
+
 - minikube 启动方法一，运行在虚拟机，这要求当前电脑上要先安装VirtualBox或者KVM：
+
 ```text
 minikube start
 ```
 
 - minikube 启动方法二，运行在宿主机，这种方式不需要在当前电脑安装ViirtualBox或者KVM：
+
 ```text
 minikube start --vm-driver=none
 ```
-![](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-09-28-minilube-start.png?raw=true)
+
+![minikube](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-09-28-minilube-start.png?raw=true)
 
 #### 三、启动镜像
+
 ```text
 sudo kubectl run kubia --image=registry.cn-hongkong.aliyuncs.com/k8s_in_action/kubia:v0.0.1 --port=8080
 ```
+
 因为是minikube创建的集群，所有不能通过LoadBalancer类型暴露外部访问连接
+
 ```text
 sudo kubectl expose deployment kubia --type=NodePort
 ```
+
 查看外部访问连接
+
 ```text
 minikube service --url kubia
 ```
@@ -61,19 +76,26 @@ minikube service --url kubia
 #### 四、deployment，pod，服务如何组合运行的
 
 查看pod
+
 ```text
 sudo kubectl get po
 ```
+
 如下：
+
 ```text
 NAME                     READY   STATUS    RESTARTS   AGE
 kubia-84654c6d97-zxnb8   1/1     Running   0          12h
 ```
+
 查看详情：
+
 ```text
 sudo kubectl describe po kubia-84654c6d97-zxnb8
 ```
+
 如下：
+
 ```text
 Name:         kubia-84654c6d97-zxnb8
 Namespace:    default
@@ -104,10 +126,10 @@ Containers:
       /var/run/secrets/kubernetes.io/serviceaccount from default-token-s6gm6 (ro)
 Conditions:
   Type              Status
-  Initialized       True 
-  Ready             True 
-  ContainersReady   True 
-  PodScheduled      True 
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
 Volumes:
   default-token-s6gm6:
     Type:        Secret (a volume populated by a Secret)
@@ -119,21 +141,29 @@ Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
                  node.kubernetes.io/unreachable:NoExecute for 300s
 Events:          <none>
 ```
+
 查看服务：
+
 ```text
 sudo kubectl get svc
 ```
+
 如下：
+
 ```text
 NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
 kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          39h
 kubia        NodePort    10.106.149.92   <none>        8080:31922/TCP   12h
 ```
+
 查看详情：
+
 ```text
 sudo kubectl describe svc kubia
 ```
+
 如下：
+
 ```text
 Name:                     kubia
 Namespace:                default
@@ -151,4 +181,4 @@ External Traffic Policy:  Cluster
 Events:                   <none>
 ```
 
-![](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-09-28-kubia-run.png?raw=true)
+![kubia-run](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-09-28-kubia-run.png?raw=true)

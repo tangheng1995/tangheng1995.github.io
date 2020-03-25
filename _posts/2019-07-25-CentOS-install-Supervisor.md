@@ -36,13 +36,12 @@ echo_supervisord_conf >/etc/supervisord.conf
 如果使用yum install -y supervisor的命令安装，会生成默认配置/etc/supervisord.conf和目录/etc/supervisord.d，如果没有则自行创建。
 
 supervisord.conf默认配置：
+
 - 加载目录/etc/supervisord.d所有 .ini 文件  
-- supervisord 日志目录 /var/log/supervisor/supervisord.log 
-
-
+- supervisord 日志目录 /var/log/supervisor/supervisord.log
 
 vim /etc/supervisord.conf
- 
+
 ```text
 
 ; Sample supervisor config file.
@@ -177,6 +176,7 @@ files = supervisord.d/*.ini
 ```
 
 ##### 自定义配置supervisord.conf
+
 在/etc/supervisord.d的目录下创建conf和log两个目录，conf用于存放管理进程的配置，log用于存放管理进程的日志。
 
 修改/etc/supervisord.conf的[include]部分，加载配置文件
@@ -195,6 +195,7 @@ logfile=/var/log/supervisor/supervisord.log
 ```
 
 #### 四、配置需要监控的应用
+
 修改/etc/supervisord.conf的[[program:theprogramname]]部分，配置需要被监控的进程
 
 ```text
@@ -331,9 +332,11 @@ supervisorctl status
 ```text
 hello                            RUNNING   pid 23125, uptime 0:01:10
 ```
+
 即监控hello.py进程成功，若hello.py异常退出，Surpervisor可自动启动hello.py进程
 
 #### 六、supervisorctl&supervisord
+
 Supervisord 安装完成后有两个可用的命令行 supervisord 和 supervisorctl，命令使用解释如下：
 
 ##### supervisorctl
@@ -348,6 +351,7 @@ Supervisord 安装完成后有两个可用的命令行 supervisord 和 superviso
 - supervisorctl update，根据最新的配置文件，启动新配置或有改动的进程，配置没有改动的进程不会受影响而重启
 
 ##### supervisord
+
 supervisord，初始启动 Supervisord，启动、管理配置中设置的进程。
 
 ```text
@@ -392,7 +396,7 @@ username=user              ; (default is no username (open server))
 password=123               ; (default is no password (open server))
 ```
 
-修改后重启supervisor进程，在浏览器访问 http://<host-ip>:9001。
+修改后重启supervisor进程，在浏览器访问 `http://<host-ip>:9001`。
 
 修改 vim /etc/nginx/nginx.conf
 
@@ -413,6 +417,6 @@ cd /usr/sbin/
 ./nginx -s reload   # 重新加载配置文件
 ```
 
-访问 http://supervisor.heygolang.cn/ ,结果如下
+访问 `http://supervisor.heygolang.cn/` ,结果如下
 
-![](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-07-25-supervisor.png?raw=true)
+![supervisor](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-07-25-supervisor.png?raw=true)

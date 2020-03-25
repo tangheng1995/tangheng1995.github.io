@@ -7,8 +7,6 @@ author:     "Archer"
 categories: python
 tags:
     - python
-    - list
-    - tuple
 ---
 
 ### Python优雅编程-列表元组常见用法

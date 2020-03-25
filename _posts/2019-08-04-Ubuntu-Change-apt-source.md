@@ -26,9 +26,10 @@ sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak.20190804
 ```text
 lsb_release -c
 ```
+
 ```text
 结果：
-Codename:	bionic
+Codename:bionic
 ```
 
 ```text
@@ -49,6 +50,7 @@ cd /etc/apt/
 sudo > sources.list
 sudo vim sources.list
 ```
+
 ```text
 deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
 
@@ -72,27 +74,32 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted univer
 ```
 
 sources.list文件的条目格式如下：
-```text
 
+```text
 deb http://site.example.com/debian distribution component1 component2 component3
 deb-src http://site.example.com/debian distribution component1 component2 component3
 ```
+
 后面几个参数是对软件包的分类（Ubuntu下是main， restricted，universe ，multiverse这四个），所以也可以编辑如下：
+
 ```text
-deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted 
+deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted
 deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed universe multiverse
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed universe multiverse
 ```
 
 #### 四、更新软件列表和软件包
+
 ```text
-sudo apt-get update 
+sudo apt-get update
 sudo apt-get upgrade
 ```
 
 #### 五、常见问题
+
 1. sudo apt-get update 报错如下：
+
 ```text
 Original exception was:
 Traceback (most recent call last):
@@ -104,8 +111,8 @@ ModuleNotFoundError: No module named 'apt_pkg'
 ```
 
 解决办法：
+
 ```text
 sudo apt-get remove python3-apt
 sudo apt-get install python3-apt
 ```
-

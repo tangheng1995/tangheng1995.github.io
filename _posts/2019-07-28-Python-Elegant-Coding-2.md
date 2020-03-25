@@ -8,7 +8,6 @@ header-img: ""
 categories: python
 tags:
     - python
-    - dict
 ---
 
 ### Python优雅编程-字典

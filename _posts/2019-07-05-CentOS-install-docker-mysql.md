@@ -11,11 +11,10 @@ tags: mysql centos docker
 
 ### CentOS安装Mysql docker
 
-
 1. 切换root用户
 
 ```text
-su root 
+su root
 ```
 
 2. 启动docker

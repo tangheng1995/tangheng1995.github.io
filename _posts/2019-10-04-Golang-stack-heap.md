@@ -146,7 +146,7 @@ Base 16: 0xa
 // Declaration
 main.Example(slice []string, str string, i int)
 // Stack trace
-main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa) 
+main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 ```
 
 显示堆栈中的最后一个参数就是Example声明中的第三个参数，它的值是0xa，也就是整数10。
@@ -286,7 +286,7 @@ go tool compile -S main.go
 输出：
 
 ```text
-[root@localhost example]# go tool compile -S main.go 
+[root@localhost example]# go tool compile -S main.go
 "".main STEXT size=183 args=0x0 locals=0x60
     0x0000 00000 (main.go:5)    TEXT    "".main(SB), $96-0
     0x0000 00000 (main.go:5)    MOVQ    (TLS), CX
@@ -328,7 +328,7 @@ func main() {
 再查看汇编代码
 
 ```text
-[root@localhost example]# go tool compile -S main.go 
+[root@localhost example]# go tool compile -S main.go
 \"".main STEXT size=102 args=0x0 locals=0x28
     0x0000 00000 (main.go:3)    TEXT    "".main(SB), $40-0
     0x0000 00000 (main.go:3)    MOVQ    (TLS), CX

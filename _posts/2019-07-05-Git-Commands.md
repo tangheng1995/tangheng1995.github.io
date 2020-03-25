@@ -24,7 +24,7 @@ tags: git
 
 ```text
 # 在当前目录新建一个Git代码库
-git init 
+git init
 
 # 新建一个目录，将其初始化为Git代码库
 git init [project-name]
@@ -39,7 +39,7 @@ Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置�
 
 ```text
 # 显示当前的Git配置
-git config --list 
+git config --list
 
 # 编辑Git配置文件
 git config -e [--global]
@@ -186,7 +186,7 @@ git checkout -b [branch] [tag]
 git status
 
 # 显示当前分支的版本历史
-git log 
+git log
 
 # 显示commit历史，以及每次commit发生变更的文件
 git log --stat
@@ -291,7 +291,7 @@ git checkout [commit] [file]
 git checkout .
 
 # 重置暂存区的指定文件，与上一次commit保持一致
-git reset --hard 
+git reset --hard
 
 # 重置当前分支的指针为指定commit，同时重置暂存区，但工作区不变
 git reset [commit]

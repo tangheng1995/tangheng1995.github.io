@@ -14,17 +14,18 @@ tags:
 #### 一、/etc/rc.local配置服务启动
 
 **修改rc.local**
-
 systemd 默认读取 /etc/systemd/system 下的文件，该目录下的文件会链接/lib/systemd/system/下的文件。
 
 执行 ls /lib/systemd/system 你可以看到有很多启动脚本，其中就有我们需要的 rc.local.service
 
 修改rc.local.service
+
 ```text
 sudo vim /lib/systemd/system/rc.local.service
 ```
 
 修改后如下：
+
 ```text
 [Unit]
 Description=/etc/rc.local Compatibility
@@ -49,13 +50,14 @@ Alias=rc-local.service
 可以看出，/etc/rc.local 的启动顺序是在网络后面，但是显然它少了 Install 段，也就没有定义如何做到开机启动，所以显然这样配置是无效的。 因此我们就需要在后面帮他加上 [Install] 段。
 
 **创建rc.local脚本**
-
 Ubuntu 18.04 默认没有/etc/rc.local这个文件，需要自己创建
+
 ```text
 sudo vim /etc/rc.local
 ```
 
 创建内容如下：
+
 ```text
 #!/bin/bash
 #
@@ -73,16 +75,18 @@ sudo vim /etc/rc.local
 echo "看到这行字，说明添加自启动脚本成功。" > /usr/local/test.log
 exit 0
 
-nohup python /home/brook/PycharmProjects/flask-hello/hello.py & 
+nohup python /home/brook/PycharmProjects/flask-hello/hello.py &
 
 ```
 
 重载units单元
+
 ```text
 systemctl daemon-reload
 ```
 
 加权限：
+
 ```text
 # 加权限
 sudo chmod +x /etc/rc.local
@@ -91,6 +95,7 @@ sudo chmod +x /etc/rc.local
 前面我们说 systemd 默认读取 /etc/systemd/system 下的配置文件, 所以还需要在 /etc/systemd/system 目录下创建软链接
 
 将服务告知系统自启的命令。
+
 ```text
 # 开启服务
 systemctl enable rc-local
@@ -99,6 +104,7 @@ sudo ln -s '/usr/lib/systemd/system/rc-local' '/etc/systemd/system/multi-user.ta
 ```
 
 启动服务：
+
 ```text
 service rc.local start
 # 或者
@@ -106,6 +112,7 @@ sudo systemctl start rc.local
 ```
 
 启动结果如下：
+
 ```text
 ● rc-local.service - /etc/rc.local Compatibility
    Loaded: loaded (/lib/systemd/system/rc-local.service; enabled; vendor preset: enabled)
@@ -121,20 +128,23 @@ sudo systemctl start rc.local
 ```
 
 检查启动服务的日志,有打印内容即可：
+
 ```text
 cat /usr/local/test.log
 ```
 
 检查python脚本是否启动(巨坑，启动脚本使用root启动了，我普通愣是没检查到，一上午反反复复在检查)：
+
 ```text
 # flask最小应用，默认端口5000
 sudo lsof -i:5000
 ```
- 
+
 #### 二、/etc/init.d/配置
 
-在/etc/init.d/目录下新建启动脚本flask-hello.sh，按照LSB tags规范改写脚本如下(否则update-rc.d的时候会报警告 
+在/etc/init.d/目录下新建启动脚本flask-hello.sh，按照LSB tags规范改写脚本如下(否则update-rc.d的时候会报警告
 insserv: warning: script 'flask-hello.sh' missing LSB tags and overrides)：
+
 ```text
 #!/bin/bash
 
@@ -149,19 +159,22 @@ insserv: warning: script 'flask-hello.sh' missing LSB tags and overrides)：
 ### END INIT INFO
 
 nohup python /home/brook/PycharmProjects/flask-hello/hello.py &
-``` 
+```
 
 设置权限：
+
 ```text
 sudo chmod +x flask-hello.sh
 ```
 
 将启动脚本添加到系统启动脚本里,此处99代表优先级，数字越大表示执行越晚：
+
 ```text
 cd /etc/init.d/ && sudo update-rc.d flask-hello.sh defaults 99
 ```
 
 #### 三、使用启动项管理工具sysv-rc-conf
+
 ```text
 # 安装
 sudo apt-get install sysv-rc-conf
@@ -189,6 +202,7 @@ init 进程读取 /etc/inittab 文件中的信息，并进入预设的运行级�
 
 **Linux运行级别**
 Linux系统有7个运行级别(runlevel)
+
 - 运行级别0：系统停机状态，系统默认运行级别不能设为0，否则不能正常启动
 - 运行级别1：单用户工作状态，root权限，用于系统维护，禁止远程登陆
 - 运行级别2：多用户状态(没有NFS)
@@ -198,10 +212,14 @@ Linux系统有7个运行级别(runlevel)
 - 运行级别6：系统正常关闭并重启，默认运行级别不能设为6，否则不能正常启动
 
 **update-rc.d的参数使用**
+update-rc.d的参数使用
+
 - -n：不做任何事情，只显示将要做的(预览、做测试)
 - -f：强制移除符号连接，即使/etc/init.d/script-name仍然存在 [NN | SS KK]：NN表示执行序号（0-99），SS表示启动时的执行序号，KK表示关机时的执行序号，SS、KK主要用于在脚本直接的执行顺序上有依赖关系的情况下
 
 **举例**
+举例
+
 ```text
  #1.添加一个启动脚本，执行序号是99。
  $ update-rc.d startBlog defaults 99
@@ -227,6 +245,8 @@ Linux系统有7个运行级别(runlevel)
 ```
 
 **开机启动/禁止启动某个服务**
+开机启动/禁止启动某个服务
+
 ```text
 update-rc.d [-n] name enable|disable [ S|2|3|4|5 ]
 update-rc.d cron enable
