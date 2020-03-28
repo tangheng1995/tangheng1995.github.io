@@ -116,7 +116,8 @@ sudo sh get-docker.sh --mirror Aliyun
 {
   "registry-mirrors": [
     "https://dockerhub.azk8s.cn",
-    "https://reg-mirror.qiniu.com"
+    "https://reg-mirror.qiniu.com",
+    "https://docker.mirrors.ustc.edu.cn"
   ]
 }
 ```
