@@ -7,6 +7,7 @@ author:     "Archer"
 categories: 
 tags:
     - vscode
+    - tool
 ---
 
 ## Vscode开发插件
