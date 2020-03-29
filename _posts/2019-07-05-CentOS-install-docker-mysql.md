@@ -9,64 +9,56 @@ cover: ''
 tags: mysql centos docker
 ---
 
-### CentOS安装Mysql docker
+## CentOS安装Mysql docker
 
-1. 切换root用户
+### 启动docker
 
-```text
+```shell
+# 切换root用户
 su root
-```
-
-2. 启动docker
-
-```text
+# 启动docker
 systemctl start docker
 ```
 
-3. 拉取mysql 5.7镜像
+### 启动mysql容器
 
-```text
+```shell
 docker pull mysql:5.7
 ```
 
-4. 创建并启动容器
+创建并启动容器
 
 ```text
-    -p: 映射本地端口3306
-
-    --restart-always: docker服务启动时，自动启动容器，并且当容器停止时，尝试重启容器。
-
-    --restart具体参数值详细信息：
+-p: 映射本地端口3306
+--restart-always: docker服务启动时，自动启动容器，并且当容器停止时，尝试重启容器。
+--restart具体参数值详细信息：
     no -  容器退出时，不重启容器；
     on-failure - 只有在非0状态退出时才从新启动容器；
     always - 无论退出状态是如何，都重启容器；
-
-    MYSQL_ROOT_PASSWORD：设置root密码为root
-
-    设置默认数据库编码为utf8mb4,默认排序规则为utf8mb4_unicode_ci
-
-    -v : 挂载本地卷
+MYSQL_ROOT_PASSWORD：设置root密码为root
+设置默认数据库编码为utf8mb4,默认排序规则为utf8mb4_unicode_ci
+-v : 挂载本地卷
 ```
 
-```text
+```shell
 docker run --name mysql -p 3306:3306 --restart=always -e MYSQL_ROOT_PASSWORD=qaqa123456 -v "$PWD/data":/var/lib/mysql -d mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
-5. 进入docker的mysql容器
+### 进入mysql容器
 
-```text
+进入docker的mysql容器
+
+```shell
+# 进入docker的mysql容器
 docker exec -it mysql /bin/bash
-```
 
-6. 登录数据库（此处的密码为参数-e MYSQL_ROOT_PASSWORD=root对应的值，此处密码为root）
-
-```text
+# 登录数据库（此处的密码为参数-e MYSQL_ROOT_PASSWORD=root对应的值，此处密码为root）
 mysql -u root -p my_password
 ```
 
-7. 修改远端连接mysql数据库
+### 修改远端连接mysql数据库
 
-```text
+```sql
 use mysql;
 
 alter user 'root'@'localhost' identified with mysql_native_password by 'my_password';
@@ -74,14 +66,15 @@ alter user 'root'@'localhost' identified with mysql_native_password by 'my_passw
 flush privileges;
 ```
 
-8. 查看挂载卷位置：获取容器/镜像的元数据
+### 查看挂载卷位置：获取容器/镜像的元数据
 
-```text
+```shell
 docker inspect container_id
 ```
+
 能查看带如下：
 
-```text
+```json
 "Mounts": [
             {
                 "Type": "bind",

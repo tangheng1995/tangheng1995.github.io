@@ -11,13 +11,13 @@ tags:
     - stack
 ---
 
-### Golang堆栈
+## Golang堆栈
 
-#### 什么是堆栈
+### 什么是堆栈
 
 在计算机中堆栈的概念分为：数据结构的堆栈和内存分配中堆栈。
 
-##### 数据结构的堆栈
+#### 数据结构的堆栈
 
 堆：堆可以被看成是一棵树，如：堆排序。在队列中，调度程序反复提取队列中第一个作业并运行，因为实际情况中某些时间较短的任务将等待很长时间才能结束，或者某些不短小，但具有重要性的作业，同样应当具有优先权。堆即为解决此类问题设计的一种数据结构。
 
@@ -25,19 +25,19 @@ tags:
 
 这里着重讲的是内存分配中的堆和栈。
 
-##### 内存分配中的堆和栈
+#### 内存分配中的堆和栈
 
 栈（操作系统）：由操作系统自动分配释放 ，存放函数的参数值，局部变量的值等。其操作方式类似于数据结构中的栈。
 
 堆（操作系统）： 一般由程序员分配释放， 若程序员不释放，程序结束时可能由OS回收，分配方式倒是类似于链表。
 
-#### 堆栈缓存方式
+### 堆栈缓存方式
 
 栈使用的是一级缓存， 他们通常都是被调用时处于存储空间中，调用完毕立即释放。
 
 堆则是存放在二级缓存中，生命周期由虚拟机的垃圾回收算法来决定（并不是一旦成为孤儿对象就能被回收）。所以调用这些对象的速度要相对来得低一些。
 
-#### 堆栈跟踪
+### 堆栈跟踪
 
 下面讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。
 
@@ -45,7 +45,7 @@ tags:
 
 示例：
 
-```text
+```go
 
 package main
 
@@ -62,7 +62,7 @@ func Example(slice []string, str string, i int) {
 
 列表1是一个简单的程序， main函数在第5行调用Example函数。Example函数在第9行声明，它有三个参数，一个字符串slice,一个字符串和一个整数。它的方法体也很简单，只有一行，debug.PrintStack（），这会立即产生一个堆栈跟踪信息:
 
-```text
+```go
 
 goroutine 1 [running]:
 runtime/debug.Stack(0x1, 0x0, 0x0)
@@ -89,7 +89,7 @@ main.main()
 
 下面主要分析 传递Example函数传参信息
 
-```text
+```go
 // Declaration
 main.Example(slice []string, str string, i int)
 // Call to Example by main.
@@ -103,7 +103,7 @@ main.Example(0x2080c3f50, 0x2, 0x4, 0x425c0, 0x5, 0xa)
 
 让我们看第一个[]string类型的参数。slice是引用类型，这意味着那个值是一个指针的头信息(header value)，它指向一个字符串。对于slice,它的头是三个word数，指向一个数组。因此前三个值代表这个slice。
 
-```text
+```go
 // Slice parameter value
 slice := make([]string, 2, 4)
 // Slice header values
@@ -120,7 +120,7 @@ main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 
 ![图一](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-10-04-1.png?raw=true)
 
-```text
+```go
 // String parameter value
 “hello”
 // String header values
@@ -138,7 +138,7 @@ main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 
 第三个参数是一个整数，它是一个简单的word值
 
-```text
+```go
 // Integer parameter value
 10
 // Integer value
@@ -153,11 +153,11 @@ main.Example(0xc00006df48, 0x2, 0x4, 0x4abd9e, 0x5, 0xa)
 
 ![图三](https://github.com/tangheng1995/tangheng1995.github.io/blob/master/img/in-post/post-js-version/2019-10-04-3.png?raw=true)
 
-##### Methods
+#### Methods
 
 接下来让我们稍微改动一下程序，让Example变成方法。
 
-```text
+```go
 package main
 
 import (
@@ -182,7 +182,7 @@ func (t *trace) Example(slice []string, str string, i int) {
 
 因为这个方法声明为pointer receiver的方法，Go使用t的指针来支持receiver type，即使代码中使用值来调用这个方法。当程序运行时，堆栈跟踪信息如下：
 
-```text
+```go
 Receiver Address: 0x5781c8
 goroutine 1 [running]:
 runtime/debug.Stack(0x15, 0xc000071ef0, 0x1)
@@ -197,9 +197,9 @@ main.main()
 
 第7行清晰的表明方法的receiver为pointer type。方法名和报包名中间有(*trace)。第二个值得注意的是堆栈信息中方法的第一个参数为receiver的值。方法调用总是转换成函数调用，并将receiver的值作为函数的第一个参数。我们可以总堆栈信息中看到实现的细节。
 
-##### Packing
+#### Packing
 
-```text
+```go
 import (
    "runtime/debug"
 )
@@ -215,7 +215,7 @@ func Example(b1, b2, b3 bool, i uint8) {
 
 再次改变Example的方法，让它接收4个参数。前三个参数是布尔类型的，第四个参数是8bit无符号整数。布尔类型也是8bit表示的，所以这四个参数可以被打包成一个word，包括32位架构和64位架构。当程序运行的时候，会产生有趣的堆栈：
 
-```text
+```go
 goroutine 1 [running]:
 runtime/debug.Stack(0x4, 0xc00007a010, 0xc000077f88)
     C:/Go/src/runtime/debug/stack.go:24 +0xae
@@ -229,7 +229,7 @@ main.main()
 
 可以看到四个值被打包成一个单一的值了0xc019010001
 
-```text
+```go
 // Parameter values
 true, false, true, 25
 
@@ -251,7 +251,7 @@ main.Example(0x19010001)
 
 Go运行时提供了详细的信息来帮助我们调试程序。通过堆栈跟踪信息stack trace，解码传递个堆栈中的方法的参数有助于我们快速定位BUG。
 
-#### 变量是堆（heap）还是堆栈（stack）
+### 变量是堆（heap）还是堆栈（stack）
 
 Go中的每个变量都存在，只要有对它的引用即可。实现选择的存储位置与语言的语义无关。
 
@@ -265,7 +265,7 @@ Go的编译器会决定在哪(堆or栈)分配内存，保证程序的正确性�
 
 新建 main.go
 
-```text
+```go
 package main
 
 import "fmt"
@@ -279,13 +279,13 @@ func main() {
 
 查看汇编代码
 
-```text
+```go
 go tool compile -S main.go
 ```
 
 输出：
 
-```text
+```go
 [root@localhost example]# go tool compile -S main.go
 "".main STEXT size=183 args=0x0 locals=0x60
     0x0000 00000 (main.go:5)    TEXT    "".main(SB), $96-0
@@ -315,7 +315,7 @@ go tool compile -S main.go
 
 修改main.go
 
-```text
+```go
 package main
 
 func main() {
@@ -327,7 +327,7 @@ func main() {
 
 再查看汇编代码
 
-```text
+```go
 [root@localhost example]# go tool compile -S main.go
 \"".main STEXT size=102 args=0x0 locals=0x28
     0x0000 00000 (main.go:3)    TEXT    "".main(SB), $40-0
@@ -361,7 +361,7 @@ func main() {
 
 Go 编译器自行决定变量分配在堆栈或堆上，以保证程序的正确性。
 
-#### 引用
+### 引用
 
 - [1] [Stack Traces In Go](https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html)
 - [2] [Go堆栈的理解](https://segmentfault.com/a/1190000017498101)

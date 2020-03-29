@@ -9,17 +9,17 @@ cover: ''
 tags: redis centos docker
 ---
 
-### CentOS安装Supervisor
+## CentOS安装Supervisor
 
-#### 一、Supervisor简介
+### Supervisor简介
 
 Supervisord 是用 Python 实现的一款的进程管理工具，supervisord 要求管理的程序是非 daemon 程序，supervisord 会帮你把它转成 daemon 程序，因此如果用 supervisord 来管理进程，进程需要以非daemon的方式启动。
 
 例如：管理nginx 的话，必须在 nginx 的配置文件里添加一行设置 daemon off 让 nginx 以非 daemon 方式启动。
 
-#### 二、Supervisor安装
+### Supervisor安装
 
-```text
+```shell
 # yum install 的方式
 yum install -y supervisor
 
@@ -29,9 +29,9 @@ easy_install supervisor
 echo_supervisord_conf >/etc/supervisord.conf
 ```
 
-#### 三、Supervisor的配置
+### Supervisor的配置
 
-##### 配置supervisord.conf默认配置
+#### 配置supervisord.conf默认配置
 
 如果使用yum install -y supervisor的命令安装，会生成默认配置/etc/supervisord.conf和目录/etc/supervisord.d，如果没有则自行创建。
 
@@ -42,7 +42,7 @@ supervisord.conf默认配置：
 
 vim /etc/supervisord.conf
 
-```text
+```conf
 
 ; Sample supervisor config file.
 
@@ -175,30 +175,30 @@ serverurl=unix:///var/run/supervisor/supervisor.sock ; use a unix:// URL  for a 
 files = supervisord.d/*.ini
 ```
 
-##### 自定义配置supervisord.conf
+#### 自定义配置supervisord.conf
 
 在/etc/supervisord.d的目录下创建conf和log两个目录，conf用于存放管理进程的配置，log用于存放管理进程的日志。
 
 修改/etc/supervisord.conf的[include]部分，加载配置文件
 
-```text
+```conf
 [include]
 files = supervisord.d/conf/*.conf
 ```
 
 修改/etc/supervisord.conf的[supervisord]部分，应用日志的目录
 
-```text
+```conf
 [supervisord]
 logfile=/var/log/supervisor/supervisord.log
 ...
 ```
 
-#### 四、配置需要监控的应用
+### 配置需要监控的应用
 
 修改/etc/supervisord.conf的[[program:theprogramname]]部分，配置需要被监控的进程
 
-```text
+```shell
 cd /home/python-workspace
 vim hello.py
 ```
@@ -213,10 +213,9 @@ def hello_world():
 
 if __name__ == '__main__':
     app.run(port=1234)
-
 ```
 
-```text
+```conf
 [program:hello]
 directory = /home/python-workspace ; 程序的启动目录
 command = python hello.py ; 启动命令，与命令行启动的命令是一样的
@@ -232,22 +231,22 @@ stdout_logfile_backups = 20     ; stdout 日志文件备份数
 stdout_logfile = /etc/supervisord.d/log/hello.log  ;日志统一放在log目录下
 ```
 
-#### 五、Surpervisor的启动
+### Surpervisor的启动
 
-##### 二进制启动
+#### 二进制启动
 
-```text
+```shell
 # supervisord二进制启动
 supervisord -c /etc/supervisord.conf
 # 检查进程
 ps aux | grep supervisord
 ```
 
-##### 以systemd的方式管理启动
+#### 以systemd的方式管理启动
 
 查看/etc/rc.d/init.d/supervisord是否存在，若不存在，则新建内容：
 
-```text
+```shell
 #!/bin/sh
 #
 # /etc/rc.d/init.d/supervisord
@@ -314,7 +313,7 @@ esac
 
 设置开机启动及systemd方式启动
 
-```text
+```shell
 sudo chmod +x /etc/rc.d/init.d/supervisord
 sudo chkconfig --add supervisord
 sudo chkconfig supervisord on
@@ -323,7 +322,7 @@ sudo service supervisord start
 
 查看管理进程状态：
 
-```text
+```shell
 supervisorctl status
 ```
 
@@ -335,11 +334,11 @@ hello                            RUNNING   pid 23125, uptime 0:01:10
 
 即监控hello.py进程成功，若hello.py异常退出，Surpervisor可自动启动hello.py进程
 
-#### 六、supervisorctl&supervisord
+### supervisorctl&supervisord
 
 Supervisord 安装完成后有两个可用的命令行 supervisord 和 supervisorctl，命令使用解释如下：
 
-##### supervisorctl
+#### supervisorctl
 
 - supervisorctl stop programxxx，停止某一个进程(programxxx)，programxxx 为 [program:beepkg] 里配置的值，这个示例就是 beepkg。
 - supervisorctl start programxxx，启动某个进程。
@@ -350,7 +349,7 @@ Supervisord 安装完成后有两个可用的命令行 supervisord 和 superviso
 - supervisorctl reload，载入最新的配置文件，停止原有进程并按新的配置启动、管理所有进程。
 - supervisorctl update，根据最新的配置文件，启动新配置或有改动的进程，配置没有改动的进程不会受影响而重启
 
-##### supervisord
+#### supervisord
 
 supervisord，初始启动 Supervisord，启动、管理配置中设置的进程。
 
@@ -385,11 +384,11 @@ Options:
                              e.g. 'cumulative,callers')
 ```
 
-#### 七、Supervisor控制台
+### Supervisor控制台
 
 修改/etc/supervisord.conf中[inet_http_server]部分：
 
-```text
+```conf
 [inet_http_server]         ; inet (TCP) server disabled by default
 port=0.0.0.0:9001        ; (ip_address:port specifier, *:port for all iface)
 username=user              ; (default is no username (open server))
@@ -400,7 +399,7 @@ password=123               ; (default is no password (open server))
 
 修改 vim /etc/nginx/nginx.conf
 
-```text
+```conf
 server {
         listen       80;
         server_name  supervisor.heygolang.cn;
@@ -411,7 +410,7 @@ server {
     }
 ```
 
-```text
+```shell
 cd /usr/sbin/
 ./nginx -t   # 检查配置文件语法
 ./nginx -s reload   # 重新加载配置文件

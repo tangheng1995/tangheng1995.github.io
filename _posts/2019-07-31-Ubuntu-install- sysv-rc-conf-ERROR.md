@@ -10,7 +10,7 @@ tags:
     - package
 ---
 
-### Ubuntu安装sysv-rc-conf无法定位软件包
+## Ubuntu安装sysv-rc-conf无法定位软件包
 
 安装sysv-rc-conf时提示
 
@@ -24,7 +24,7 @@ E: 无法定位软件包 sysv-rc-conf
 
 解决方案，添加镜像源：
 
-```text
+```shell
 sudo vim /etc/apt/sources.list
 
 deb http://archive.ubuntu.com/ubuntu/ trusty main universe restricted multiverse

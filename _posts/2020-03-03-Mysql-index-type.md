@@ -10,7 +10,7 @@ tags:
     - index
 ---
 
-### Mysql hash索引 与 btree索引的区别
+## Mysql hash索引 与 btree索引的区别
 
 索引是帮助mysql获取数据的数据结构。最常见的索引是Btree索引和Hash索引。
 
@@ -34,23 +34,23 @@ hash索引
 
 当使用=，<=>，IN，IS NULL或者IS NOT NULL操作符时才会使用hash索引，并且不能用于加速ORDER BY操作，并且条件值必须是索引列查找某行该列的整个值
 
-#### BTree
+### BTree
 
 BTree索引是最常用的mysql数据库索引算法，因为它不仅可以被用在=,>,>=,<,<=和between这些比较操作符上，而且还可以用于like操作符，只要它的查询条件是一个不以通配符开头的常量，例如：
 
-```text
+```sql
 select * from user where name like ‘jack%’;
 select * from user where name like ‘jac%k%’;
 ```
 
 如果一通配符开头，或者没有使用常量，则不会使用索引，例如：
 
-```text
+```sql
 select * from user where name like ‘%jack’;
 select * from user where name like simply_name;
 ```
 
-#### Hash
+### Hash
 
 Hash索引只能用于对等比较，例如=,<=>（相当于=）操作符。由于是一次定位数据，不像BTree索引需要从根节点到枝节点，最后才能访问到页节点这样多次IO访问，所以检索效率远高于BTree索引。
 
@@ -83,31 +83,31 @@ Mysql常见索引有：主键索引、唯一索引、普通索引、全文索引
 
 PRIMARY KEY（主键索引）  
 
-```text
+```sql
 ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` )
 ```
 
 UNIQUE(唯一索引)
 
-```text
+```sql
 ALTER TABLE `table_name` ADD UNIQUE (`column`)
 ```
 
 INDEX(普通索引)
 
-```text
+```sql
 ALTER TABLE `table_name` ADD INDEX index_name ( `column` )
 ```
 
 FULLTEXT(全文索引)
 
-```text
+```sql
 ALTER TABLE `table_name` ADD FULLTEXT ( `column` )
 ```
 
 组合索引
 
-```text
+```sql
 ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
 ```
 
@@ -123,6 +123,6 @@ Mysql各种索引区别：
 
 组合索引：为了更多的提高mysql效率可建立组合索引，遵循”最左前缀“原则。
 
-#### 引用
+### 引用
 
 - [1] [mysql索引(btree索引和hash索引的区别)](https://www.cnblogs.com/kenshinobiy/p/4360371.html)

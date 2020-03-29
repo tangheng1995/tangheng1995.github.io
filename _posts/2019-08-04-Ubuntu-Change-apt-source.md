@@ -10,25 +10,25 @@ tags:
     - apt
 ---
 
-### Ubuntu18.04下更改apt源为阿里云源
+## Ubuntu18.04下更改apt源为阿里云源
 
-#### 一、备份apt源文件
+### 备份apt源文件
 
 修改的文件是sources.list，它在目录/etc/apt/下，sources.list是包管理工具apt所用的记录软件包仓库位置的配置文件，同样类型的还有位于 同目录
 下sources.list.d文件下的各种.list后缀的各文件。
 
-```text
+```shell
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak.20190804
 ```
 
-#### 二、查看系统版本信息
+### 查看系统版本信息
 
-```text
+```shell
 lsb_release -c
 ```
 
-```text
-结果：
+```shell
+# 结果：
 Codename:bionic
 ```
 
@@ -41,9 +41,9 @@ Ubuntu 16.04 (LTS)代号为xenial。
 Ubuntu 18.04 (LTS)代号为bionic。
 ```
 
-#### 三、修改apt源文件
+### 修改apt源文件
 
-```text
+```shell
 # 进入目录
 cd /etc/apt/
 # 清空source.list文件
@@ -51,7 +51,7 @@ sudo > sources.list
 sudo vim sources.list
 ```
 
-```text
+```shell
 deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
 
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
@@ -75,28 +75,28 @@ deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted univer
 
 sources.list文件的条目格式如下：
 
-```text
+```shell
 deb http://site.example.com/debian distribution component1 component2 component3
 deb-src http://site.example.com/debian distribution component1 component2 component3
 ```
 
 后面几个参数是对软件包的分类（Ubuntu下是main， restricted，universe ，multiverse这四个），所以也可以编辑如下：
 
-```text
+```shell
 deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted
 deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed universe multiverse
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted
 deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed universe multiverse
 ```
 
-#### 四、更新软件列表和软件包
+### 更新软件列表和软件包
 
-```text
+```shell
 sudo apt-get update
 sudo apt-get upgrade
 ```
 
-#### 五、常见问题
+### shell常见问题
 
 1. sudo apt-get update 报错如下：
 
@@ -112,7 +112,7 @@ ModuleNotFoundError: No module named 'apt_pkg'
 
 解决办法：
 
-```text
+```shell
 sudo apt-get remove python3-apt
 sudo apt-get install python3-apt
 ```

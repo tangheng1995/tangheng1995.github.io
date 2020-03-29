@@ -10,9 +10,9 @@ tags:
     - ide
 ---
 
-### Ubuntu创建应用桌面快捷图标
+## Ubuntu创建应用桌面快捷图标
 
-#### 一、配置环境变量
+### 配置环境变量
 
 下载最新安装包：
 
@@ -28,23 +28,23 @@ https://www.jetbrains.com/go/download/#section=linux
 
 GOland启动程序如下：
 
-```text
+```shell
 /home/brook/profile/dev-tool/goland-2019.2/GoLand-2019.2/bin/golang.sh
 ```
 
 添加golang.sh至环境变量中,即可全局启动golang.sh：
 
-```text
+```shell
 sudo vim /etc/profile
 ```
 
 添加内容如下：
 
-```text
+```shell
 export PATH=$PATH:/home/brook/profile/dev-tool/pycharm-professional-2019.2/pycharm-2019.2/bin
 ```
 
-#### 二、创建桌面图标
+### 创建桌面图标
 
 进入 /usr/share/applications 目录，Ubuntu安装的软件快捷方式都保存在/usr/share/applications目录下，该目录下所有文件名都类似*.desktop
 
@@ -72,13 +72,13 @@ Terminal表示是否在终端中运行
 
 .desktop文件不需要可执行权限来启动程序，推荐将权限设置为644
 
-```text
-sudo chmod 744 goland.desktop 
+```shell
+sudo chmod 744 goland.desktop
 ```
 
 使用xdg-desktop-menu命令来将自己编写的Desktop entry文件添加到系统应用列表，使用xdg-desktop-icon来将自己的Desktop entry文件添加到桌面上
 
-```text
+```shell
 # 安装到应用列表
 # 我们一般不会填vendor属性，使用novender选项
 xdg-desktop-menu install --novendor goland.desktop

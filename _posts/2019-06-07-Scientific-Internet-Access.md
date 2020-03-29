@@ -8,9 +8,6 @@ categories: 工具
 tags: vpn
 ---
 
-分享一个谷歌浏览器的镜像，不用繁琐的VPS配置，点击即可实现科学上网；
-
-如果你想自己搭建VPS，可以看之前的文章,步骤较多，但是一劳永逸；
 
 ## 谷歌搜索
 
@@ -45,4 +42,4 @@ tags: vpn
 * [谷歌学术镜像网站3]( http://www.4243.net/)
 * [谷歌学术镜像网站4]( http://www.4243.net/)
 
-以上资源[来源](https://lai.yuweining.cn/archives/2112/),非常感谢；
+以上资源[来源](https://lai.yuweining.cn/archives/2112/),非常感谢

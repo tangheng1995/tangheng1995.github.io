@@ -9,15 +9,15 @@ tags:
     - mysql
 ---
 
-### Mysql-8.0压缩包安装(Win)
+## Mysql-8.0压缩包安装(Win)
 
-#### 1. 下载zip安装包
+### 下载zip安装包
 
 ![(mysql-8.0.19-winx64.zip)](https://dev.mysql.com/downloads/file/?id=492455)
 
-#### 2. 安装
+### 安装
 
-##### 2.1 解压
+#### 解压
 
 我解压目录为 D:\devsoft\Mysql\mysql-8.0.19-winx64
 
@@ -30,11 +30,11 @@ D:\devsoft\Mysql\mysql-8.0.19-winx64
 D:\devsoft\Mysql\mysql-8.0.19-winx64\bin
 ```
 
-##### 2.2 配置初始化my.ini文件
+#### 配置初始化my.ini文件
 
 在根目录 D:\devsoft\Mysql\mysql-8.0.19-winx64 添加 my.ini文件并创建data目录:
 
-```text
+```ini
 [mysqld]
 # 设置3306端口
 port=3306
@@ -70,7 +70,7 @@ port=3306
 default-character-set=utf8mb4
 ```
 
-##### 2.3 安装mysql
+#### 安装mysql
 
 在安装时，必须以管理员身份运行cmd，否则在安装时会报错，会导致安装失败的情况
 
@@ -88,7 +88,7 @@ mysqld --initialize --console
 
 执行完成后，会打印 root 用户的初始默认密码,记录密码
 
-##### 2.4 启动mysql服务
+#### 启动mysql服务
 
 ```text
 # 启动
@@ -101,7 +101,7 @@ net stop mysql
 sc delete mysql
 ```
 
-##### 2.5 连接mysql更改密码
+#### 连接mysql更改密码
 
 ```text
 # 登录
@@ -113,6 +113,6 @@ ERROR 2003 (HY000): Can't connect to MySQL server on 'localhost' (10061)
 
 修改密码：
 
-```text
+```sql
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '新密码';  
 ```

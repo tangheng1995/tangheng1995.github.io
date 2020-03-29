@@ -9,9 +9,9 @@ cover: ''
 tags: git
 ---
 
-### Git常用命令
+## Git常用命令
 
-#### 名词
+### 名词
 
 - master: 默认开发分支
 - origin: 默认远程版本库
@@ -20,9 +20,9 @@ tags: git
 - Repository：仓库区（或本地仓库）
 - Remote：远程仓库
 
-#### 一、新建代码库
+### 新建代码库
 
-```text
+```shell
 # 在当前目录新建一个Git代码库
 git init
 
@@ -33,11 +33,11 @@ git init [project-name]
 git clone [url]
 ```
 
-#### 二、配置
+### 配置
 
 Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。
 
-```text
+```shell
 # 显示当前的Git配置
 git config --list
 
@@ -51,9 +51,9 @@ git config [--global] user.email "[email address]"
 
 ```
 
-#### 三、增加、删除、修改文件
+### 增加、删除、修改文件
 
-```text
+```shell
 # 查看状态
 git status
 
@@ -82,9 +82,9 @@ git rm --cached [file]
 git mv [file-original] [file=rename]
 ```
 
-#### 四、代码提交
+### 代码提交
 
-```text
+```shell
 # 提交暂存区到仓库区
 git commit -m [message]
 
@@ -104,9 +104,9 @@ git commit --amend -m [message]
 git commit --amend [file1] [file2] ...
 ```
 
-#### 五、分支
+### 分支
 
-```text
+```shell
 # 显示所有本地分支
 git branch
 
@@ -151,9 +151,9 @@ git rebase <branch>
 git cherry-pick [commit]
 ```
 
-#### 六、标签
+### 标签
 
-```text
+```shell
 # 列出所有本地标签
 git tag
 
@@ -179,9 +179,9 @@ git push [remote] --tags
 git checkout -b [branch] [tag]
 ```
 
-#### 七、查看信息
+### 查看信息
 
-```text
+```shell
 # 查看有变更的文件
 git status
 
@@ -238,9 +238,9 @@ git show [commit]:[filename]
 git reflog
 ```
 
-#### 八、远程操作
+### 远程操作
 
-```text
+```shell
 # 下载远程仓库的所以变动
 git fetch [remote]
 
@@ -266,9 +266,9 @@ git push [remote] --force
 git push [remote] --all
 ```
 
-#### 九、撤销
+### 撤销
 
-```text
+```shell
 # 撤销工作目录中所有未提交文件的修改内容
 git reset --hard HEAD
 
@@ -310,10 +310,9 @@ git stash
 git stash pop
 ```
 
-#### 十、其他
+### 其他
 
-```text
+```shell
 # 生成一个可供发布的压缩包
 git archive
-
 ```

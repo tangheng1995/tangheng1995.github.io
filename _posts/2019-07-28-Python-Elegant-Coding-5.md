@@ -9,9 +9,9 @@ tags:
     - python
 ---
 
-### Python优雅编程-列表元组常见用法
+## Python优雅编程-列表元组常见用法
 
-#### 一、列表/元组拆解
+### 列表/元组拆解
 
 ```python
 # 常见用法
@@ -32,7 +32,7 @@ print(name, sex, age)
 Output: Tim Boy 27
 ```
 
-#### 二、使用操作符in
+### 使用操作符in
 
 ```python
 # 常见用法
@@ -52,7 +52,7 @@ if name in ["Tim", "Tom"]:
 Output: Tim
 ```
 
-#### 三、字符串连接join
+### 字符串连接join
 
 ```python
 # 常见用法
@@ -74,7 +74,7 @@ print(S)
 Output: TimBoy27
 ```
 
-#### 四、字典键值判断
+### 字典键值判断
 
 ```python
 # 常见用法
@@ -94,7 +94,7 @@ if "age" in D:
 Output: 27
 ```
 
-#### 五、真假判断
+### 真假判断
 
 ```python
 # 常见用法
@@ -120,7 +120,7 @@ Output:
     []
 ```
 
-#### 六、遍历列表及索引
+### 遍历列表及索引
 
 ```python
 # 常见用法
@@ -143,7 +143,7 @@ Output:
     2 27
 ```
 
-#### 七、嵌套列表推导
+### 嵌套列表推导
 
 ```python
 # 常见用法
@@ -166,7 +166,7 @@ for i in n:
 Output: A B
 ```
 
-#### 八、循环嵌套
+### 循环嵌套
 
 ```python
 # 常见用法
@@ -195,7 +195,7 @@ Output:
     Boy Boy
 ```
 
-#### 九、条件的列表推导
+### 条件的列表推导
 
 ```python
 num = [15, 65, 27, 40, 90]
@@ -214,4 +214,3 @@ print([n if n >= 20 else n*2 for n in num])
 ```text
 Output: [30, 68, 27, 40, 90]
 ```
-

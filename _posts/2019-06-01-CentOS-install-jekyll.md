@@ -9,50 +9,37 @@ cover: ''
 tags: centos jekyll blog github
 ---
 
-1. 安装依赖
+## CentOS 安装 jekyll
 
-    ```text
-    sudo yum install nodejs npm ruby ruby-devel rubygems git
-    ```
+### 安装jekyll
 
-2. 修改gem源
+```shell
+# 安装依赖
+sudo yum install nodejs npm ruby ruby-devel rubygems git
 
-    ```text
-    gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
+# 修改gem源
+gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
+gem sources -l
 
-    gem sources -l
-    ```
+# jekyll需要ruby 2.1以上，先安装ram升级ruby
+curl -sSL https://get.rvm.io | bash -s stable
 
-3. jekyll需要ruby 2.1以上，先安装ram升级ruby
+# 应用ram
+source /etc/profile.d/rvm.sh
 
-    ```text
-    curl -sSL https://get.rvm.io | bash -s stable
-    ### 应用ram
-   source /etc/profile.d/rvm.sh
-    ```
+# 查看ruby版本
+rvm list known
 
-4. 查看ruby版本
+# 安装ruby 2.5
+rvm install 2.5
 
-    ```text
-    rvm list known
-    ```
+# 验证版本
+ruby -v
 
-5. 安装ruby 2.5
+# 安装jekyll
+gem install jekyll
+```
 
-    ```text
-    rvm install 2.5
-    ### 验证版本
-    ruby -v
-    ```
-  
-6. 安装jekyll
+### 主题
 
-    ```text
-    gem install jekyll
-    ```
-
-7. 寻找自己喜欢的主题
-
-    ```text
-    http://jekyllthemes.org/
-    ```
+[寻找自己喜欢的主题](http://jekyllthemes.org/)

@@ -10,9 +10,9 @@ tags:
     - innodb
 ---
 
-### Mysql 储存引擎之Innodb
+## Mysql 储存引擎之Innodb
 
-#### innodb是一种事务型存储引擎。innodb是支持事务的ACID特性的
+### innodb是一种事务型存储引擎。innodb是支持事务的ACID特性的
 
 - A, atomacity 原子性 事务必须是原子工作单元；对于其数据修改，要么全都执行，要么全都不执行。通常，与某个事务关联的操作具有共同的目标，并且是相互依赖的。如果系统只执行这些操作的一个子集，则可能会破坏事务的总体目标。原子性消除了系统处理操作子集的可能性。
 
@@ -28,7 +28,7 @@ tags:
 
 > [参考：事务的概念](https://hit-alibaba.github.io/interview/Server/db/Transaction.html)
 
-#### innodb支持行级锁
+### innodb支持行级锁
 
 行级锁的特点是在进行写操作时，我们所需要锁定的资源更少，这样可以支持的并发就更多。需要注意的是，innodb的行级锁是由存储引擎层实现的，mysql服务器完全不了解存储引擎中锁的实现方式。
 
@@ -49,7 +49,7 @@ tags:
 
 > [参考：MySQL常用存储引擎之Innodb](https://segmentfault.com/a/1190000015468361)
 
-#### 引用
+### 引用
 
 - [1] [事务的概念](https://hit-alibaba.github.io/interview/Server/db/Transaction.html)
 - [2] [MySQL常用存储引擎之Innodb](https://segmentfault.com/a/1190000015468361)

@@ -9,18 +9,19 @@ tags:
     - linux
 ---
 
-### Ubuntu配置服务自启
+## Ubuntu配置服务自启
 
-#### 一、/etc/rc.local配置服务启动
+### /etc/rc.local配置服务启动
 
-**修改rc.local**
+#### 修改rc.local
+
 systemd 默认读取 /etc/systemd/system 下的文件，该目录下的文件会链接/lib/systemd/system/下的文件。
 
 执行 ls /lib/systemd/system 你可以看到有很多启动脚本，其中就有我们需要的 rc.local.service
 
 修改rc.local.service
 
-```text
+```shell
 sudo vim /lib/systemd/system/rc.local.service
 ```
 
@@ -49,16 +50,17 @@ Alias=rc-local.service
 
 可以看出，/etc/rc.local 的启动顺序是在网络后面，但是显然它少了 Install 段，也就没有定义如何做到开机启动，所以显然这样配置是无效的。 因此我们就需要在后面帮他加上 [Install] 段。
 
-**创建rc.local脚本**
+#### 创建rc.local脚本
+
 Ubuntu 18.04 默认没有/etc/rc.local这个文件，需要自己创建
 
-```text
+```shell
 sudo vim /etc/rc.local
 ```
 
 创建内容如下：
 
-```text
+```shell
 #!/bin/bash
 #
 # rc.local
@@ -81,13 +83,13 @@ nohup python /home/brook/PycharmProjects/flask-hello/hello.py &
 
 重载units单元
 
-```text
+```shell
 systemctl daemon-reload
 ```
 
 加权限：
 
-```text
+```shell
 # 加权限
 sudo chmod +x /etc/rc.local
 ```
@@ -96,7 +98,7 @@ sudo chmod +x /etc/rc.local
 
 将服务告知系统自启的命令。
 
-```text
+```shell
 # 开启服务
 systemctl enable rc-local
 # 等同于
@@ -105,7 +107,7 @@ sudo ln -s '/usr/lib/systemd/system/rc-local' '/etc/systemd/system/multi-user.ta
 
 启动服务：
 
-```text
+```shell
 service rc.local start
 # 或者
 sudo systemctl start rc.local
@@ -129,23 +131,23 @@ sudo systemctl start rc.local
 
 检查启动服务的日志,有打印内容即可：
 
-```text
+```shell
 cat /usr/local/test.log
 ```
 
 检查python脚本是否启动(巨坑，启动脚本使用root启动了，我普通愣是没检查到，一上午反反复复在检查)：
 
-```text
+```shell
 # flask最小应用，默认端口5000
 sudo lsof -i:5000
 ```
 
-#### 二、/etc/init.d/配置
+### /etc/init.d/配置
 
 在/etc/init.d/目录下新建启动脚本flask-hello.sh，按照LSB tags规范改写脚本如下(否则update-rc.d的时候会报警告
 insserv: warning: script 'flask-hello.sh' missing LSB tags and overrides)：
 
-```text
+```shell
 #!/bin/bash
 
 ### BEGIN INIT INFO
@@ -163,19 +165,19 @@ nohup python /home/brook/PycharmProjects/flask-hello/hello.py &
 
 设置权限：
 
-```text
+```shell
 sudo chmod +x flask-hello.sh
 ```
 
 将启动脚本添加到系统启动脚本里,此处99代表优先级，数字越大表示执行越晚：
 
-```text
+```shell
 cd /etc/init.d/ && sudo update-rc.d flask-hello.sh defaults 99
 ```
 
-#### 三、使用启动项管理工具sysv-rc-conf
+### 使用启动项管理工具sysv-rc-conf
 
-```text
+```shell
 # 安装
 sudo apt-get install sysv-rc-conf
 
@@ -188,7 +190,7 @@ Ctrl+P：上一页
 Space：选中或取消
 ```
 
-#### 四、扩展
+### 扩展
 
 **update-rc.d**
 Ubuntu或者Debian系统中update-rc.d命令，是用来更新系统启动项的脚本。这些脚本的链接位于/etc/rcN.d/目录，对应脚本位于/etc/init.d/目录。在了解update-rc.d命令之前，你需要知道的是有关Linux系统主要启动步骤，以及Ubuntu中运行级别的知识
@@ -220,7 +222,7 @@ update-rc.d的参数使用
 **举例**
 举例
 
-```text
+```shell
  #1.添加一个启动脚本，执行序号是99。
  $ update-rc.d startBlog defaults 99
  #2.A启动后B才能启动，B关闭后A才关闭（A的启动顺序比B的小，结束顺序比B的大）

@@ -10,18 +10,18 @@ tags:
     - channel
 ---
 
-### Golang无缓冲channel和有缓冲channel
+## Golang无缓冲channel和有缓冲channel
 
-#### channel的定义
+### channel的定义
 
 channel是一个对应make创建的底层数据结构的引用。
 当我们复制一个channel或用于函数参数传递时，我们只是拷贝了一个channel引用，因此调用者和被调用者将引用同一个channel对象。和其它的引用类型一样，channel的零值也是nil。
 定义一个channel时，也需要定义发送到channel的值的类型。channel可以使用内置的make()函数来创建：
 我们先来看一段代码
 
-##### 无缓冲channel
+### 无缓冲channel
 
-```text
+```go
 package main
 
 import "fmt"
@@ -72,9 +72,9 @@ func main(){
 读channel： <- channel
 写channel： channel <- 数据
 
-##### 有缓冲channel
+### 有缓冲channel
 
-```text
+```go
 package main
 
 import "fmt"
@@ -121,7 +121,7 @@ func main(){
 最后，在第 4 步，所有的发送和接收都完成，而通道里还有几个值，也有一些空间可以存更多的值。
 有缓冲通道就是图中所示，一方可以写入很多数据，不用等对方的操作，而另外一方也可以直接拿出数据，不需要等对方写，但是注意一点（如果写入的一方把channel写满了，那么如果要继续写就要等对方取数据后才能继续写入，这也是一种阻塞，读出数据也是一样，如果里面没有数据则不能取，就要等对方写入），而有缓冲channel定义也比较简单
 
-```text
+```go
 ch:=make(chan int,10)//chan int 只能写入读入int类型的数据，10代表容量为10.
 ```
 

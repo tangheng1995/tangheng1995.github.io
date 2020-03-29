@@ -9,11 +9,11 @@ tags:
     - mysql
 ---
 
-### Mysql SQL 优化
+## Mysql SQL 优化
 
-#### 1. 查看SQL执行频率
+### 查看SQL执行频率
 
-```text
+```sql
 SHOW STATUS LIKE 'Com_%';
 ```
 
@@ -34,13 +34,13 @@ Connections：试图连接MySQL服务器的次数。
 Uptime：服务器工作时间
 Slow_queries：慢查询的次数
 
-#### 2. 定位执行效率比较低的SQL语句
+### 定位执行效率比较低的SQL语句
 
 - 通过慢查询日志定位慢SQL，用--log-slow-queries[=file_name]选项时，mysqld会写一个所有执行时间超过long_query_time秒的SQL语句的日件
 
 - 使用SHOW FULL PROCESSLIST; 查看当前MySQL在进行的线程，同时对一表操作进行优化。
 
-#### 3. 通过EXPLAIN分析慢SQL
+### 通过EXPLAIN分析慢SQL
 
 语法：EXPLAIN SQL语句
 
@@ -72,29 +72,29 @@ Slow_queries：慢查询的次数
 - Extra：执行情况的说明和描述，包含不适合在其他列中显示但是对执行计划重要的额信息
   Using where：表示优化器除了利用索引来加速访问之外，还需要根据索引查询数据
 
-#### 4. 通过show profile分析SQL
+### 通过show profile分析SQL
 
 Show Profile是mysql提供的可以用来分析当前会话中sql语句执行的资源消耗情况的工具，可用于sql调优的测量。默认情况下处于关闭状态，并保存最近15次的运行结果。
 
-##### 4.1 查看当前MySQL是否支持profile
+#### 查看当前MySQL是否支持profile
 
-```text
+```sql
 select @@have profiling
 ```
 
-##### 4.2 查看当前MySQL profile参数，默认关闭的
+#### 查看当前MySQL profile参数，默认关闭的
 
-```text
+```sql
 show variables like 'profiling'
 ```
 
-##### 4.3 开启 profile参数
+#### 开启 profile参数
 
-```text
+```sql
 set profiling=on
 ```
 
-#### 4.4 使用方法
+### 使用方法
 
 - 执行需要查询SQL
 - show profiles; 能看到Query的SQL、Query_ID、Duration
@@ -106,7 +106,7 @@ set profiling=on
 
 - 详细分析排序
 
-```text
+```sql
 SELECT
     STATE,
     SUM(DURATION) AS TR,
@@ -142,7 +142,7 @@ ORDER BY
 
 > 提示：InnoDB引擎count(*)没有MyISAM执行速度快，就是因为InnoDB引擎经历了Sending data状态，存在访问数据的过程，而MyISAM引擎的表在executing之后直接就结束查询，完全不需要访问数据。
 
-#### 5. 合理添加索引
+### 合理添加索引
 
 - 每张表的索引个数建议不超过6个，索引能增快select查询速度，但同时也降低了 insert 及 update 的效率，因为 insert 或 update 时有可能会重建索引
 - 联合索引匹配最左原则(leftmost)，索引为(a,b,c)，能匹配查询a,ab,abc的条件查询

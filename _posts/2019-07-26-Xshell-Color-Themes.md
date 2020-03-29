@@ -10,11 +10,11 @@ tags:
     - tools
 ---
 
-### Xshell 配置配色方案
+## Xshell 配置配色方案
 
-#### 一、编辑配色方案
+### 编辑配色方案
 
-```text
+```shell
 vim greencolor.xcs
 ```
 
@@ -46,7 +46,7 @@ name0=greencolor
 
 配置名为greencolor
 
-#### 二、导入配色方案
+### 导入配色方案
 
 ```text
 工具 --> 配色方案 --> 导入
