@@ -48,6 +48,11 @@ tags:
 
 - [UPUPOO](http://www.upupoo.com/)
 
+### 录屏
+
+- [OBS Studio](https://obsproject.com/download)
+- [Captura](https://github.com/MathewSachin/Captura/releases)
+
 ### 视频剪辑
 
 - [喵影工厂](https://www.shencut.com/)
