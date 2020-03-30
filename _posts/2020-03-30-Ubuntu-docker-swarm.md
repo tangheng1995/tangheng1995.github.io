@@ -2,7 +2,7 @@
 layout: post
 title: Ubuntu下使用docker swarm 创建集群
 subtitle: Ubuntu下使用docker swarm 创建集群
-date:       2020-00-30 12:00:00
+date:       2020-03-30 12:00:00
 author:     "Archer"
 categories: 
 tags:
