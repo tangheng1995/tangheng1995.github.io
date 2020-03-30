@@ -11,6 +11,12 @@ tags: centos jekyll blog github
 
 ## CentOS 安装 jekyll
 
+> EPEL (Extra Packages for Enterprise Linux)是基于Fedora的一个项目，为“红帽系”的操作系统提供额外的软件包，适用于RHEL、CentOS和Scientific Linux.
+
+```shell
+yum install -y  epel-release
+```
+
 ### 安装jekyll
 
 ```shell
