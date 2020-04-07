@@ -67,4 +67,18 @@ tags:
 
 ### 文件搜索
 
+- [Wox & Everything](http://www.wox.one/)
+
 - [Everything](https://www.voidtools.com/zh-cn/)
+
+### 应用卸载
+
+- [Geek Uninstaller](https://geekuninstaller.com/)
+
+### 文件预览
+
+- [QuickLook](https://github.com/QL-Win/QuickLook/releases)
+
+### 下载器
+
+- [IDM](http://www.internetdownloadmanager.com/)
