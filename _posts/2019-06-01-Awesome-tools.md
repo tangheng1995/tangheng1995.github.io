@@ -82,3 +82,4 @@ tags:
 ### 下载器
 
 - [IDM](http://www.internetdownloadmanager.com/)
+- [Motrix](https://github.com/agalwood/Motrix/releases)
