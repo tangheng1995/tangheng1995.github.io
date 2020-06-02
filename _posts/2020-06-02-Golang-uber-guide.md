@@ -195,11 +195,7 @@ change.md
 - 导出或未导出的类型是实现同一接口的类型集合的一部分
 - 其他违反接口的情况会破坏用户。
 
-<table>
-<thead><tr><th>Bad</th><th>Good</th></tr></thead>
-<tbody>
-<tr><td>
-
+**Bad**
 ```go
 type Handler struct {
   // ...
@@ -212,8 +208,7 @@ func (h *Handler) ServeHTTP(
 }
 ```
 
-</td><td>
-
+**Good**
 ```go
 type Handler struct {
   // ...
@@ -226,9 +221,6 @@ func (h *Handler) ServeHTTP(
   // ...
 }
 ```
-
-</td></tr>
-</tbody></table>
 
 如果 `*Handler` 永远不会与 `http.Handler` 接口匹配,那么语句 `var _ http.Handler = (*Handler)(nil)` 将无法编译
 
