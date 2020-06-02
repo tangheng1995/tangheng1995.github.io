@@ -1117,6 +1117,9 @@ for i := 0; i < b.N; i++ {
   w.Write([]byte("Hello world"))
 }
 ```
+```
+BenchmarkBad-4   50000000   22.2 ns/op
+```
 
 **Good**
 ```go
@@ -1125,21 +1128,9 @@ for i := 0; i < b.N; i++ {
   w.Write(data)
 }
 ```
-
-</tr>
-<tr><td>
-
-```
-BenchmarkBad-4   50000000   22.2 ns/op
-```
-
-
-
 ```
 BenchmarkGood-4  500000000   3.25 ns/op
 ```
-
-
 
 ### 尽量初始化时指定 Map 容量
 
