@@ -656,3 +656,7 @@ tip.golang.org/doc/diagnostics.html
 
 *  <https://www.youtube.com/watch?v=8eRx5Wo3xYA>
 *  <http://codecapsule.com/2012/01/18/how-to-implement-a-paper/>
+
+### 引用
+
+- [1] [编写和优化Go代码](https://github.com/dgryski/go-perfbook/blob/master/performance-zh.md)
