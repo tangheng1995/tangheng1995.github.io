@@ -186,6 +186,73 @@ defer conn.Close()
 
 此时 `defer conn.Close()` 则不是关闭连接，而是释放连接到连接池
 
+测试：
+
+```go
+package cache
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/garyburd/redigo/redis"
+)
+
+// Pool redis conn pool
+var Pool *redis.Pool
+
+// InitPool 初始化redis conn pool
+func InitPool() {
+	pool := &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", "127.0.0.1:6379") },
+	}
+	Pool = pool
+}
+
+// GetTest3 GetTest3
+func GetTest3() {
+	conn := Pool.Get()
+	defer conn.Close()
+	username, err := redis.String(conn.Do("GET", "mykey"))
+	if err != nil {
+		fmt.Println("redis get failed:", err)
+	} else {
+		fmt.Printf("Get mykey: %v \n", username)
+	}
+}
+
+```
+
+```go
+package test
+
+import (
+	"benchmark/cache"
+	"testing"
+)
+
+func BenchmarkGetTest3(b *testing.B) {
+	cache.InitPool()
+	for i := 0; i < b.N; i++ { // b.N，测试循环次数
+		cache.GetTest3()
+	}
+}
+```
+
+输出：
+
+```text
+# Pool
+
+BenchmarkGetTest3-8        24814            145063 ns/op             208 B/op          8 allocs/op
+PASS
+ok      benchmark/test  5.082s
+```
+
+对比发现，执行时间差不多，分配内存增加2倍，分配对象增加1.6倍，但是由单连接变成连接池，高并发场景下性能还是提升很大
+
 ### 引用
 
 - [1] [redis连接池](https://pkg.go.dev/github.com/garyburd/redigo/redis?tab=doc#Pool)
