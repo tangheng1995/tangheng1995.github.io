@@ -28,3 +28,5 @@ VSCode 插件列表（欢迎大家补充）：
 |GitLens|非常方便的查看文件代码的 commit 信息（提交时间，提交人等）。|
 |markdownlint|格式化markdown语法|
 |Docker|创建、管理docker应用|
+|Bracket Pair Colorizer 2|代码块染色|
+
