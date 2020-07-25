@@ -53,7 +53,7 @@ type: page
 {% include comments.html %}
 
 <script>
-var days = 0, daysMax = Math.floor((Date.now() / 1000 - {{ "2016-07-07" | date: "%s" }}) / (60 * 60 * 24));
+var days = 0, daysMax = Math.floor((Date.now() / 1000 - {{ "2019-06-01" | date: "%s" }}) / (60 * 60 * 24));
 (function daysCount(){
     if(days > daysMax){
         document.getElementById('days').innerHTML = daysMax;
