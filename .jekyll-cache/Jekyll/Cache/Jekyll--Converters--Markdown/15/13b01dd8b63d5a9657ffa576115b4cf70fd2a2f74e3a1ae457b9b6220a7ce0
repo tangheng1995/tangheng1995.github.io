@@ -1,0 +1,10 @@
+I"<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang redis 实践 性能测试及优化。</p>
+
+<p>本文简单测试redis连接开启关闭连接的性能情况，以及连接池性能情况。</p>
+:ET

@@ -1,0 +1,195 @@
+I"2C<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#go函数传参" id="markdown-toc-go函数传参">Go函数传参</a>    <ul>
+      <li><a href="#常规传递" id="markdown-toc-常规传递">常规传递</a></li>
+      <li><a href="#指针传递" id="markdown-toc-指针传递">指针传递</a></li>
+      <li><a href="#数组元素作为函数参数" id="markdown-toc-数组元素作为函数参数">数组元素作为函数参数</a></li>
+      <li><a href="#数组名作为函数参数" id="markdown-toc-数组名作为函数参数">数组名作为函数参数</a></li>
+      <li><a href="#slice作为函数参数" id="markdown-toc-slice作为函数参数">slice作为函数参数</a></li>
+      <li><a href="#函数作为参数" id="markdown-toc-函数作为参数">函数作为参数</a></li>
+      <li><a href="#管道作为参数" id="markdown-toc-管道作为参数">管道作为参数</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang 函数参数传递。</p>
+
+<h2 id="go函数传参">Go函数传参</h2>
+
+<p>参数传递是指在程序的传递过程中，实际参数就会将参数值传递给相应的形式参数，然后在函数中实现对数据处理和返回的过程。比较常见的参数传递有：值传递，按地址传递参数或者按数组传递参数。</p>
+
+<h3 id="常规传递">常规传递</h3>
+
+<p>使用普通变量作为函数参数的时候，在传递参数时只是对变量值得拷贝，即将实参的值复制给变参，当函数对变参进行处理时，并不会影响原来实参的值。</p>
+
+<p>例如：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+<span class="k">func</span> <span class="n">swap</span><span class="p">(</span><span class="n">a</span> <span class="kt">int</span><span class="p">,</span> <span class="n">b</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">temp</span> <span class="kt">int</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">temp</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">x</span> <span class="o">:=</span> <span class="m">5</span>
+    <span class="n">y</span> <span class="o">:=</span> <span class="m">10</span>
+    <span class="n">swap</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>输出结果：5 10</p>
+
+<p>传递给swap的是x，y的值得拷贝，函数对拷贝的值做了交换，但却没有改变x,y的值。</p>
+
+<h3 id="指针传递">指针传递</h3>
+
+<p>函数的变量不仅可以使用普通变量，还可以使用指针变量，使用指针变量作为函数的参数时，在进行参数传递时将是一个地址看呗，即将实参的内存地址复制给变参，这时对变参的修改也将会影响到实参的值。</p>
+
+<p>我们还是用上面的的例子，稍作修改如下：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">package</span> <span class="n">main</span>
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+<span class="k">func</span> <span class="n">swap</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span><span class="kt">int</span><span class="p">,</span> <span class="n">b</span> <span class="o">*</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">temp</span> <span class="kt">int</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="o">*</span><span class="n">a</span>
+    <span class="o">*</span><span class="n">a</span> <span class="o">=</span> <span class="o">*</span><span class="n">b</span>
+    <span class="o">*</span><span class="n">b</span> <span class="o">=</span> <span class="n">temp</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">x</span> <span class="o">:=</span> <span class="m">5</span>
+    <span class="n">y</span> <span class="o">:=</span> <span class="m">10</span>
+    <span class="n">swap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>输出结果：10 5</p>
+
+<h3 id="数组元素作为函数参数">数组元素作为函数参数</h3>
+
+<p>使用数组元素作为函数参数时，其使用方法和普通变量相同，即是一个“值拷贝”。</p>
+
+<p>例：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">package</span> <span class="n">main</span>
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+<span class="k">func</span> <span class="n">function</span><span class="p">(</span><span class="n">a</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">a</span> <span class="o">+=</span> <span class="m">100</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="m">5</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">}</span>
+    <span class="n">function</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="m">2</span><span class="p">])</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="m">2</span><span class="p">])</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>输出结果：3</p>
+
+<p>可以看到将数组元素s[2]的值作为函数的实参，不管对形参做什么操作，实参都没有改变。</p>
+
+<h3 id="数组名作为函数参数">数组名作为函数参数</h3>
+
+<p>和其他语言不同的是，go语言在将数组名作为函数参数的时候，参数传递即是对数组的复制。在形参中对数组元素的修改都不会影响到数组元素原来的值。这个和上面的类似，就不贴代码了，有兴趣的自行编写代码测试下吧。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+<span class="k">func</span> <span class="n">function</span><span class="p">(</span><span class="n">s1</span> <span class="p">[</span><span class="m">5</span><span class="p">]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"%T,%p </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">s1</span><span class="p">)</span>  <span class="c">//[5]int,0xc4200140c0</span>
+    <span class="n">s1</span><span class="p">[</span><span class="m">0</span><span class="p">]</span> <span class="o">+=</span> <span class="m">100</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="m">5</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"%T,%p </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">)</span>    <span class="c">//[5]int,0xc420014060</span>
+    <span class="n">function</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="m">0</span><span class="p">])</span>               <span class="c">//1</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="slice作为函数参数">slice作为函数参数</h3>
+
+<p>在使用slice作为函数参数时，进行参数传递将是一个地址拷贝，即将底层数组的内存地址复制给参数slice。这时，对slice元素的操作就是对底层数组元素的操作。例如：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">package</span> <span class="n">main</span>
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+<span class="k">func</span> <span class="n">function</span><span class="p">(</span><span class="n">s1</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">s1</span><span class="p">[</span><span class="m">0</span><span class="p">]</span> <span class="o">+=</span> <span class="m">100</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="m">5</span><span class="p">]</span><span class="kt">int</span><span class="p">{</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">}</span>
+    <span class="k">var</span> <span class="n">s</span> <span class="p">[]</span><span class="kt">int</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="o">:</span><span class="p">]</span>
+    <span class="n">function</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="m">0</span><span class="p">])</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>运行结果：101</p>
+
+<h3 id="函数作为参数">函数作为参数</h3>
+
+<p>在go语言中，函数也作为一种数据类型，所以函数也可以作为函数的参数来使用。例如：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">package</span> <span class="n">main</span>
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+<span class="k">func</span> <span class="n">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="kt">int</span><span class="p">,</span> <span class="n">sum</span> <span class="k">func</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="kt">int</span> <span class="o">=</span> <span class="m">5</span><span class="p">,</span> <span class="m">6</span>
+    <span class="n">f</span> <span class="o">:=</span> <span class="n">sum</span>
+    <span class="n">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>运行结果：11</p>
+
+<p>函数sum作为函数function的形参，而变量f是一个函数类型，作为function（）调用时的实参。</p>
+
+<h3 id="管道作为参数">管道作为参数</h3>
+
+<p>在使用channel作为函数参数时，进行参数传递将是一个地址拷贝，即将内存地址复制给参数ch。例如：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="k">func</span> <span class="n">function</span><span class="p">(</span><span class="n">ch</span> <span class="k">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"写入 %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span>  <span class="c">//写入 0xc000054070</span>
+    <span class="n">ch</span> <span class="o">&lt;-</span> <span class="m">1</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"写入 1"</span><span class="p">)</span>    <span class="c">//1</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span> <span class="c">//这里就是创建了一个channel，缓冲管道</span>
+
+    <span class="k">go</span> <span class="n">function</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"读出 %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span>   <span class="c">//读出 0xc000054070</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"读出"</span><span class="p">,</span> <span class="o">&lt;-</span><span class="n">ch</span><span class="p">)</span>    <span class="c">//1</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+:ET

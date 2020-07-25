@@ -1,0 +1,114 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu1804下更改apt源为阿里云源" id="markdown-toc-ubuntu1804下更改apt源为阿里云源">Ubuntu18.04下更改apt源为阿里云源</a>    <ul>
+      <li><a href="#备份apt源文件" id="markdown-toc-备份apt源文件">备份apt源文件</a></li>
+      <li><a href="#查看系统版本信息" id="markdown-toc-查看系统版本信息">查看系统版本信息</a></li>
+      <li><a href="#修改apt源文件" id="markdown-toc-修改apt源文件">修改apt源文件</a></li>
+      <li><a href="#更新软件列表和软件包" id="markdown-toc-更新软件列表和软件包">更新软件列表和软件包</a></li>
+      <li><a href="#shell常见问题" id="markdown-toc-shell常见问题">shell常见问题</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Ubuntu18.04下更改apt源为阿里云源。</p>
+
+<h2 id="ubuntu1804下更改apt源为阿里云源">Ubuntu18.04下更改apt源为阿里云源</h2>
+
+<h3 id="备份apt源文件">备份apt源文件</h3>
+
+<p>修改的文件是sources.list，它在目录/etc/apt/下，sources.list是包管理工具apt所用的记录软件包仓库位置的配置文件，同样类型的还有位于 同目录
+下sources.list.d文件下的各种.list后缀的各文件。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo cp</span> /etc/apt/sources.list /etc/apt/sources.list.bak.20190804
+</code></pre></div></div>
+
+<h3 id="查看系统版本信息">查看系统版本信息</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lsb_release <span class="nt">-c</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 结果：</span>
+Codename:bionic
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Ubuntu 12.04 (LTS)代号为precise。
+Ubuntu 14.04 (LTS)代号为trusty。
+Ubuntu 15.04 代号为vivid。
+Ubuntu 15.10 代号为wily。
+Ubuntu 16.04 (LTS)代号为xenial。
+Ubuntu 18.04 (LTS)代号为bionic。
+</code></pre></div></div>
+
+<h3 id="修改apt源文件">修改apt源文件</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 进入目录</span>
+<span class="nb">cd</span> /etc/apt/
+<span class="c"># 清空source.list文件</span>
+<span class="nb">sudo</span> <span class="o">&gt;</span> sources.list
+<span class="nb">sudo </span>vim sources.list
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+</code></pre></div></div>
+
+<p>sources.list文件的条目格式如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deb http://site.example.com/debian distribution component1 component2 component3
+deb-src http://site.example.com/debian distribution component1 component2 component3
+</code></pre></div></div>
+
+<p>后面几个参数是对软件包的分类（Ubuntu下是main， restricted，universe ，multiverse这四个），所以也可以编辑如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted
+deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed universe multiverse
+</code></pre></div></div>
+
+<h3 id="更新软件列表和软件包">更新软件列表和软件包</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get update
+<span class="nb">sudo </span>apt-get upgrade
+</code></pre></div></div>
+
+<h3 id="shell常见问题">shell常见问题</h3>
+
+<ol>
+  <li>sudo apt-get update 报错如下：</li>
+</ol>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Original exception was:
+Traceback (most recent call last):
+  File "/usr/lib/cnf-update-db", line 8, in &lt;module&gt;
+    from CommandNotFound.db.creator import DbCreator
+  File "/usr/lib/python3/dist-packages/CommandNotFound/db/creator.py", line 11, in &lt;module&gt;
+    import apt_pkg
+ModuleNotFoundError: No module named 'apt_pkg'
+</code></pre></div></div>
+
+<p>解决办法：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get remove python3-apt
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>python3-apt
+</code></pre></div></div>
+:ET

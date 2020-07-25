@@ -1,0 +1,87 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#工具" id="markdown-toc-工具">工具</a></li>
+  <li><a href="#chrome-浏览器插件" id="markdown-toc-chrome-浏览器插件">Chrome 浏览器插件</a></li>
+  <li><a href="#vscode-插件" id="markdown-toc-vscode-插件">vscode 插件</a></li>
+  <li><a href="#notepad-插件" id="markdown-toc-notepad-插件">notepad++ 插件</a></li>
+  <li><a href="#科学上网" id="markdown-toc-科学上网">科学上网</a>    <ul>
+      <li><a href="#免费资源" id="markdown-toc-免费资源">免费资源</a></li>
+    </ul>
+  </li>
+  <li><a href="#comments" id="markdown-toc-comments">Comments</a></li>
+</ul>
+
+<blockquote>
+  <p>收集了自用的一些工具</p>
+</blockquote>
+
+<h2 id="工具">工具</h2>
+
+<ul>
+  <li>数据库管理: <a href="">Navicat</a></li>
+  <li>虚拟化: <a href="">VMware Workstation Pro</a></li>
+  <li>快捷工具: <a href="https://u.tools/">utools</a></li>
+  <li>屏幕录制: <a href="http://www.tlxsoft.com/">屏幕录像专家</a></li>
+  <li>shell终端：<a href="">xshell</a> <a href="http://www.vandyke.com">SecureCRT</a> <a href="">Putty</a></li>
+  <li>网络调试：<a href="">Wireshark</a> []</li>
+  <li>浏览器: <a href="">Chrome</a> <a href="">Firefox</a></li>
+  <li>IM: <a href="">QQ</a> <a href="">WeChat</a> <a href="">Telegram</a></li>
+  <li>IDE: <a href="">PyCharm</a></li>
+  <li>密码：[KeePass]</li>
+  <li>邮件管理: [Foxmail]</li>
+  <li>截图工具: <a href="">QQ</a> <a href="https://zh.snipaste.com/index.html">snipaste</a></li>
+  <li>笔记: <a href="">OneNote</a></li>
+</ul>
+
+<h2 id="chrome-浏览器插件">Chrome 浏览器插件</h2>
+
+<ul>
+  <li>广告拦截：<code class="language-plaintext highlighter-rouge">adblock</code></li>
+  <li>自动代理切换：<code class="language-plaintext highlighter-rouge">SwitchyOmega</code></li>
+  <li>翻译：<code class="language-plaintext highlighter-rouge">沙拉查词</code></li>
+  <li>github 代码阅读：<code class="language-plaintext highlighter-rouge">octotree</code>, <code class="language-plaintext highlighter-rouge">sourcegraph</code></li>
+  <li>轮询页面: <code class="language-plaintext highlighter-rouge">Revolver</code></li>
+  <li>json: <code class="language-plaintext highlighter-rouge">json-handle</code></li>
+  <li>cookie: <code class="language-plaintext highlighter-rouge">EditThisCookie</code></li>
+  <li>IP: <code class="language-plaintext highlighter-rouge">shodan</code></li>
+  <li>网页截图: <code class="language-plaintext highlighter-rouge">FireShot</code></li>
+  <li>api管理: <code class="language-plaintext highlighter-rouge">Postman</code></li>
+  <li>脚本管理器: <code class="language-plaintext highlighter-rouge">Tampermonkey</code></li>
+</ul>
+
+<h2 id="vscode-插件">vscode 插件</h2>
+
+<p><strong>makedown</strong></p>
+<ul>
+  <li>图床：picgo</li>
+</ul>
+
+<p><strong>基础</strong></p>
+<ul>
+  <li>中文包: Chinese (Simplified) Language Pack for Visual Studio Code</li>
+  <li>文件图标: material icon theme</li>
+  <li>括号匹配: Bracket Pair Colorizer 2</li>
+  <li>代码自动补全工具: TabNine</li>
+</ul>
+
+<h2 id="notepad-插件">notepad++ 插件</h2>
+<ul>
+  <li>js代码压缩,js代码格式化,JSON查看器: JSMinNpp</li>
+</ul>
+
+<h2 id="科学上网">科学上网</h2>
+
+<h3 id="免费资源">免费资源</h3>
+
+<p><strong>ssr订阅</strong></p>
+<ul>
+  <li><a href="https://raw.githubusercontent.com/voken100g/AutoSSR/master/stable">AutoSSR</a></li>
+  <li><a href="https://raw.githubusercontent.com/ssrsub/ssr/master/ssrsub">SSRSUB</a></li>
+</ul>
+
+<h2 id="comments">Comments</h2>
+
+<div id="utteranc-es-comment"></div>
+<script src="https://utteranc.es/client.js" repo="tangheng1995/tangheng1995.github.io" issue-term="pathname" label="utteranc-es-comment" theme="github-light" crossorigin="anonymous" async="">
+</script>
+
+:ET

@@ -1,0 +1,10 @@
+I"O<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Docker Engines的集群管理和业务流程功能是由swarmkit构建的。Swarmkit是一个独立的项目，由Docker直接调用来实现Docker的业务流程层。</p>
+
+<p>Swarm由多个运行了swarm模式Docker Engine的宿主机组成，每一个宿主机扮演了manager角色或者worker角色，再或者即扮演了manager角色也扮演了worker角色。Manager是管理节点关系和委托的节点，而worker是用来运行service的节点。</p>
+:ET

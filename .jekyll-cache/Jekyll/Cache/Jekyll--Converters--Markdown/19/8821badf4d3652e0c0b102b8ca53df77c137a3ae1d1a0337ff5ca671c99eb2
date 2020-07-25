@@ -1,0 +1,64 @@
+I"$<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#静态语言与动态语言的区别" id="markdown-toc-静态语言与动态语言的区别">静态语言与动态语言的区别</a>    <ul>
+      <li><a href="#动态类型语言" id="markdown-toc-动态类型语言">动态类型语言</a></li>
+      <li><a href="#静态类型语言" id="markdown-toc-静态类型语言">静态类型语言</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>静态语言与动态语言的区别。</p>
+
+<h2 id="静态语言与动态语言的区别">静态语言与动态语言的区别</h2>
+
+<h3 id="动态类型语言">动态类型语言</h3>
+
+<p>动态类型语言是指在运行期间才去做数据类型检查的语言，也就是说，在用动态类型的语言编程时，永远也不用给任何变量指定数据类型，该语言会在你第一次赋值给变量时，在内部将数据类型记录下来。Python 和 Ruby 就是一种典型的动态类型语言，其他的各种脚本语言如 JavaScript 也属于动态类型语言。</p>
+
+<p>动态类型语言的优点
+编写的代码数量更少，看起来更加简洁，可以把精力更多地放在业务逻辑上。虽然不区分类型在某些情况下会让程序变得难以理解，但整体而言，代码量越少，越专注于逻辑表达，对阅读程序越有帮助。</p>
+
+<p>动态类型语言的缺点
+无法保证变量的类型，从而在程序的运行期有可能发生跟类型相关的错误。</p>
+
+<p>动态类型语言对变量类型的宽容给实际编码带来了很大的灵活性。由于无需进行类型检测，我们可以尝试调用任何对象的任意方法，而无需去考虑它原本是否被设计为拥有该方法。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python
+</span>
+<span class="o">//</span> <span class="n">可传数字</span><span class="err">、</span><span class="n">字符串等类型</span>
+<span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+ <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="s">"1"</span><span class="p">,</span> <span class="s">"2"</span>
+ <span class="o">//</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+ <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="静态类型语言">静态类型语言</h3>
+
+<p>静态类型语言与动态类型语言刚好相反，它的数据类型是在编译其间检查的，也就是说在写程序时要声明所有变量的数据类型，C/C++ 是静态类型语言的典型代表，其他的静态类型语言还有 C#、JAVA 等。</p>
+
+<p>静态类型语言的优点
+首先是在编译时就能发现类型不匹配的错误，编译器可以帮助我们提前避免程序在运行期间有可能发生的一些错误。其次，如果在程序中明确规定了数据类型，编译器还可以针对这些信息对程序进行一些优化工作，提高程序执行速度。</p>
+
+<p>静态类型语言的缺点
+首先是迫使程序员依照强契约来编写程序，为每个变量规定数据类型，归根结底只是辅助我们编写可靠性高程序的一种手段，而不是编写程序的目的，毕竟大部分人编写程序的目的是为了完成需求交付生产。其次，类型的声明也会增加更多的代码，在程序编写过程中，这些细节会让程序员的精力从思考业务逻辑上分散开来。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="c">//只能传入int类型</span>
+<span class="k">func</span> <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="kt">int</span><span class="p">){</span>
+  <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+ <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">:=</span> <span class="m">1</span><span class="p">,</span> <span class="m">2</span>
+ <span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+:ET

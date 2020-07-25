@@ -1,0 +1,82 @@
+I"1.<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#mysql-数据库拥塞处理工具pt-kill" id="markdown-toc-mysql-数据库拥塞处理工具pt-kill">Mysql 数据库拥塞处理工具pt-kill</a>    <ul>
+      <li><a href="#pt-kill介绍" id="markdown-toc-pt-kill介绍">pt-kill介绍</a></li>
+      <li><a href="#常用杀会话场景" id="markdown-toc-常用杀会话场景">常用杀会话场景</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Percona-Toolkit系列之pt-kill杀会话利器。</p>
+
+<h2 id="mysql-数据库拥塞处理工具pt-kill">Mysql 数据库拥塞处理工具pt-kill</h2>
+
+<h3 id="pt-kill介绍">pt-kill介绍</h3>
+
+<p>生产环境中我们时常遇到这样的情况，数据库性能恶劣，需要马上杀掉全部会话，不然数据库就挂起来。我们可以先找show processlist的输出来杀会话，但是比较麻烦。pt-kill为我们解决了杀会话问题。</p>
+
+<h3 id="常用杀会话场景">常用杀会话场景</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -- 1、每10秒检查一次，发现有 Query 的进程就给干掉</span>
+
+<span class="c"># 只打印-每10秒检查一次，发现有 Query 的进程就给干掉</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-command</span><span class="o">=</span><span class="s2">"Query"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span>  <span class="nt">--print</span> <span class="nt">--log</span><span class="o">=</span>/tmp/1.log
+
+<span class="c"># 执行杀操作</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-command</span><span class="o">=</span><span class="s2">"Query"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span> <span class="nt">--kill</span> <span class="nt">--log</span><span class="o">=</span>/tmp/kill.log
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -- 2、查杀select大于30s的会话</span>
+
+<span class="c"># 只打印-查杀select大于30s的会话</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-info</span> <span class="s2">"select|SELECT"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span>  <span class="nt">--print</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select.log
+
+<span class="c"># 执行杀操作-查杀select大于30s的会话</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-info</span> <span class="s2">"select|SELECT"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span> <span class="nt">--kill</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select_kill.log
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -- 3、查杀某IP来源的会话</span>
+
+<span class="c"># 只打印-查杀某IP来源的会话</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-host</span> <span class="s2">"192.168.65.129"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span>  <span class="nt">--print</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select.log
+
+<span class="c"># 执行杀操作-查杀某IP来源的会话</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-host</span> <span class="s2">"192.168.65.129"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span> <span class="nt">--kill</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select_kill.log
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -- 4、查杀访问某用户的会话</span>
+
+<span class="c"># 只打印-查杀访问某用户的会话</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-user</span> <span class="s2">"u2"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span>  <span class="nt">--print</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select.log
+
+<span class="c"># 执行杀操作-查杀访问某用户的会话</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-user</span> <span class="s2">"u2"</span> <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span> <span class="nt">--kill</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select_kill.log
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -- 5、杀掉正在进行filesort的sql</span>
+
+<span class="c"># 只打印-杀掉正在进行filesort的sql</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-command</span> Query <span class="nt">--match-state</span> <span class="s2">"Sorting result"</span>  <span class="nt">--run-time</span> 1 <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span>  <span class="nt">--print</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select.log
+
+<span class="c"># 执行杀操作-杀掉正在进行filesort的sql</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-command</span> Query <span class="nt">--match-state</span> <span class="s2">"Sorting result"</span>  <span class="nt">--run-time</span> 1 <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span> <span class="nt">--kill</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select_kill.log
+
+
+<span class="c"># 只打印</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-command</span> Query <span class="nt">--match-state</span> <span class="s2">"Creating sort index"</span>  <span class="nt">--run-time</span> 1 <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span>  <span class="nt">--print</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select.log
+
+<span class="c"># 执行杀操作</span>
+pt-kill <span class="nt">--host</span><span class="o">=</span>192.168.65.128 <span class="nt">--port</span><span class="o">=</span>3306 <span class="nt">--user</span><span class="o">=</span>root <span class="nt">--password</span><span class="o">=</span>rootpwd  <span class="nt">--match-db</span><span class="o">=</span><span class="s1">'db222'</span>  <span class="nt">--match-command</span> Query <span class="nt">--match-state</span> <span class="s2">"Creating sort index"</span>  <span class="nt">--run-time</span> 1 <span class="nt">--busy-time</span> 30 <span class="nt">--victims</span> all <span class="nt">--interval</span> 10 <span class="nt">--daemonize</span> <span class="nt">--kill</span> <span class="nt">--log</span><span class="o">=</span>/tmp/pt_select_kill.log
+</code></pre></div></div>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="http://www.fordba.com/percona-toolkit-pt-kill.html">Percona-Toolkit系列之pt-kill杀会话利器</a></li>
+  <li>[2] <a href="https://www.cnblogs.com/bjx2020/p/9076953.html">pt-kill用法记录</a></li>
+  <li>[3] <a href="https://www.percona.com/doc/percona-toolkit/LATEST/pt-kill.html">pt-kill官网</a></li>
+</ul>
+:ET

@@ -1,0 +1,219 @@
+I"�5<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu-安装k8s集群" id="markdown-toc-ubuntu-安装k8s集群">Ubuntu 安装k8s集群</a>    <ul>
+      <li><a href="#环境准备" id="markdown-toc-环境准备">环境准备</a>        <ul>
+          <li><a href="#docker环境" id="markdown-toc-docker环境">docker环境</a></li>
+          <li><a href="#k8s环境" id="markdown-toc-k8s环境">k8s环境</a></li>
+        </ul>
+      </li>
+      <li><a href="#禁用swap" id="markdown-toc-禁用swap">禁用swap</a></li>
+      <li><a href="#配置master节点cgroup-driver" id="markdown-toc-配置master节点cgroup-driver">配置master节点cgroup driver</a></li>
+      <li><a href="#拉取镜像" id="markdown-toc-拉取镜像">拉取镜像</a></li>
+      <li><a href="#初始化集群master" id="markdown-toc-初始化集群master">初始化集群master</a></li>
+      <li><a href="#拷贝-homekubeconfig-至子节点" id="markdown-toc-拷贝-homekubeconfig-至子节点">拷贝 $HOME/.kube/config 至子节点</a></li>
+      <li><a href="#扩展" id="markdown-toc-扩展">扩展</a>        <ul>
+          <li><a href="#centos--rhel--fedora-配置k8s环境" id="markdown-toc-centos--rhel--fedora-配置k8s环境">CentOS / RHEL / Fedora 配置k8s环境</a></li>
+          <li><a href="#报错一" id="markdown-toc-报错一">报错一</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Ubuntu 搭建 k8s 集群。</p>
+
+<h2 id="ubuntu-安装k8s集群">Ubuntu 安装k8s集群</h2>
+
+<h3 id="环境准备">环境准备</h3>
+
+<h4 id="docker环境">docker环境</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-fsSL</span> get.docker.com <span class="nt">-o</span> get-docker.sh
+
+<span class="nb">sudo </span>sh get-docker.sh <span class="nt">--mirror</span> Aliyun
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/docker/daemon.json
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>
+  <span class="s2">"registry-mirrors"</span>: <span class="o">[</span>
+    <span class="s2">"https://dockerhub.azk8s.cn"</span>,
+    <span class="s2">"https://reg-mirror.qiniu.com"</span>
+  <span class="o">]</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl daemon-reload <span class="o">&amp;&amp;</span> <span class="nb">sudo </span>systemctl restart docker
+</code></pre></div></div>
+
+<h4 id="k8s环境">k8s环境</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt-get update <span class="o">&amp;&amp;</span> apt-get upgrade <span class="o">&amp;&amp;</span> apt-get <span class="nb">install</span> <span class="nt">-y</span> apt-transport-https
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
+
+<span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> &gt;/etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+</span><span class="no">EOF  
+
+</span>apt-get update
+apt-get <span class="nb">install</span> <span class="nt">-y</span> kubelet kubeadm kubectl
+</code></pre></div></div>
+
+<blockquote>
+  <p>官方源：</p>
+</blockquote>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>curl <span class="nt">-s</span> https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
+<span class="nb">sudo echo</span> <span class="s2">"deb http://apt.kubernetes.io/ kubernetes-xenial main"</span> <span class="o">&gt;</span> /etc/apt/sources.list.d/kubernetes.list
+<span class="nb">sudo </span>apt-get update
+<span class="nb">sudo </span>apt-get <span class="nb">install</span> <span class="nt">-y</span> kubelet kubeadm kubectl kubernetes-cni
+</code></pre></div></div>
+
+<h3 id="禁用swap">禁用swap</h3>
+
+<blockquote>
+  <p>对于禁用 <code class="language-plaintext highlighter-rouge">swap</code> 内存，具体原因可以查看Github上的Issue: <a href="https://link.juejin.im/?target=https%3A%2F%2Fgithub.com%2Fkubernetes%2Fkubernetes%2Fissues%2F53533">Kubelet/Kubernetes should work with Swap Enabled</a></p>
+</blockquote>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 编辑/etc/fstab文件，注释掉引用swap的行</span>
+<span class="nb">sudo </span>swapoff <span class="nt">-a</span>
+<span class="c"># 测试：输入top 命令，若 KiB Swap一行中 total 显示 0 则关闭成功</span>
+
+<span class="c"># 永久关闭：</span>
+<span class="nb">sudo </span>vim /etc/fstab
+<span class="c"># 注释掉swap那一行,reboot</span>
+</code></pre></div></div>
+
+<h3 id="配置master节点cgroup-driver">配置master节点cgroup driver</h3>
+
+<p>查看 Docker 使用的是 cgroup driver:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker info | <span class="nb">grep</span> <span class="nt">-i</span> cgroup
+WARNING: No swap limit support
+Cgroup Driver: systemd
+</code></pre></div></div>
+
+<p>而 kubelet 使用的 cgroupfs 为system，不一致故有如下修正：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+</code></pre></div></div>
+
+<p>加上如下配置：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">Environment</span><span class="o">=</span><span class="s2">"KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"</span>
+</code></pre></div></div>
+
+<p>或者：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">Environment</span><span class="o">=</span><span class="s2">"KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs --pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.1"</span>
+</code></pre></div></div>
+
+<p>重启 kubelet</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl daemon-reload
+systemctl restart kubelet
+</code></pre></div></div>
+
+<h3 id="拉取镜像">拉取镜像</h3>
+
+<p>利用kubeadm查看需要拉取的镜像：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubeadm config images list
+</code></pre></div></div>
+
+<p>编写脚本 <code class="language-plaintext highlighter-rouge">pull.sh</code> 从阿里云拉取需要的镜像</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for </span>i <span class="k">in</span> <span class="sb">`</span>kubeadm config images list<span class="sb">`</span><span class="p">;</span> <span class="k">do
+  </span><span class="nv">imageName</span><span class="o">=</span><span class="k">${</span><span class="nv">i</span><span class="p">#k8s.gcr.io/</span><span class="k">}</span>
+  docker pull registry.aliyuncs.com/google_containers/<span class="nv">$imageName</span>
+  docker tag registry.aliyuncs.com/google_containers/<span class="nv">$imageName</span> k8s.gcr.io/<span class="nv">$imageName</span>
+  docker rmi registry.aliyuncs.com/google_containers/<span class="nv">$imageName</span>
+<span class="k">done</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="初始化集群master">初始化集群master</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubeadm init <span class="nt">--apiserver-advertise-address</span><span class="o">=</span>192.168.17.132 <span class="nt">--pod-network-cidr</span><span class="o">=</span>10.244.0.0/16
+</code></pre></div></div>
+
+<p>配置环境：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.kube
+<span class="nb">sudo cp</span> <span class="nt">-i</span> /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+<span class="nb">sudo chown</span> <span class="si">$(</span><span class="nb">id</span> <span class="nt">-u</span><span class="si">)</span>:<span class="si">$(</span><span class="nb">id</span> <span class="nt">-g</span><span class="si">)</span> <span class="nv">$HOME</span>/.kube/config
+</code></pre></div></div>
+
+<p>配置网络模型flannel:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+</code></pre></div></div>
+
+<blockquote>
+  <p>因为用的kubuctl版本是v1.16.0，所以这里kube-flannel.yml需要修改一个值</p>
+</blockquote>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 下载 kube-flannel.yml</span>
+wget https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
+
+<span class="c"># 修改"cniVersion": "0.2.0"为 "cniVersion": "0.3.1"</span>
+
+<span class="c"># 运行</span>
+kubectl apply <span class="nt">-f</span> kube-flannel.yml
+</code></pre></div></div>
+
+<p>或者weavenet:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> <span class="s2">"https://cloud.weave.works/k8s/net?k8s-version=</span><span class="si">$(</span>kubectl version | <span class="nb">base64</span> | <span class="nb">tr</span> <span class="nt">-d</span> <span class="s1">'\n'</span><span class="si">)</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>或者calico (需要init时–pod-network-cidr=192.168.0.0/16):</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+kubectl apply <span class="nt">-f</span> https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+</code></pre></div></div>
+
+<h3 id="拷贝-homekubeconfig-至子节点">拷贝 $HOME/.kube/config 至子节点</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#</span>
+<span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.kube
+vim <span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.kube/config
+</code></pre></div></div>
+
+<h3 id="扩展">扩展</h3>
+
+<h4 id="centos--rhel--fedora-配置k8s环境">CentOS / RHEL / Fedora 配置k8s环境</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>bash <span class="nt">-c</span> <span class="s1">'cat &lt;&lt; EOF &gt; /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF'</span> <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">sudo </span>setenforce 0 <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> kubelet kubeadm kubectl <span class="o">&amp;&amp;</span> <span class="se">\</span>
+<span class="nb">sudo </span>systemctl <span class="nb">enable </span>kubelet <span class="o">&amp;&amp;</span> <span class="nb">sudo </span>systemctl start kubelet
+</code></pre></div></div>
+
+<h4 id="报错一">报错一</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 执行kubeadm reset后，重新kubeadm init</span>
+kubectl get nodes
+Unable to connect to the server: x509: certificate signed by unknown authority <span class="o">(</span>possibly because of <span class="s2">"crypto/rsa:
+verification error"</span> <span class="k">while </span>trying to verify candidate authority certificate <span class="s2">"kubernetes"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>解决办法：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 重点就在 `rm -rf $HOME/.kube`</span>
+<span class="nb">rm</span> <span class="nt">-rf</span> <span class="nv">$HOME</span>/.kube
+<span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.kube
+<span class="nb">sudo cp</span> <span class="nt">-i</span> /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+<span class="nb">sudo chown</span> <span class="si">$(</span><span class="nb">id</span> <span class="nt">-u</span><span class="si">)</span>:<span class="si">$(</span><span class="nb">id</span> <span class="nt">-g</span><span class="si">)</span> <span class="nv">$HOME</span>/.kube/config
+</code></pre></div></div>
+:ET

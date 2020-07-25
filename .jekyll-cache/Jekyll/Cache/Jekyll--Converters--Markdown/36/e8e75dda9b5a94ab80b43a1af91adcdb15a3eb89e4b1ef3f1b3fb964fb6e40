@@ -1,0 +1,212 @@
+I"�#<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#sonar-进行golang代码质量管理" id="markdown-toc-sonar-进行golang代码质量管理">Sonar 进行Golang代码质量管理</a>    <ul>
+      <li><a href="#sonar-概述" id="markdown-toc-sonar-概述">Sonar 概述</a></li>
+      <li><a href="#环境" id="markdown-toc-环境">环境</a></li>
+      <li><a href="#关键字" id="markdown-toc-关键字">关键字</a></li>
+      <li><a href="#安装服务端" id="markdown-toc-安装服务端">安装服务端</a></li>
+      <li><a href="#安装客户端" id="markdown-toc-安装客户端">安装客户端</a></li>
+      <li><a href="#检测代码" id="markdown-toc-检测代码">检测代码</a></li>
+      <li><a href="#总结" id="markdown-toc-总结">总结</a></li>
+      <li><a href="#参考" id="markdown-toc-参考">参考</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Sonar 是一个用于代码质量管理的开放平台。通过插件机制，Sonar 可以集成不同的测试工具，代码分析工具，以及持续集成工具。</p>
+
+<p>与持续集成工具（例如 Hudson/Jenkins 等）不同，Sonar 并不是简单地把不同的代码检查工具结果（例如 FindBugs，PMD 等）直接显示在 Web 页面上，而是通过不同的插件对这些结果进行再加工处理，通过量化的方式度量代码质量的变化，从而可以方便地对不同规模和种类的工程进行代码质量管理。</p>
+
+<h2 id="sonar-进行golang代码质量管理">Sonar 进行Golang代码质量管理</h2>
+
+<h3 id="sonar-概述">Sonar 概述</h3>
+
+<p>Sonar 是一个用于代码质量管理的开放平台。通过插件机制，Sonar 可以集成不同的测试工具，代码分析工具，以及持续集成工具。</p>
+
+<p>与持续集成工具（例如 Hudson/Jenkins 等）不同，Sonar 并不是简单地把不同的代码检查工具结果（例如 FindBugs，PMD 等）直接显示在 Web 页面上，而是通过不同的插件对这些结果进行再加工处理，通过量化的方式度量代码质量的变化，从而可以方便地对不同规模和种类的工程进行代码质量管理。</p>
+
+<p>本次测试使用golang接入sonar，可展示可靠性、安全性、可维护性、覆盖率、重复等多项指标。</p>
+
+<h3 id="环境">环境</h3>
+
+<ul>
+  <li>sonarqube-7.9.1-community</li>
+  <li><a href="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip">sonar-scanner-cli-4.2.0.1873</a></li>
+  <li>postgres-10</li>
+</ul>
+
+<h3 id="关键字">关键字</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>指标</th>
+      <th>简介</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Bugs</td>
+      <td>bug个数及评分</td>
+    </tr>
+    <tr>
+      <td>Vulnerabilities</td>
+      <td>安全漏洞个数及评分</td>
+    </tr>
+    <tr>
+      <td>Debt</td>
+      <td>债务(代码问题)持续时间</td>
+    </tr>
+    <tr>
+      <td>Code Smells</td>
+      <td>轻微问题：代码风格等等</td>
+    </tr>
+    <tr>
+      <td>Coverage</td>
+      <td>单元测试覆盖率</td>
+    </tr>
+    <tr>
+      <td>Duplications</td>
+      <td>代码重复率</td>
+    </tr>
+    <tr>
+      <td>Duplicated Blocks</td>
+      <td>代码重复块数</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="安装服务端">安装服务端</h3>
+
+<p>本次测试选择SonarQube-7.9.1社区版docker镜像测试</p>
+
+<p>创建挂在卷：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$&gt; docker volume create --name sonarqube_data
+$&gt; docker volume create --name sonarqube_extensions
+$&gt; docker volume create --name sonarqube_logs
+</code></pre></div></div>
+
+<p>启动postgres</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=1 --name postgres postgres:10
+</code></pre></div></div>
+
+<p>启动sonarqube，因为我安装汉化插件，所以扩展目录我挂在 <code class="language-plaintext highlighter-rouge">/home/tangheng/profile/sonar/extensions</code></p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -d --name sonarqube \
+    -p 9000:9000 \
+    -e SONAR_JDBC_URL=jdbc:postgresql://172.18.0.1:5432/sonar \
+    -e SONAR_JDBC_USERNAME=postgres \
+    -e SONAR_JDBC_PASSWORD=1 \
+    -v sonarqube_data:/opt/sonarqube/data \
+    -v /home/tangheng/profile/sonar/extensions:/opt/sonarqube/extensions \
+    -v sonarqube_logs:/opt/sonarqube/logs \
+    sonarqube:7.9.1-community
+</code></pre></div></div>
+
+<p>安装汉化插件：</p>
+
+<p>SonarQube - 中文插件安装
+下载地址：<a href="https://github.com/SonarQubeCommunity/sonar-l10n-zh/releases/tag/sonar-l10n-zh-plugin-1.16">https://github.com/SonarQubeCommunity/sonar-l10n-zh/releases/tag/sonar-l10n-zh-plugin-1.16</a></p>
+
+<p>将sonar-l10n-zh-plugin-1.16.jar放置 <code class="language-plaintext highlighter-rouge">/home/tangheng/profile/sonar/extensions/plugins</code> 目录</p>
+
+<p>安装成功后，访问 <a href="http://localhost:9000/">http://localhost:9000/</a> ，默认帐号密码： admin/admin</p>
+
+<h3 id="安装客户端">安装客户端</h3>
+
+<p>安装 sonar-scanner 至 <code class="language-plaintext highlighter-rouge">/usr/local/sonar-scanner</code> 目录：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+mv sonar-scanner-4.2.0.1873-linux /usr/local/sonar-scanner
+</code></pre></div></div>
+
+<p>修改配置文件 <code class="language-plaintext highlighter-rouge">/usr/local/sonar-scanner/conf/sonar-scanner.properties</code>：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#Configure here general information about the environment, such as SonarQube server connection details for example
+#No information about specific project should appear here
+
+#----- Default SonarQube server
+sonar.host.url=http://localhost:9000
+
+#----- Default source code encoding
+sonar.sourceEncoding=UTF-8
+
+sonar.jdbc.username=postgres
+sonar.jdbc.password=1
+
+#项目使用的语言
+sonar.language=go  
+#项目的独特关键字,maven 项目是 &lt;groupId&gt;:&lt;artiactId&gt;，go 项目自己定义就可以
+sonar.projectKey=projectKey  
+#将在web界面上显示的名字
+sonar.projectName=cms 
+#项目版本
+sonar.projectVersion=1.0  
+#需要分析的源码目录的路径
+sonar.sources=.  
+sonar.exclusions=**/*_test.go,**/vendor/**  
+sonar.tests=.  
+sonar.test.inclusions=**/*_test.go  
+sonar.test.exclusions=**/vendor/**  
+#golangci-lint 报告路径
+sonar.go.golangci-lint.reportPaths=report.xml  
+#单测覆盖率报告地址
+sonar.go.coverage.reportPaths=coverage.out
+
+sonar.jdbc.url=jdbc:mysql://172.18.0.1:5432/sonar?useUnicode=true&amp;characterEncoding=utf8
+</code></pre></div></div>
+
+<p>配置环境变量：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export PATH=$PATH:/usr/local/sonar-scanner/bin
+</code></pre></div></div>
+
+<p>验证：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sonar-scanner -v
+
+# 输出
+INFO: Scanner configuration file: /usr/local/sonar-scanner/conf/sonar-scanner.properties
+INFO: Project root configuration file: NONE
+INFO: SonarQube Scanner 4.2.0.1873
+INFO: Java 11.0.3 AdoptOpenJDK (64-bit)
+INFO: Linux 4.19.0-6-amd64 amd64
+</code></pre></div></div>
+
+<h3 id="检测代码">检测代码</h3>
+
+<p>以cms项目为例。目前已经做了单元测试及覆盖率，不过多介绍：</p>
+
+<p>makefile：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>test:
+	go test $(CURDIR)/test -v -coverprofile=coverage.out -covermode=count -coverpkg=./...
+
+coverage: test
+	find . -name "coverage.out.*" -exec tail +2 {} &gt;&gt; coverage.out \;
+	go tool cover -html coverage.out -o coverage.html
+	go tool cover -func=coverage.out
+
+scanner: coverage
+	sonar-scanner
+</code></pre></div></div>
+
+<p>执行 <code class="language-plaintext highlighter-rouge">sonar-scanner</code> 命令，可将生成的报告上传到服务器。</p>
+
+<h3 id="总结">总结</h3>
+
+<p>Sonar 为代码的质量管理提供了一个平台，可以说是目前最强大的代码质量管理工具之一。对项目增加CI测试流程同时，上传测试报告到统一服务器，既方便整体了解项目性能及漏洞，也能为后续迭代重构时提供有效参考。</p>
+
+<h3 id="参考">参考</h3>
+
+<ul>
+  <li><a href="https://docs.sonarqube.org/latest/setup/install-server/">sonarqube服务端docker安装</a></li>
+  <li><a href="https://docsin.uniontech.com/?p=6984">golang 单元测试和代码覆盖率统计</a></li>
+  <li><a href="https://github.com/SonarQubeCommunity/sonar-l10n-zh/releases/tag/sonar-l10n-zh-plugin-1.16">sonar汉化插件</a></li>
+</ul>
+:ET

@@ -1,0 +1,84 @@
+I"�<blockquote>
+  <p>目前从事Golang开发工作，努力学习中……</p>
+</blockquote>
+
+<p>请使用 Mozilla Firefox、Google Chrome 等现代浏览器浏览本博客。</p>
+
+<p>本博采用 Jekyll<a href="https://jekyllrb.com/" title="Jekyll">[1]</a> 搭建，Markdown<a href="http://daringfireball.net/projects/markdown/" title="Markdown">[2]</a> 写作，托管于 GitHub<a href="https://github.com/" title="GitHub">[3]</a>。</p>
+
+<p>自 2019 年 06 月 01 日起，本站已运行 <span id="days"></span> 天，截至 2020 年 07 月 25 日，写了博文 52 篇，15 万 4440 字。</p>
+
+<p>即日起，本博客的原创内容，均采用知识共享组织（Creative Commons）的 “署名-非商业性使用 3.0 中国大陆 (CC BY-NC 3.0 CN)<a href="http://creativecommons.org/licenses/by-nc/3.0/cn/" title="署名-非商业性使用 3.0 中国大陆">[4]</a>” 许可。</p>
+
+<h2 id="博主">博主</h2>
+
+<ul>
+  <li>Github: <a href="https://github.com/tangheng1995">tangheng1995</a></li>
+</ul>
+
+<h2 id="开源项目">开源项目</h2>
+
+<ul>
+  <li><a href="https://github.com/lework/Ansible-roles">Ansible-roles</a> 含有运维日常部署，应用发布，系统操作等等的 ansible role，目前已有 70+。</li>
+  <li><a href="https://github.com/lework/kubectl-check">kubectl-check</a> 用于检查 deployment 的所有 pod 是否就绪的 kubectl 插件</li>
+  <li><a href="https://github.com/lework/lenav">lenav</a> 一个简便的公司内部网址导航站</li>
+  <li><a href="https://github.com/lework/leversion">leversion</a> 列出开源软件的最新版本</li>
+  <li><a href="https://github.com/lework/lemonitor">lemonitor</a> 开源软件的国内镜像站点</li>
+  <li><a href="https://github.com/leops-china/ansible-wiki">Ansible wiki</a> Ansible Wiki站点</li>
+</ul>
+
+<h2 id="博客历程">博客历程</h2>
+
+<ul>
+  <li>2019-06-01 使用 Jekyll 平台 写博客，托管在 Gihub 中</li>
+  <li>2020-07-24 使用 gitalk 评论</li>
+  <li>2020-07-24 增加搜索功能</li>
+  <li>2020-07-24 使用 utteranc.es 评论</li>
+  <li>2020-07-24 增加赞赏支持功能</li>
+  <li>2020-07-24 文章中增加 “原文地址” 和 “字数统计”</li>
+  <li>2020-07-24 代码块增加 “Copy” 功能</li>
+</ul>
+
+<h2 id="赞赏奖励">赞赏奖励</h2>
+
+<p>若您觉得本博客所创造的内容对您有所帮助，可考虑略表心意，支持一下。</p>
+
+<div id="post-reward" class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden="" />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+      <img class="image" src="/assets/images/reward/wechat.png" />
+      <span>微信赞赏</span>
+    </label>
+     
+    <label class="qr-code-image" for="reward">
+      <img class="image" src="/assets/images/reward/alipay.png" />
+      <span>支付宝赞赏</span>
+    </label>
+    
+  </div>
+</div>
+
+<script></script>
+
+<div id="utteranc-es-comment"></div>
+<script src="https://utteranc.es/client.js" repo="tangheng1995/tangheng1995.github.io" issue-term="pathname" label="utteranc-es-comment" theme="github-light" crossorigin="anonymous" async="">
+</script>
+
+<script>
+var days = 0, daysMax = Math.floor((Date.now() / 1000 - 1467820800) / (60 * 60 * 24));
+(function daysCount(){
+    if(days > daysMax){
+        document.getElementById('days').innerHTML = daysMax;
+        return;
+    } else {
+        document.getElementById('days').innerHTML = days;
+        days += 10;
+        setTimeout(daysCount, 1); 
+    }
+})();
+</script>
+
+:ET

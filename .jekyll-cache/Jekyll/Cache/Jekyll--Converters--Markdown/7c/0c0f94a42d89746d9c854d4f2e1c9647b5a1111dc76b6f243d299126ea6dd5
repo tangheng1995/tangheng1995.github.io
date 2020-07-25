@@ -1,0 +1,143 @@
+I"E!<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#golang默认包管理工具" id="markdown-toc-golang默认包管理工具">Golang默认包管理工具</a>    <ul>
+      <li><a href="#配置go-env" id="markdown-toc-配置go-env">配置go env</a></li>
+      <li><a href="#go-mod-init" id="markdown-toc-go-mod-init">go mod init</a></li>
+      <li><a href="#go-mod-download" id="markdown-toc-go-mod-download">go mod download</a></li>
+      <li><a href="#go-mod-tidy" id="markdown-toc-go-mod-tidy">go mod tidy</a></li>
+      <li><a href="#go-mod-vendor" id="markdown-toc-go-mod-vendor">go mod vendor</a></li>
+      <li><a href="#go-get" id="markdown-toc-go-get">go get</a></li>
+      <li><a href="#vendor-模式" id="markdown-toc-vendor-模式">vendor 模式</a></li>
+      <li><a href="#replace" id="markdown-toc-replace">replace</a></li>
+      <li><a href="#清缓存" id="markdown-toc-清缓存">清缓存</a></li>
+      <li><a href="#gomod--gosum" id="markdown-toc-gomod--gosum">go.mod &amp; go.sum</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang 默认包管理工具配置及使用。</p>
+
+<h2 id="golang默认包管理工具">Golang默认包管理工具</h2>
+
+<p>go mod是go语言内置的包管理工具，集成在go tool中，安装好go就可以使用。</p>
+
+<h3 id="配置go-env">配置go env</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">"on"</span>
+<span class="nv">GOARCH</span><span class="o">=</span><span class="s2">"amd64"</span>
+<span class="nv">GOBIN</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GOCACHE</span><span class="o">=</span><span class="s2">"/home/tangheng/.cache/go-build"</span>
+<span class="nv">GOENV</span><span class="o">=</span><span class="s2">"/home/tangheng/.config/go/env"</span>
+<span class="nv">GOEXE</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GOFLAGS</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GOHOSTARCH</span><span class="o">=</span><span class="s2">"amd64"</span>
+<span class="nv">GOHOSTOS</span><span class="o">=</span><span class="s2">"linux"</span>
+<span class="nv">GOINSECURE</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GONOPROXY</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GONOSUMDB</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GOOS</span><span class="o">=</span><span class="s2">"linux"</span>
+<span class="nv">GOPATH</span><span class="o">=</span><span class="s2">"/home/tangheng/go"</span>
+<span class="nv">GOPRIVATE</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GOPROXY</span><span class="o">=</span><span class="s2">"https://goproxy.cn,direct"</span>
+<span class="nv">GOROOT</span><span class="o">=</span><span class="s2">"/usr/local/go"</span>
+<span class="nv">GOSUMDB</span><span class="o">=</span><span class="s2">"sum.golang.org"</span>
+<span class="nv">GOTMPDIR</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">GOTOOLDIR</span><span class="o">=</span><span class="s2">"/usr/local/go/pkg/tool/linux_amd64"</span>
+<span class="nv">GCCGO</span><span class="o">=</span><span class="s2">"gccgo"</span>
+<span class="nv">AR</span><span class="o">=</span><span class="s2">"ar"</span>
+<span class="nv">CC</span><span class="o">=</span><span class="s2">"gcc"</span>
+<span class="nv">CXX</span><span class="o">=</span><span class="s2">"g++"</span>
+<span class="nv">CGO_ENABLED</span><span class="o">=</span><span class="s2">"1"</span>
+<span class="nv">GOMOD</span><span class="o">=</span><span class="s2">"/dev/null"</span>
+<span class="nv">CGO_CFLAGS</span><span class="o">=</span><span class="s2">"-g -O2"</span>
+<span class="nv">CGO_CPPFLAGS</span><span class="o">=</span><span class="s2">""</span>
+<span class="nv">CGO_CXXFLAGS</span><span class="o">=</span><span class="s2">"-g -O2"</span>
+<span class="nv">CGO_FFLAGS</span><span class="o">=</span><span class="s2">"-g -O2"</span>
+<span class="nv">CGO_LDFLAGS</span><span class="o">=</span><span class="s2">"-g -O2"</span>
+<span class="nv">PKG_CONFIG</span><span class="o">=</span><span class="s2">"pkg-config"</span>
+<span class="nv">GOGCCFLAGS</span><span class="o">=</span><span class="s2">"-fPIC -m64 -pthread -fmessage-length=0 -fdebug-prefix-map=/tmp/go-build303757599=/tmp/go-build -gno-record-gcc-switches"</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 修改go env参数</span>
+go <span class="nb">env</span> <span class="nt">-w</span> <span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">"on"</span>
+
+<span class="c"># 重置go env参数</span>
+go <span class="nb">env</span> <span class="nt">-w</span> <span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">""</span>
+</code></pre></div></div>
+
+<h3 id="go-mod-init">go mod init</h3>
+
+<p>初始化</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go mod init &lt;module-name&gt;
+</code></pre></div></div>
+
+<h3 id="go-mod-download">go mod download</h3>
+
+<p>下载依赖，也可直接运行main函数自动下载需要的依赖</p>
+
+<h3 id="go-mod-tidy">go mod tidy</h3>
+
+<p>同步依赖包，添加需要的，移除多余的</p>
+
+<h3 id="go-mod-vendor">go mod vendor</h3>
+
+<p>将依赖包放入项目vendor目录，方便项目部署反复下载依赖</p>
+
+<h3 id="go-get">go get</h3>
+
+<p>go mod不再下载源码进$GOPATH/src</p>
+
+<p>go mod的下载目录在$GOPATH/pkg/mod，并且是文件权限是只读</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 升级依赖包</span>
+go get <span class="nt">-u</span> 
+</code></pre></div></div>
+
+<h3 id="vendor-模式">vendor 模式</h3>
+
+<p>go mod是不推荐使用vendor目录的，而是直接使用source或cache中的包。</p>
+
+<p>module mode下默认忽略vendor目录。通过flag-mod=vendor设置vendor模式，依赖只从顶层的vendor中查找。可以通过环境变量GOFLAGS=-mod=vendor来设置flag。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go <span class="nb">env</span> <span class="nt">-w</span> <span class="nv">GOFLAGS</span><span class="o">=</span><span class="s2">"-mod=vendor"</span>
+</code></pre></div></div>
+
+<h3 id="replace">replace</h3>
+
+<p>让原本依赖的 github.com/repo/pkg 包，实际使用 github.com/your-fork/pkg@v。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go mod edit <span class="nt">-replace</span> old[@v]<span class="o">=</span>new[@v]
+
+<span class="c"># 如果不是replace本地包，必须带上版本号</span>
+go mod edit <span class="nt">-replace</span> golang.org/x/crypto<span class="o">=</span>github.com/golang/crypto@v0.0.0-20190621222207-cc06ce4a13d4
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># go.mod</span>
+replace golang.org/x/crypto <span class="o">=&gt;</span> github.com/golang/crypto v0.0.0-20190621222207-cc06ce4a13d4
+
+replace golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4 <span class="o">=&gt;</span> github.com/golang/crypto v0.0.0-20190621222207-cc06ce4a13d4
+</code></pre></div></div>
+
+<h3 id="清缓存">清缓存</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go clean <span class="nt">-modcache</span>
+</code></pre></div></div>
+
+<h3 id="gomod--gosum">go.mod &amp; go.sum</h3>
+
+<p>go.mod：依赖列表和版本约束。</p>
+
+<p>go.sum：记录module文件hash值，用于安全校验。</p>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://segmentfault.com/a/1190000019314903">golang内置包管理工具go mod简明教程</a></li>
+  <li>[2] <a href="https://tip.golang.org/cmd/go/#hdr-Download_modules_to_local_cache">官方文档</a></li>
+  <li>[3] <a href="https://github.com/golang/go/wiki/Modules#how-do-i-use-vendoring-with-modules-is-vendoring-going-away">How do I use vendoring with modules? Is vendoring going away?</a></li>
+</ul>
+:ET

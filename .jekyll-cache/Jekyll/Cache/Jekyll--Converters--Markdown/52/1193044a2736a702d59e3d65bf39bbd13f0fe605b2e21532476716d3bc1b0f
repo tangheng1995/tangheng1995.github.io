@@ -1,0 +1,173 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu-安装-k8s" id="markdown-toc-ubuntu-安装-k8s">Ubuntu 安装 K8S</a>    <ul>
+      <li><a href="#安装kubectl" id="markdown-toc-安装kubectl">安装kubectl</a></li>
+      <li><a href="#安装-minikube" id="markdown-toc-安装-minikube">安装 minikube</a></li>
+      <li><a href="#启动镜像" id="markdown-toc-启动镜像">启动镜像</a></li>
+      <li><a href="#deploymentpod服务如何组合运行的" id="markdown-toc-deploymentpod服务如何组合运行的">deployment，pod，服务如何组合运行的</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Ubuntu 安装 K8S。</p>
+
+<h2 id="ubuntu-安装-k8s">Ubuntu 安装 K8S</h2>
+
+<h3 id="安装kubectl">安装kubectl</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-LO</span> https://storage.googleapis.com/kubernetes-release/release/<span class="sb">`</span>curl <span class="nt">-s</span> https://storage.googleapis.com/kubernetes-release/release/stable.txt<span class="sb">`</span>/bin/linux/amd64/kubectl
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x ./kubectl
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo mv</span> ./kubectl /usr/local/bin/
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl version
+</code></pre></div></div>
+
+<h3 id="安装-minikube">安装 minikube</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-Lo</span> minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 <span class="se">\</span>
+  <span class="o">&amp;&amp;</span> <span class="nb">chmod</span> +x minikube
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo mv</span> ./minikube /usr/local/bin/
+</code></pre></div></div>
+
+<ul>
+  <li>minikube 启动方法一，运行在虚拟机，这要求当前电脑上要先安装VirtualBox或者KVM：</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube start
+</code></pre></div></div>
+
+<ul>
+  <li>minikube 启动方法二，运行在宿主机，这种方式不需要在当前电脑安装ViirtualBox或者KVM：</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube start <span class="nt">--vm-driver</span><span class="o">=</span>none
+</code></pre></div></div>
+
+<p><img src="/assets/images/2019/2019-09-28-minilube-start.png" alt="minikube" /></p>
+
+<h3 id="启动镜像">启动镜像</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>kubectl run kubia <span class="nt">--image</span><span class="o">=</span>registry.cn-hongkong.aliyuncs.com/k8s_in_action/kubia:v0.0.1 <span class="nt">--port</span><span class="o">=</span>8080
+</code></pre></div></div>
+
+<p>因为是minikube创建的集群，所有不能通过LoadBalancer类型暴露外部访问连接</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>kubectl expose deployment kubia <span class="nt">--type</span><span class="o">=</span>NodePort
+</code></pre></div></div>
+
+<p>查看外部访问连接</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube service <span class="nt">--url</span> kubia
+</code></pre></div></div>
+
+<h3 id="deploymentpod服务如何组合运行的">deployment，pod，服务如何组合运行的</h3>
+
+<p>查看pod</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>kubectl get po
+</code></pre></div></div>
+
+<p>如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                     READY   STATUS    RESTARTS   AGE
+kubia-84654c6d97-zxnb8   1/1     Running   0          12h
+</code></pre></div></div>
+
+<p>查看详情：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>kubectl describe po kubia-84654c6d97-zxnb8
+</code></pre></div></div>
+
+<p>如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Name:         kubia-84654c6d97-zxnb8
+Namespace:    default
+Priority:     0
+Node:         minikube/192.168.17.131
+Start Time:   Fri, 27 Sep 2019 19:02:20 +0000
+Labels:       pod-template-hash<span class="o">=</span>84654c6d97
+              <span class="nv">run</span><span class="o">=</span>kubia
+Annotations:  &lt;none&gt;
+Status:       Running
+IP:           172.17.0.2
+IPs:
+  IP:           172.17.0.2
+Controlled By:  ReplicaSet/kubia-84654c6d97
+Containers:
+  kubia:
+    Container ID:   docker://f42b859c86c85a93baca41b865c94e475973497c9abf6327f6a335b8d4886398
+    Image:          registry.cn-hongkong.aliyuncs.com/k8s_in_action/kubia:v0.0.1
+    Image ID:       docker-pullable://registry.cn-hongkong.aliyuncs.com/k8s_in_action/kubia@sha256:9497e7b118a92d1d3c9e0823a10c9b1cc94259c04689df49f8ef355b76eac052
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Fri, 27 Sep 2019 19:02:22 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    &lt;none&gt;
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-s6gm6 <span class="o">(</span>ro<span class="o">)</span>
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  default-token-s6gm6:
+    Type:        Secret <span class="o">(</span>a volume populated by a Secret<span class="o">)</span>
+    SecretName:  default-token-s6gm6
+    Optional:    <span class="nb">false
+</span>QoS Class:       BestEffort
+Node-Selectors:  &lt;none&gt;
+Tolerations:     node.kubernetes.io/not-ready:NoExecute <span class="k">for </span>300s
+                 node.kubernetes.io/unreachable:NoExecute <span class="k">for </span>300s
+Events:          &lt;none&gt;
+</code></pre></div></div>
+
+<p>查看服务：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>kubectl get svc
+</code></pre></div></div>
+
+<p>如下：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes   ClusterIP   10.96.0.1       &lt;none&gt;        443/TCP          39h
+kubia        NodePort    10.106.149.92   &lt;none&gt;        8080:31922/TCP   12h
+</code></pre></div></div>
+
+<p>查看详情：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>kubectl describe svc kubia
+</code></pre></div></div>
+
+<p>如下：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Name:                     kubia
+Namespace:                default
+Labels:                   run=kubia
+Annotations:              &lt;none&gt;
+Selector:                 run=kubia
+Type:                     NodePort
+IP:                       10.106.149.92
+Port:                     &lt;unset&gt;  8080/TCP
+TargetPort:               8080/TCP
+NodePort:                 &lt;unset&gt;  31922/TCP
+Endpoints:                172.17.0.2:8080
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   &lt;none&gt;
+</code></pre></div></div>
+
+<p><img src="/assets/images/2019/2019-09-28-kubia-run.png" alt="kubia-run" /></p>
+:ET

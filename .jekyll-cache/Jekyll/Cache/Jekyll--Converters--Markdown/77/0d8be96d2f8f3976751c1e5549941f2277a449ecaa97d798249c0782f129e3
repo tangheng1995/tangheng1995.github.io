@@ -1,0 +1,123 @@
+I"7<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#mysql-80压缩包安装win" id="markdown-toc-mysql-80压缩包安装win">Mysql-8.0压缩包安装(Win)</a>    <ul>
+      <li><a href="#下载zip安装包" id="markdown-toc-下载zip安装包">下载zip安装包</a></li>
+      <li><a href="#安装" id="markdown-toc-安装">安装</a>        <ul>
+          <li><a href="#解压" id="markdown-toc-解压">解压</a></li>
+          <li><a href="#配置初始化myini文件" id="markdown-toc-配置初始化myini文件">配置初始化my.ini文件</a></li>
+          <li><a href="#安装mysql" id="markdown-toc-安装mysql">安装mysql</a></li>
+          <li><a href="#启动mysql服务" id="markdown-toc-启动mysql服务">启动mysql服务</a></li>
+          <li><a href="#连接mysql更改密码" id="markdown-toc-连接mysql更改密码">连接mysql更改密码</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Windows 安装 MySQL压缩包。</p>
+
+<h2 id="mysql-80压缩包安装win">Mysql-8.0压缩包安装(Win)</h2>
+
+<h3 id="下载zip安装包">下载zip安装包</h3>
+
+<p><img src="https://dev.mysql.com/downloads/file/?id=492455" alt="(mysql-8.0.19-winx64.zip)" /></p>
+
+<h3 id="安装">安装</h3>
+
+<h4 id="解压">解压</h4>
+
+<p>我解压目录为 D:\devsoft\Mysql\mysql-8.0.19-winx64</p>
+
+<blockquote>
+  <p>解压后的文件目录，缺失data文件夹和my.ini配置文件</p>
+</blockquote>
+
+<p>添加路径至环境变量PATH：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>D:\devsoft\Mysql\mysql-8.0.19-winx64
+D:\devsoft\Mysql\mysql-8.0.19-winx64\bin
+</code></pre></div></div>
+
+<h4 id="配置初始化myini文件">配置初始化my.ini文件</h4>
+
+<p>在根目录 D:\devsoft\Mysql\mysql-8.0.19-winx64 添加 my.ini文件并创建data目录:</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[mysqld]</span>
+<span class="c"># 设置3306端口
+</span><span class="py">port</span><span class="p">=</span><span class="s">3306</span>
+
+<span class="c"># 设置mysql的安装目录
+</span><span class="py">basedir</span><span class="p">=</span><span class="s">D:</span><span class="se">\d</span><span class="s">evsoft</span><span class="se">\M</span><span class="s">ysql</span><span class="se">\m</span><span class="s">ysql-8.0.19-winx64   # 根据自己的地址更改</span>
+
+<span class="c"># 设置mysql数据库的数据的存放目录
+</span><span class="py">datadir</span><span class="p">=</span><span class="s">D:</span><span class="se">\d</span><span class="s">evsoft</span><span class="se">\M</span><span class="s">ysql</span><span class="se">\m</span><span class="s">ysql-8.0.19-winx64</span><span class="se">\d</span><span class="s">ata   # 根据自己的地址更改</span>
+
+<span class="err">&lt;!--</span> <span class="c"># 允许最大连接数 --&gt;
+</span><span class="py">max_connections</span><span class="p">=</span><span class="s">200</span>
+
+<span class="c"># 允许连接失败的次数。这是为了防止有人从该主机试图攻击数据库系统
+</span><span class="py">max_connect_errors</span><span class="p">=</span><span class="s">10</span>
+
+<span class="c"># 服务端使用的字符集默认为UTF8
+</span><span class="py">character-set-server</span><span class="p">=</span><span class="s">utf8mb4</span>
+
+<span class="c"># 创建新表时将使用的默认存储引擎
+</span><span class="py">default-storage-engine</span><span class="p">=</span><span class="s">INNODB</span>
+
+<span class="c"># 默认使用“mysql_native_password”插件认证
+</span><span class="py">default_authentication_plugin</span><span class="p">=</span><span class="s">mysql_native_password</span>
+
+<span class="nn">[mysql]</span>
+<span class="c"># 设置mysql客户端默认字符集
+</span><span class="py">default-character-set</span><span class="p">=</span><span class="s">utf8mb4</span>
+
+<span class="nn">[client]</span>
+<span class="c"># 设置mysql客户端连接服务端时默认使用的端口
+</span><span class="py">port</span><span class="p">=</span><span class="s">3306</span>
+<span class="py">default-character-set</span><span class="p">=</span><span class="s">utf8mb4</span>
+</code></pre></div></div>
+
+<h4 id="安装mysql">安装mysql</h4>
+
+<p>在安装时，必须以管理员身份运行cmd，否则在安装时会报错，会导致安装失败的情况</p>
+
+<p>遇到在 C:\Windows\system32&gt; 命令无法切换到需要安装mysql的目录时，执行：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd /d D:\devsoft\Mysql\mysql-8.0.19-winx64\bin
+</code></pre></div></div>
+
+<p>在MySQL安装目录的 bin 目录路径下执行命令：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysqld --initialize --console
+</code></pre></div></div>
+
+<p>执行完成后，会打印 root 用户的初始默认密码,记录密码</p>
+
+<h4 id="启动mysql服务">启动mysql服务</h4>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 启动
+net start mysql
+
+# 停止
+net stop mysql
+
+# 删除服务
+sc delete mysql
+</code></pre></div></div>
+
+<h4 id="连接mysql更改密码">连接mysql更改密码</h4>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 登录
+mysql -u root -p
+
+# 遇到报错，win + r 输入 services.msc 启动 mysql 服务
+ERROR 2003 (HY000): Can't connect to MySQL server on 'localhost' (10061)
+</code></pre></div></div>
+
+<p>修改密码：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">ALTER</span> <span class="k">USER</span> <span class="s1">'root'</span><span class="o">@</span><span class="s1">'localhost'</span> <span class="n">IDENTIFIED</span> <span class="k">WITH</span> <span class="n">mysql_native_password</span> <span class="k">BY</span> <span class="s1">'新密码'</span><span class="p">;</span>  
+</code></pre></div></div>
+:ET

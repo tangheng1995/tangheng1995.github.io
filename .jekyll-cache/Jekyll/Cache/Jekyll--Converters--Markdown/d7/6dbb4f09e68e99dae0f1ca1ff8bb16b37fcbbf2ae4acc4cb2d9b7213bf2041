@@ -1,0 +1,54 @@
+I"*<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#centos-安装-jekyll" id="markdown-toc-centos-安装-jekyll">CentOS 安装 jekyll</a>    <ul>
+      <li><a href="#安装jekyll" id="markdown-toc-安装jekyll">安装jekyll</a></li>
+      <li><a href="#主题" id="markdown-toc-主题">主题</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>CentOS 安装 jekyll 博客。</p>
+
+<h2 id="centos-安装-jekyll">CentOS 安装 jekyll</h2>
+
+<blockquote>
+  <p>EPEL (Extra Packages for Enterprise Linux)是基于Fedora的一个项目，为“红帽系”的操作系统提供额外的软件包，适用于RHEL、CentOS和Scientific Linux.</p>
+</blockquote>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum <span class="nb">install</span> <span class="nt">-y</span>  epel-release
+</code></pre></div></div>
+
+<h3 id="安装jekyll">安装jekyll</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 安装依赖</span>
+<span class="nb">sudo </span>yum <span class="nb">install </span>nodejs npm ruby ruby-devel rubygems git
+
+<span class="c"># 修改gem源</span>
+gem sources <span class="nt">--add</span> https://gems.ruby-china.com/ <span class="nt">--remove</span> https://rubygems.org/
+gem sources <span class="nt">-l</span>
+
+<span class="c"># jekyll需要ruby 2.1以上，先安装ram升级ruby</span>
+curl <span class="nt">-sSL</span> https://get.rvm.io | bash <span class="nt">-s</span> stable
+
+<span class="c"># 应用ram</span>
+<span class="nb">source</span> /etc/profile.d/rvm.sh
+
+<span class="c"># 查看ruby版本</span>
+rvm list known
+
+<span class="c"># 安装ruby 2.5</span>
+rvm <span class="nb">install </span>2.5
+
+<span class="c"># 验证版本</span>
+ruby <span class="nt">-v</span>
+
+<span class="c"># 安装jekyll</span>
+gem <span class="nb">install </span>jekyll
+</code></pre></div></div>
+
+<h3 id="主题">主题</h3>
+
+<p><a href="http://jekyllthemes.org/">寻找自己喜欢的主题</a></p>
+:ET

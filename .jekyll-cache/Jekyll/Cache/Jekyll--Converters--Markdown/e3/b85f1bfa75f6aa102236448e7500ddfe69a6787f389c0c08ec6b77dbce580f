@@ -1,0 +1,68 @@
+I"|<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#linux-ssh远程登陆免密" id="markdown-toc-linux-ssh远程登陆免密">Linux ssh远程登陆免密</a>    <ul>
+      <li><a href="#生成公钥密钥此处我默认生成在homebrookssh目录" id="markdown-toc-生成公钥密钥此处我默认生成在homebrookssh目录">生成公钥密钥(此处我默认生成在/home/brook/.ssh/目录)</a></li>
+      <li><a href="#拷贝a的公钥至b的-ssh-目录下" id="markdown-toc-拷贝a的公钥至b的-ssh-目录下">拷贝A的公钥至B的 ~/.ssh/ 目录下</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux SSH远程登陆免密。</p>
+
+<h2 id="linux-ssh远程登陆免密">Linux ssh远程登陆免密</h2>
+
+<p>目的：
+要求节点A免密登陆到节点B</p>
+
+<p>方案：
+就是A想要连接B免密登录B，需要把A的id_rsa.pub文件内容写进B的authorized_keys里面</p>
+
+<h3 id="生成公钥密钥此处我默认生成在homebrookssh目录">生成公钥密钥(此处我默认生成在/home/brook/.ssh/目录)</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh-keygen -t rsa -P ""
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Generating public/private rsa key pair.
+Enter file in which to save the key (/home/brook/.ssh/id_rsa):
+Your identification has been saved in /home/brook/.ssh/id_rsa.
+Your public key has been saved in /home/brook/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:lGuZ63vwuXyI0wf9J06AtOlbPA7Np3hWzBfjJisU+Hc brook@brook-X75VC
+The key's randomart image is:
++---[RSA 2048]----+
+|                 |
+|         .       |
+|        o o      |
+|       . * =   o |
+|        S =.oo. o|
+|       ..o.*.++E.|
+|        .=++BoB. |
+|       .o.*B=*o .|
+|        o+=*+..o |
++----[SHA256]-----+
+</code></pre></div></div>
+
+<h3 id="拷贝a的公钥至b的-ssh-目录下">拷贝A的公钥至B的 ~/.ssh/ 目录下</h3>
+
+<ul>
+  <li>方法一</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 此处 -p port 指的是B节点ssh端口</span>
+ssh-copy-id <span class="nt">-i</span> ~/.ssh/id_rsa.pub user@host <span class="nt">-p</span> port
+<span class="c"># 输入密码即可，下次磕免密登陆</span>
+</code></pre></div></div>
+
+<ul>
+  <li>方法二</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 此处 -P port 指的是B节点ssh端口</span>
+scp <span class="nt">-P</span> port /home/brook/.ssh/id_rsa.pub user@host:~/.ssh/id_rsa.pub1
+
+<span class="c"># 再登陆B节点/.ssh/ 目录，将id_rsa.pub1内容写至authorized_key文件</span>
+<span class="nb">cat </span>id_rsa.pub1 <span class="o">&gt;</span> authorized_key
+</code></pre></div></div>
+:ET

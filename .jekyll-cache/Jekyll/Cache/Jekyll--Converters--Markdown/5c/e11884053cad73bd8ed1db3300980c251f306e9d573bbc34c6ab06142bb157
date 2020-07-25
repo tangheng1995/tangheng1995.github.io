@@ -1,0 +1,121 @@
+I"�'<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#python优雅编程-字符串的格式化" id="markdown-toc-python优雅编程-字符串的格式化">Python优雅编程-字符串的格式化</a>    <ul>
+      <li><a href="#f-字符串f-string" id="markdown-toc-f-字符串f-string">f-字符串(f-string)</a></li>
+      <li><a href="#strformat-方法" id="markdown-toc-strformat-方法">str.format() 方法</a></li>
+      <li><a href="#旧的字符串格式格式化方法" id="markdown-toc-旧的字符串格式格式化方法">旧的字符串格式：%格式化方法</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Python优雅编程之字符串的格式化。</p>
+
+<h2 id="python优雅编程-字符串的格式化">Python优雅编程-字符串的格式化</h2>
+
+<h3 id="f-字符串f-string">f-字符串(f-string)</h3>
+
+<p>格式化的字符串字面值（简称为f-字符串），是在字符串的开始引号之前加上一个f或F。在这样的字符串中，我们可以在花括号{}中引用变量或Python表达式。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span>
+<span class="k">print</span><span class="p">(</span><span class="s">f"the sum of </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s"> + </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s"> is </span><span class="si">{</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: the sum of 10 + 20 is 30
+</code></pre></div></div>
+
+<p>花括号{}里面的表达式可以有一些格式说明符，它们用来更好的控制值的格式化方式。比如下面这个例子，将浮点数保留到小数点后三位：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 这个f-字符串中的表达式，在:后面跟了限制小数点位数的格式说明符0.3f
+</span><span class="n">pi</span> <span class="o">=</span> <span class="mf">3.1415926</span>
+<span class="k">print</span><span class="p">(</span><span class="s">f"pi is </span><span class="si">{</span><span class="n">pi</span><span class="p">:</span><span class="mf">0.3</span><span class="n">f</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: pi is 3.142
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 限制最小字符宽度的，可以让输出保持列对齐
+</span><span class="n">persons</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Tom'</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span> <span class="s">'Jack'</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span> <span class="s">'William'</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">age</span> <span class="ow">in</span> <span class="n">persons</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">f'</span><span class="si">{</span><span class="n">name</span><span class="p">:</span><span class="mi">7</span><span class="si">}</span><span class="s"> : </span><span class="si">{</span><span class="n">age</span><span class="p">:</span><span class="mi">5</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output:
+Tom     :    23
+Jack    :    29
+William :    20
+</code></pre></div></div>
+
+<h3 id="strformat-方法">str.format() 方法</h3>
+
+<ul>
+  <li>字符串里面的花括号被format方法传入的参数替换，所以，花括号的数量应该和传递给format的参数的数量保持一致，严格来说，花括号的数量不能多于
+format传递的参数的数量，否则会报错</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"I love {} and {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"Python"</span><span class="p">,</span> <span class="s">"Golang"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: I love Python and Golang
+</code></pre></div></div>
+
+<ul>
+  <li>花括号中可以包含数字，用来表示传递给format()方法的对象的位置：</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"I love {1} and {0}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"Python"</span><span class="p">,</span> <span class="s">"Golang"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: I love Golang and Python
+</code></pre></div></div>
+
+<ul>
+  <li>如果在format()方法中使用关键字参数，则使用参数的名称来引用它们的值：</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"I love {p} and {g}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="s">"Python"</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="s">"Golang"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: I love Python and Golang
+</code></pre></div></div>
+
+<ul>
+  <li>位置和关键字参数可以组合在一起使用</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"I love {0} and {g}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"Python"</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="s">"Golang"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: I love Python and Golang
+</code></pre></div></div>
+
+<ul>
+  <li>以给format传递一个字典和使用方括号[]来访问键来完成格式化：</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">persons</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Tom'</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span> <span class="s">'Jack'</span><span class="p">:</span> <span class="mi">29</span><span class="p">,</span> <span class="s">'William'</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Tom:{0[Tom]:d}, Jack:{0[Jack]}, William:{0[William]:d}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">persons</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output:Tom:23, Jack:29, William:20
+</code></pre></div></div>
+
+<p>花括号里面的0[Tom]:d的意思是，0代表传给format的第一个对象，即persons；[Tom]就是通过键来引用第一个对象中Tom对应的值，即23；:d是整数格式化
+说明符，如果Tom得到值是字符串就会报错：Unknown format code ‘d’ for object of type ‘str’</p>
+
+<p>这里也可以使用**符号将字典作为关键字参数传递：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">'Tom:{Tom:d}, Jack:{Jack}, William:{William:d}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="o">**</span><span class="n">persons</span><span class="p">))</span>         
+</code></pre></div></div>
+
+<h3 id="旧的字符串格式格式化方法">旧的字符串格式：%格式化方法</h3>
+
+<p>在Python 2中，使用百分号%进行格式化。但在Python3中，更推荐使用str.format()方法或f-字符串格式化。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"I love %s and %s"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">"Python"</span><span class="p">,</span> <span class="s">"Golang"</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: I love Python and Golang
+</code></pre></div></div>
+:ET

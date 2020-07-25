@@ -1,0 +1,93 @@
+I"]<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#git-配置多用户" id="markdown-toc-git-配置多用户">Git 配置多用户</a>    <ul>
+      <li><a href="#生成ssh-key" id="markdown-toc-生成ssh-key">生成ssh-key</a></li>
+      <li><a href="#创建或修改config文件" id="markdown-toc-创建或修改config文件">创建或修改config文件</a></li>
+      <li><a href="#测试" id="markdown-toc-测试">测试</a></li>
+    </ul>
+  </li>
+  <li><a href="#配置代理" id="markdown-toc-配置代理">配置代理</a></li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Git 常用配置。</p>
+
+<ul>
+  <li>配置多用户</li>
+  <li>配置代理</li>
+</ul>
+
+<h2 id="git-配置多用户">Git 配置多用户</h2>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 用户A
+name: A
+email: a-mail@mail.com
+
+# 用户B
+name: B
+email: b-mail@mail.com
+</code></pre></div></div>
+
+<h3 id="生成ssh-key">生成ssh-key</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 用户A</span>
+ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-C</span> <span class="s2">"a-mail@mail.com"</span>
+
+<span class="c"># 用户B</span>
+ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-C</span> <span class="s2">"b-mail@mail.com"</span>
+</code></pre></div></div>
+
+<p>分别生成公钥私钥：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 用户A</span>
+id_rsa_a 和 id_rsa_a.pub
+
+<span class="c"># 用户B</span>
+id_rsa_b 和 id_rsa_b.pub
+</code></pre></div></div>
+
+<p>将公钥内容粘贴到自己的github或者其他第三方SSH公钥上。</p>
+
+<h3 id="创建或修改config文件">创建或修改config文件</h3>
+
+<p>创建或修改config文件 (默认.ssh下)</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Host github.com
+    HostName github.com
+    IdentityFile ~/.ssh/id_rsa_a
+    User A
+
+Host gitee.com
+    HostName gitee.com
+    IdentityFile ~/.ssh/id_rsa_b
+    User B
+</code></pre></div></div>
+
+<h3 id="测试">测试</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh -vT git@github.com
+ssh -vT git@gitee.com
+</code></pre></div></div>
+
+<p>进各自项目设置用户邮箱：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config user.name "yourname"
+git config user.email "youremail"
+</code></pre></div></div>
+
+<h2 id="配置代理">配置代理</h2>
+
+<p>配置github代理，加速下载：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global http.https://github.com.proxy socks5://127.0.0.1:1080
+
+#取消代理
+git config --global --unset http.https://github.com.proxy
+</code></pre></div></div>
+
+<p>查看：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global -e
+</code></pre></div></div>
+:ET

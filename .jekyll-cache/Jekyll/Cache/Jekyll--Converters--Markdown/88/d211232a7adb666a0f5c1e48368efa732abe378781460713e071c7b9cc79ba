@@ -1,0 +1,152 @@
+I"?<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#mi-mix-2s-安装-第三方rom-lineageos16" id="markdown-toc-mi-mix-2s-安装-第三方rom-lineageos16">Mi Mix 2s 安装 第三方ROM lineageos16</a>    <ul>
+      <li><a href="#前置条件确认电脑安装了-adb-和-fastboot" id="markdown-toc-前置条件确认电脑安装了-adb-和-fastboot">前置条件，确认电脑安装了 <code class="language-plaintext highlighter-rouge">adb</code> 和 <code class="language-plaintext highlighter-rouge">fastboot</code></a></li>
+      <li><a href="#解锁bootloader" id="markdown-toc-解锁bootloader">解锁bootloader</a></li>
+      <li><a href="#fastboot模式安装第三方recovery" id="markdown-toc-fastboot模式安装第三方recovery">fastboot模式安装第三方recovery</a></li>
+      <li><a href="#在recovery里安装lineageos" id="markdown-toc-在recovery里安装lineageos">在recovery里安装LineageOS</a></li>
+      <li><a href="#qa" id="markdown-toc-qa">Q&amp;A</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>小米Mix2s安装lineageos16。</p>
+
+<h2 id="mi-mix-2s-安装-第三方rom-lineageos16">Mi Mix 2s 安装 第三方ROM lineageos16</h2>
+
+<h3 id="前置条件确认电脑安装了-adb-和-fastboot">前置条件，确认电脑安装了 <code class="language-plaintext highlighter-rouge">adb</code> 和 <code class="language-plaintext highlighter-rouge">fastboot</code></h3>
+
+<ol>
+  <li>
+    <p>安装 <code class="language-plaintext highlighter-rouge">adb</code> 和 <code class="language-plaintext highlighter-rouge">fastboot</code> ，下载 <a href="https://dl.google.com/android/repository/platform-tools-latest-windows.zip">Windows zip</a></p>
+  </li>
+  <li>
+    <p>解压 <code class="language-plaintext highlighter-rouge">platform-tools</code> 并且设置系统 <code class="language-plaintext highlighter-rouge">Path</code> 环境变量</p>
+  </li>
+  <li>
+    <p>确认 <code class="language-plaintext highlighter-rouge">adb</code> 命令，链接手机，设置开发者选项 USB调试</p>
+  </li>
+</ol>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看android设备</span>
+adb devices
+</code></pre></div></div>
+
+<ol>
+  <li>确认 <code class="language-plaintext highlighter-rouge">fastboot</code> 命令，手机进入 fastboot模式，输入命令：</li>
+</ol>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 查看fastboot设备</span>
+fastboot devices
+</code></pre></div></div>
+
+<h3 id="解锁bootloader">解锁bootloader</h3>
+
+<ol>
+  <li>
+    <p>在开发者选项中，解锁状态中设备绑定小米账号（大约需要3天才能正式解锁）</p>
+  </li>
+  <li>
+    <p>申请解锁，下载官方解锁工具，<a href="http://en.miui.com/unlock/">小米官方解锁网站</a></p>
+  </li>
+  <li>
+    <p>手机同时按住 音量下键+电源键，进入fastboot模式，再使用小米解锁工具解锁</p>
+  </li>
+</ol>
+
+<h3 id="fastboot模式安装第三方recovery">fastboot模式安装第三方recovery</h3>
+
+<ol>
+  <li>
+    <p>下载 <a href="https://dl.twrp.me/polaris">TWRP</a>,我这里下载的是<a href="https://dl.twrp.me/polaris/twrp-3.3.1-0-polaris.img.html">twrp-3.3.1-0-polaris.img</a></p>
+  </li>
+  <li>
+    <p>命令行输入 <code class="language-plaintext highlighter-rouge">adb reboot bootloader</code>，先检验设备是否进入fastboot模式，<code class="language-plaintext highlighter-rouge">fastboot devices</code></p>
+  </li>
+  <li>
+    <p>刷入 recovery 到设备</p>
+  </li>
+</ol>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastboot flash recovery &lt;recovery_filename&gt;.img
+</code></pre></div></div>
+
+<ol>
+  <li>重启进入 recovery验证安装</li>
+</ol>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastboot boot &lt;recovery_filename&gt;.img
+</code></pre></div></div>
+
+<h3 id="在recovery里安装lineageos">在recovery里安装LineageOS</h3>
+
+<ol>
+  <li>
+    <p>下载 <a href="https://download.lineageos.org/polaris">LineageOS install package</a></p>
+  </li>
+  <li>
+    <p>可以额外下载谷歌全套，<a href="http://opengapps.org/?api=9.0&amp;variant=nano">MindTheGapps (mirror), OpenGApps</a>,安装Gapps在安装lineageos后面，稍后讲详细步骤</p>
+  </li>
+  <li>
+    <p>进入 fastboot ，点击 <code class="language-plaintext highlighter-rouge">Wipe</code>，点击 <code class="language-plaintext highlighter-rouge">Format Data</code> 格式化数据</p>
+  </li>
+  <li>
+    <p>进入上一级菜单，点击 <code class="language-plaintext highlighter-rouge">Advanced Wipe</code>，然后选中 <code class="language-plaintext highlighter-rouge">Cache </code> 和 <code class="language-plaintext highlighter-rouge">System</code> 分区擦除，点击 <code class="language-plaintext highlighter-rouge">Swipe to Wipe</code></p>
+  </li>
+  <li>
+    <p>在主菜单上选择 <code class="language-plaintext highlighter-rouge">Advanced</code>,<code class="language-plaintext highlighter-rouge">ADB Sideload</code>，确认开始sideload</p>
+  </li>
+  <li>
+    <p>命令行 <code class="language-plaintext highlighter-rouge">adb sideload filename.zip</code></p>
+  </li>
+  <li>
+    <p>安装lineageos完成后，把下载好的Gapps包传至手机某个目录，返回主菜单，点击 <code class="language-plaintext highlighter-rouge">Install</code> ，<code class="language-plaintext highlighter-rouge">install zip</code> ，选中安装包 <code class="language-plaintext highlighter-rouge">Apply update</code></p>
+  </li>
+  <li>
+    <p>命令行 <code class="language-plaintext highlighter-rouge">adb reboot</code>，完成</p>
+  </li>
+</ol>
+
+<h3 id="qa">Q&amp;A</h3>
+
+<ol>
+  <li>WIFI 链接后显示已连接无网络</li>
+</ol>
+
+<p>进入开发者选项 一律不使用<code class="language-plaintext highlighter-rouge">HDCP检查</code>，确认勾选启用WLAN详细日志记录功能，拨号 <code class="language-plaintext highlighter-rouge">*#*#4636#*#*</code> , 进入 <code class="language-plaintext highlighter-rouge">Wi-Fi information</code> –&gt; <code class="language-plaintext highlighter-rouge">Wi-Fi status</code>,
+能看到wifi的ping主机是www.google.com，国内连不上是正常的，浏览器搜索换下国内网址就可以</p>
+
+<ol>
+  <li>pixel设置向导屡次停止运行</li>
+</ol>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 命令行运行</span>
+adb root
+adb remount
+adb shell
+pm disable com.google.android.setupwizard
+</code></pre></div></div>
+
+<p>然后进入应用权限，把所有google相关的app的权限全部打开</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 新命令行运行</span>
+pm <span class="nb">enable </span>com.google.android.setupwizard
+</code></pre></div></div>
+
+<p>然后进入显示系统，然后在下面找到设置向导（setup wizard），打开里面两个权限</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>am start <span class="nt">-n</span> com.google.android.setupwizard/.SetupWizardTestActivity
+</code></pre></div></div>
+
+<ol>
+  <li>去掉lineageos wifi叉号</li>
+</ol>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>adb shell <span class="s2">"settings put global captive_portal_http_url http://captive.lineageos.org.cn/generate_204"</span><span class="p">;</span>
+adb shell <span class="s2">"settings put global captive_portal_https_url https://captive.lineageos.org.cn/generate_204"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>然后打开飞行模式，关闭飞行模式，即可去掉叉号或叹号</p>
+:ET

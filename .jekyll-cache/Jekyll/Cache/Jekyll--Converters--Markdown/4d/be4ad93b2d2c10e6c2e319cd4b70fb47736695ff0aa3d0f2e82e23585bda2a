@@ -1,0 +1,257 @@
+I"�8<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu下使用docker-swarm-创建集群" id="markdown-toc-ubuntu下使用docker-swarm-创建集群">Ubuntu下使用docker swarm 创建集群</a>    <ul>
+      <li><a href="#创建集群" id="markdown-toc-创建集群">创建集群</a></li>
+      <li><a href="#添加节点" id="markdown-toc-添加节点">添加节点</a></li>
+      <li><a href="#创建服务" id="markdown-toc-创建服务">创建服务</a></li>
+      <li><a href="#查看服务状态" id="markdown-toc-查看服务状态">查看服务状态</a></li>
+      <li><a href="#服务中任务副本数" id="markdown-toc-服务中任务副本数">服务中任务副本数</a></li>
+      <li><a href="#删除服务" id="markdown-toc-删除服务">删除服务</a></li>
+      <li><a href="#滚动更新" id="markdown-toc-滚动更新">滚动更新</a></li>
+      <li><a href="#drain状态的节点" id="markdown-toc-drain状态的节点">DRAIN状态的节点</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Docker Engines的集群管理和业务流程功能是由swarmkit构建的。Swarmkit是一个独立的项目，由Docker直接调用来实现Docker的业务流程层。</p>
+
+<p>Swarm由多个运行了swarm模式Docker Engine的宿主机组成，每一个宿主机扮演了manager角色或者worker角色，再或者即扮演了manager角色也扮演了worker角色。Manager是管理节点关系和委托的节点，而worker是用来运行service的节点。</p>
+
+<h2 id="ubuntu下使用docker-swarm-创建集群">Ubuntu下使用docker swarm 创建集群</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">docker-machine</code> 可在单节点上虚拟多个节点创建集群(测试使用，不建议生产)</li>
+  <li><code class="language-plaintext highlighter-rouge">docker swarm init --advertise-addr &lt;MANAGER-IP&gt;</code> 创建集群</li>
+</ul>
+
+<p>本次测试使用多节点创建docker swarm 集群</p>
+
+<h3 id="创建集群">创建集群</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker swarm init <span class="nt">--advertise-addr</span> &lt;MANAGER-IP&gt;
+</code></pre></div></div>
+
+<p>MANAGER-IP 为我作为manager节点的IP，其他worker节点必须通过这个IP访问到该节点</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker swarm init <span class="nt">--advertise-addr</span> 192.168.17.135
+<span class="o">[</span><span class="nb">sudo</span><span class="o">]</span> password <span class="k">for </span>brook:
+Swarm initialized: current node <span class="o">(</span>ijiiozx9qim84b7ky1k33et30<span class="o">)</span> is now a manager.
+
+To add a worker to this swarm, run the following <span class="nb">command</span>:
+
+    docker swarm <span class="nb">join</span> <span class="nt">--token</span> SWMTKN-1-19wv30d5bzg9a5k60n4afvtcrhxbzek3c3zv2241s3pdbuvpzd-9ycrg2o42n3p8l5z8ga1hiz7t 192.168.17.135:2377
+
+To add a manager to this swarm, run <span class="s1">'docker swarm join-token manager'</span> and follow the instructions.
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># worker节点加入集群凭证</span>
+<span class="nb">sudo </span>docker swarm <span class="nb">join</span> <span class="nt">--token</span> SWMTKN-1-19wv30d5bzg9a5k60n4afvtcrhxbzek3c3zv2241s3pdbuvpzd-9ycrg2o42n3p8l5z8ga1hiz7t 192.168.17.135:2377
+</code></pre></div></div>
+
+<p>token凭证为新节点加入集群的凭证</p>
+
+<p>查看token：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker swarm join-token worker
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># docker info 查看swarm状态</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker info
+
+Swarm: active
+  NodeID: ijiiozx9qim84b7ky1k33et30
+  Is Manager: <span class="nb">true
+  </span>ClusterID: 04329fak6fjmxqxfmpcc0o0se
+  Managers: 1
+  Nodes: 1
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># docker node ls 查看节点信息</span>
+
+<span class="nv">$ </span><span class="nb">sudo </span>docker node <span class="nb">ls
+
+</span>ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+ijiiozx9qim84b7ky1k33et30 <span class="k">*</span>   swarm               Ready               Active              Leader              19.03.8
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">*</code> 表示当前链接的节点，即我们执行操作命令的节点。</p>
+
+<h3 id="添加节点">添加节点</h3>
+
+<p>主节点：192.168.17.135</p>
+
+<p>子节点：</p>
+
+<ul>
+  <li>192.168.17.136</li>
+  <li>192.168.17.137</li>
+</ul>
+
+<p>worker节点加入swarm集群</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker swarm <span class="nb">join</span> <span class="nt">--token</span> SWMTKN-1-19wv30d5bzg9a5k60n4afvtcrhxbzek3c3zv2241s3pdbuvpzd-9ycrg2o42n3p8l5z8ga1hiz7t 192.168.17.135:2377
+This node joined a swarm as a worker.
+</code></pre></div></div>
+
+<h3 id="创建服务">创建服务</h3>
+
+<p>在manager上创建服务</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>docker service create <span class="nt">--replicas</span> 1 <span class="nt">--name</span> helloworld alpine ping docker.com
+
+s05l117gvfosnct3s7us29l2i
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">docker service create</code>命令创建了一个service</li>
+  <li><code class="language-plaintext highlighter-rouge">--name</code> 将service命名为 <code class="language-plaintext highlighter-rouge">helloworld</code></li>
+  <li><code class="language-plaintext highlighter-rouge">--replicas</code> 指定运行1个实例</li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">alpine ping docker.com</code> 定义了service将以<code class="language-plaintext highlighter-rouge">Alpine Linux</code>为镜像的container运行，并在container内部执行命令<code class="language-plaintext highlighter-rouge">ping docker.com</code></p>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">--publish</code>参数来暴露端口。target用来指定container内部的端口号</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># docker service ls 查看服务</span>
+<span class="nv">$ </span><span class="nb">sudo </span>docker service <span class="nb">ls
+</span>ID            NAME        SCALE  IMAGE   COMMAND
+s05l117gvfos  helloworld  1/1    alpine  ping docker.com
+</code></pre></div></div>
+
+<h3 id="查看服务状态">查看服务状态</h3>
+
+<p>在manager节点上执行 <code class="language-plaintext highlighter-rouge">docker service inspect --pretty &lt;SERVICE-ID&gt;</code> 查看service的详细信息,<code class="language-plaintext highlighter-rouge">docker service inspect &lt;SERVICE-ID&gt;</code> 查看json格式</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker service inspect <span class="nt">--pretty</span> helloworld
+
+ID:             s05l117gvfosnct3s7us29l2i
+Name:           helloworld
+Service Mode:   Replicated
+ Replicas:      1
+Placement:
+UpdateConfig:
+ Parallelism:   1
+ On failure:    pause
+ Monitoring Period: 5s
+ Max failure ratio: 0
+ Update order:      stop-first
+RollbackConfig:
+ Parallelism:   1
+ On failure:    pause
+ Monitoring Period: 5s
+ Max failure ratio: 0
+ Rollback order:    stop-first
+ContainerSpec:
+ Image:         alpine:latest@sha256:b276d875eeed9c7d3f1cfa7edb06b22ed22b14219a7d67c52c56612330348239
+ Args:          ping docker.com
+ Init:          <span class="nb">false
+</span>Resources:
+Endpoint Mode:  vip
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">docker service ps helloworld</code> 查看service在哪些节点上运行</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE            ERROR               PORTS
+som7bkgohcv1        helloworld.1        alpine:latest       swarm               Running             Running 10 minutes ago
+</code></pre></div></div>
+
+<h3 id="服务中任务副本数">服务中任务副本数</h3>
+
+<p>集群分布式部署服务可指定服务副本数，在manager节点上执行 <code class="language-plaintext highlighter-rouge">docker service scale &lt;SERVICE-ID&gt;=&lt;NUMBER-OF-TASKS&gt;</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker service scale <span class="nv">helloworld</span><span class="o">=</span>5
+
+helloworld scaled to 5
+overall progress: 5 out of 5 tasks
+1/5: running
+2/5: running
+3/5: running
+4/5: running
+5/5: running
+</code></pre></div></div>
+
+<p>查看服务状态：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker service ps helloworld
+
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE                ERROR               PORTS
+som7bkgohcv1        helloworld.1        alpine:latest       swarm               Running             Running 17 minutes ago
+lbznumtbgtx2        helloworld.2        alpine:latest       swarm-worker1       Running             Running about a minute ago
+xcu7by8nmb2j        helloworld.3        alpine:latest       swarm-worker2       Running             Running about a minute ago
+px3urph3p30s        helloworld.4        alpine:latest       swarm-worker2       Running             Running about a minute ago
+924k8gdu234m        helloworld.5        alpine:latest       swarm               Running             Running about a minute ago
+</code></pre></div></div>
+
+<h3 id="删除服务">删除服务</h3>
+
+<p>在manager节点上 <code class="language-plaintext highlighter-rouge">docker service rm &lt;SERVICE-ID&gt;</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker service <span class="nb">rm </span>helloworld
+
+helloworld
+</code></pre></div></div>
+
+<p>查看服务是否被删除：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker service inspect helloworld
+<span class="o">[]</span>
+Status: Error: no such service: helloworld, Code: 1
+</code></pre></div></div>
+
+<h3 id="滚动更新">滚动更新</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>docker service create <span class="se">\</span>
+   <span class="nt">--replicas</span> 3 <span class="se">\</span>
+   <span class="nt">--name</span> redis <span class="se">\</span>
+   <span class="nt">--update-delay</span> 10s <span class="se">\</span>
+   redis:alpine
+</code></pre></div></div>
+
+<p>在部署时，我们需要对升级操作的策略进行设置。</p>
+
+<p>–update-delay指定每一个task升级的延时时间。例如，我们要求每个task较之前一个task开始升级的时间延时T秒，则把参数设置成Ts，s表示单位秒，m表示单位分钟，h表示单位小时。所以10m30s，表示将延时10分30秒。</p>
+
+<p>默认情况下一次更新1个task，可以通过参数–update-parallelism来设置同时开始更新的最大task个数。</p>
+
+<p>默认情况下当一个执行更新任务的task的状态成为RUNNING时，才会继续开始下一个task的更新，知道所有的task都成为RUNNING状态为止。一旦更新操作过程中，有一个task返回FAILED状态，则更新会立即停止。我们可以在docker service create或者docker service update命令中使用–update-failure-action参数，来控制更新失败后的操作。</p>
+
+<p>manager更新任务：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker service update <span class="nt">--image</span> redis:alpine3.11   redis
+
+redis
+</code></pre></div></div>
+
+<p>调度更新的步骤如下：</p>
+
+<ul>
+  <li>停止第一个task。</li>
+  <li>更新第一个停止的task。</li>
+  <li>更新完成后将task启动起啦。</li>
+  <li>如果task返回RUNNING状态，在等待task更新延时时间到达后，开始更新下一个task。</li>
+  <li>如果task返回FAILED 状态，则停止更新操作。</li>
+</ul>
+
+<h3 id="drain状态的节点">DRAIN状态的节点</h3>
+
+<p>DRAIN状态将阻止节点接收manager分配的任务。同时也意味着，manager将停止该节点上的task，并将task转移到其他ACTIVE状态的节点上运行。</p>
+
+<p><code class="language-plaintext highlighter-rouge">docker node update --availability drain &lt;NODE-ID&gt;</code> 将节点状态设置为DRAIN</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>docker node update <span class="nt">--availability</span> drain worker1
+
+worker1
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">docker node update --availability active &lt;NODE-ID&gt;</code>使节点状态变回到ACTIVE</p>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://www.bookstack.cn/read/docker-swarm-guides/swarmmo-shi-guan-jian-gai-nian.md">Swarm模式关键概念</a></li>
+  <li>[2] <a href="https://yeasy.gitbooks.io/docker_practice/swarm_mode/deploy.html">Swarm部署服务</a></li>
+</ul>
+:ET

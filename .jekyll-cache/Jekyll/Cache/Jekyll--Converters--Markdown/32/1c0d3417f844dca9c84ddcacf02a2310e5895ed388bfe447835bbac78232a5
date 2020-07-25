@@ -1,0 +1,678 @@
+I"��<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#goroutine原理" id="markdown-toc-goroutine原理">goroutine原理</a>    <ul>
+      <li><a href="#goroutine简介" id="markdown-toc-goroutine简介">goroutine简介</a></li>
+      <li><a href="#goroutine内部原理" id="markdown-toc-goroutine内部原理">goroutine内部原理</a>        <ul>
+          <li><a href="#并发" id="markdown-toc-并发">并发</a></li>
+          <li><a href="#并行" id="markdown-toc-并行">并行</a></li>
+          <li><a href="#进程" id="markdown-toc-进程">进程</a></li>
+          <li><a href="#线程" id="markdown-toc-线程">线程</a></li>
+          <li><a href="#协程" id="markdown-toc-协程">协程</a></li>
+          <li><a href="#调度模型简介" id="markdown-toc-调度模型简介">调度模型简介</a></li>
+          <li><a href="#调度实现" id="markdown-toc-调度实现">调度实现</a></li>
+        </ul>
+      </li>
+      <li><a href="#使用goroutine" id="markdown-toc-使用goroutine">使用goroutine</a>        <ul>
+          <li><a href="#基本使用" id="markdown-toc-基本使用">基本使用</a></li>
+          <li><a href="#goroutine异常捕捉" id="markdown-toc-goroutine异常捕捉">goroutine异常捕捉</a></li>
+          <li><a href="#同步的goroutine" id="markdown-toc-同步的goroutine">同步的goroutine</a></li>
+          <li><a href="#goroutine之间的通讯" id="markdown-toc-goroutine之间的通讯">goroutine之间的通讯</a></li>
+        </ul>
+      </li>
+      <li><a href="#channel" id="markdown-toc-channel">channel</a>        <ul>
+          <li><a href="#简介" id="markdown-toc-简介">简介</a></li>
+          <li><a href="#channel使用" id="markdown-toc-channel使用">channel使用</a></li>
+          <li><a href="#带缓冲区channe和不带缓冲区channel" id="markdown-toc-带缓冲区channe和不带缓冲区channel">带缓冲区channe和不带缓冲区channel</a></li>
+          <li><a href="#channel实现作业池" id="markdown-toc-channel实现作业池">channel实现作业池</a></li>
+          <li><a href="#只读channel和只写channel" id="markdown-toc-只读channel和只写channel">只读channel和只写channel</a></li>
+          <li><a href="#select-case实现非阻塞channel" id="markdown-toc-select-case实现非阻塞channel">select-case实现非阻塞channel</a></li>
+          <li><a href="#channel频率控制" id="markdown-toc-channel频率控制">channel频率控制</a></li>
+        </ul>
+      </li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang goroutine 原理。</p>
+
+<h2 id="goroutine原理">goroutine原理</h2>
+
+<blockquote>
+  <p><a href="https://juejin.im/entry/5b3f2f166fb9a04fb900b119">转载：掘金</a></p>
+</blockquote>
+
+<h3 id="goroutine简介">goroutine简介</h3>
+
+<p>goroutine是go语言中最为NB的设计，也是其魅力所在，goroutine的本质是协程，是实现并行计算的核心。goroutine使用方式非常的简单，只需使用go关键字即可启动一个协程，并且它是处于异步方式运行，你不需要等它运行完成以后在执行以后的代码。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">go</span> <span class="k">func</span><span class="p">()</span><span class="c">//通过go关键字启动一个协程来运行函数</span>
+</code></pre></div></div>
+
+<h3 id="goroutine内部原理">goroutine内部原理</h3>
+
+<p>概念介绍
+在进行实现原理之前，了解下一些关键性术语的概念。</p>
+
+<h4 id="并发">并发</h4>
+
+<p>一个cpu上能同时执行多项任务，在很短时间内，cpu来回切换任务执行(在某段很短时间内执行程序a，然后又迅速得切换到程序b去执行)，有时间上的重叠（宏观上是同时的，微观仍是顺序执行）,这样看起来多个任务像是同时执行，这就是并发。</p>
+
+<h4 id="并行">并行</h4>
+
+<p>当系统有多个CPU时,每个CPU同一时刻都运行任务，互不抢占自己所在的CPU资源，同时进行，称为并行。</p>
+
+<h4 id="进程">进程</h4>
+
+<p>cpu在切换程序的时候，如果不保存上一个程序的状态（也就是我们常说的context–上下文），直接切换下一个程序，就会丢失上一个程序的一系列状态，于是引入了进程这个概念，用以划分好程序运行时所需要的资源。因此进程就是一个程序运行时候的所需要的基本资源单位（也可以说是程序运行的一个实体）。</p>
+
+<h4 id="线程">线程</h4>
+
+<p>cpu切换多个进程的时候，会花费不少的时间，因为切换进程需要切换到内核态，而每次调度需要内核态都需要读取用户态的数据，进程一旦多起来，cpu调度会消耗一大堆资源，因此引入了线程的概念，线程本身几乎不占有资源，他们共享进程里的资源，内核调度起来不会那么像进程切换那么耗费资源。</p>
+
+<h4 id="协程">协程</h4>
+
+<p>协程拥有自己的寄存器上下文和栈。协程调度切换时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈。因此，协程能保留上一次调用时的状态（即所有局部状态的一个特定组合），每次过程重入时，就相当于进入上一次调用的状态，换种说法：进入上一次离开时所处逻辑流的位置。线程和进程的操作是由程序触发系统接口，最后的执行者是系统；协程的操作执行者则是用户自身程序，goroutine也是协程。</p>
+
+<h4 id="调度模型简介">调度模型简介</h4>
+
+<p>groutine能拥有强大的并发实现是通过GPM调度模型实现，下面就来解释下goroutine的调度模型。</p>
+
+<p><img src="/assets/images/2020/2020-01-13-our-cast.jpg" alt="模型" /></p>
+
+<p>Go的调度器内部有四个重要的结构：M，P，S，Sched，如上图所示（Sched未给出）</p>
+
+<blockquote>
+  <p>M代表系统线程，G代表goroutine，P代表处理器，上下文(可理解为context)，Sched存储闲置未使用的P</p>
+</blockquote>
+
+<ul>
+  <li>
+    <p>M:M代表内核级线程，一个M就是一个线程，goroutine就是跑在M之上的；M是一个很大的结构，里面维护小对象内存cache（mcache）、当前执行的goroutine、随机数发生器等等非常多的信息</p>
+  </li>
+  <li>
+    <p>G:代表一个goroutine，它有自己的栈，instruction pointer和其他信息（正在等待的channel等等），用于调度。</p>
+  </li>
+  <li>
+    <p>P:P全称是Processor，处理器，它的主要用途就是用来执行goroutine的，所以它也维护了一个goroutine队列，里面存储了所有需要它来执行的goroutine Sched：代表调度器，它维护有存储M和G的队列以及调度器的一些状态信息等。</p>
+  </li>
+</ul>
+
+<p>为什么要Go调度器？</p>
+
+<p>用户空间线程和内核空间线程之间的映射关系有：N:1,1:1和M:N</p>
+
+<ul>
+  <li>
+    <p>N:1是说，多个（N）用户线程始终在一个内核线程上跑，context上下文切换确实很快，但是无法真正的利用多核。</p>
+  </li>
+  <li>
+    <p>1：1是说，一个用户线程就只在一个内核线程上跑，这时可以利用多核，但是上下文switch很慢。</p>
+  </li>
+  <li>
+    <p>M:N是说， 多个goroutine在多个内核线程上跑，这个看似可以集齐上面两者的优势，但是无疑增加了调度的难度。</p>
+  </li>
+</ul>
+
+<h4 id="调度实现">调度实现</h4>
+
+<p><img src="/assets/images/2020/2020-01-13-in-motion.jpg" alt="实现" /></p>
+
+<p>从上图中看，有2个物理线程M，每一个M都拥有一个处理器P，每一个也都有一个正在运行的goroutine。</p>
+
+<p>P的数量可以通过GOMAXPROCS()来设置，它其实也就代表了真正的并发度，即有多少个goroutine可以同时运行。P的最大为256个，即默认最大处理器为256核</p>
+
+<p>图中灰色的那些goroutine并没有运行，而是出于ready的就绪态，正在等待被调度。P维护着这个队列（称之为runqueue）</p>
+
+<p>Go语言里，启动一个goroutine很容易：go function 就行，所以每有一个go语句被执行，runqueue队列就在其末尾加入一个</p>
+
+<p>goroutine，在下一个调度点，就从runqueue中取出（如何决定取哪个goroutine？）一个goroutine执行。</p>
+
+<p>当一个OS线程M0陷入阻塞时（如下图)，P转而在运行M1，图中的M1可能是正被创建，或者从线程缓存中取出。</p>
+
+<p><img src="/assets/images/2020/2020-01-13-syscall.jpg" alt="阻塞" /></p>
+
+<p>当MO返回时，它必须尝试取得一个P来运行goroutine，一般情况下，它会从其他的OS线程那里拿一个P过来，
+如果没有拿到的话，它就把goroutine放在一个global runqueue里，然后自己睡眠（放入线程缓存里）。所有的P也会周期性的检查global runqueue并运行其中的goroutine，否则global runqueue上的goroutine永远无法执行。   另一种情况是P所分配的任务G很快就执行完了（分配不均），这就导致了这个处理器P很忙，但是其他的P还有任务，此时如果global runqueue没有任务G了，那么P不得不从其他的P里拿一些G来执行。一般来说，如果P从其他的P那里要拿任务的话，一般就拿run queue的一半，这就确保了每个OS线程都能充分的使用，如下图：</p>
+
+<p><img src="/assets/images/2020/2020-01-13-steal.jpg" alt="图4" /></p>
+
+<p>goroutine在 system call 和 channel call 发生阻塞时，有不同处理方式：</p>
+
+<p>当程序发起system call时，M会发生阻塞，同时唤起(或创建)一个新的M继续执行其他的G
+当程序发起channel call时，程序可能会发生阻塞，但是不会阻塞M，G的状态会设置为waiting，M继续执行其他的G。当G调用完成，会有一个可用的M继续执行它</p>
+
+<h3 id="使用goroutine">使用goroutine</h3>
+
+<h4 id="基本使用">基本使用</h4>
+
+<p>设置goroutine运行的CPU数量，最新版本的go已经默认已经设置了。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">num</span> <span class="o">:=</span> <span class="n">runtime</span><span class="o">.</span><span class="n">NumCPU</span><span class="p">()</span>    <span class="c">//获取主机的逻辑CPU个数</span>
+<span class="n">runtime</span><span class="o">.</span><span class="n">GOMAXPROCS</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>    <span class="c">//设置可同时执行的最大CPU数</span>
+</code></pre></div></div>
+
+<p>使用示例</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"time"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">cal</span><span class="p">(</span><span class="n">a</span> <span class="kt">int</span> <span class="p">,</span> <span class="n">b</span> <span class="kt">int</span> <span class="p">)</span>  <span class="p">{</span>
+    <span class="n">c</span> <span class="o">:=</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"%d + %d = %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+<span class="err">　　</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span><span class="m">0</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="m">10</span> <span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">{</span>
+        <span class="k">go</span> <span class="n">cal</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="m">1</span><span class="p">)</span>  <span class="c">//启动10个goroutine 来计算</span>
+    <span class="p">}</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span> <span class="o">*</span> <span class="m">2</span><span class="p">)</span> <span class="c">// sleep作用是为了等待所有任务完成</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//结果
+//8 + 9 = 17
+//9 + 10 = 19
+//4 + 5 = 9
+//5 + 6 = 11
+//0 + 1 = 1
+//1 + 2 = 3
+//2 + 3 = 5
+//3 + 4 = 7
+//7 + 8 = 15
+//6 + 7 = 13
+</code></pre></div></div>
+
+<h4 id="goroutine异常捕捉">goroutine异常捕捉</h4>
+
+<p>当启动多个goroutine时，如果其中一个goroutine异常了，并且我们并没有对进行异常处理，那么整个程序都会终止，所以我们在编写程序时候最好每个goroutine所运行的函数都做异常处理，异常处理采用recover</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"time"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">addele</span><span class="p">(</span><span class="n">a</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">,</span><span class="n">i</span> <span class="kt">int</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="k">defer</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>    <span class="c">//匿名函数捕获错误</span>
+        <span class="n">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+            <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"add ele fail"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}()</span>
+   <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">i</span>
+   <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">Arry</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span><span class="m">4</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span><span class="m">0</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="m">10</span> <span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">{</span>
+        <span class="k">go</span> <span class="n">addele</span><span class="p">(</span><span class="n">Arry</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span> <span class="o">*</span> <span class="m">2</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//结果
+add ele fail
+[0 0 0 0]
+[0 1 0 0]
+[0 1 2 0]
+[0 1 2 3]
+add ele fail
+add ele fail
+add ele fail
+add ele fail
+add ele fail
+</code></pre></div></div>
+
+<h4 id="同步的goroutine">同步的goroutine</h4>
+
+<p>由于goroutine是异步执行的，那很有可能出现主程序退出时还有goroutine没有执行完，此时goroutine也会跟着退出。此时如果想等到所有goroutine任务执行完毕才退出，go提供了sync包和channel来解决同步问题，当然如果你能预测每个goroutine执行的时间，你还可以通过time.Sleep方式等待所有的groutine执行完成以后在退出程序(如上面的列子)。</p>
+
+<p>示例一：使用sync包同步goroutine sync大致实现方式 WaitGroup 等待一组goroutinue执行完毕. 主程序调用 Add 添加等待的goroutinue数量. 每个goroutinue在执行结束时调用 Done ，此时等待队列数量减1.，主程序通过Wait阻塞，直到等待队列为0.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"sync"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">cal</span><span class="p">(</span><span class="n">a</span> <span class="kt">int</span> <span class="p">,</span> <span class="n">b</span> <span class="kt">int</span> <span class="p">,</span><span class="n">n</span> <span class="o">*</span><span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="n">c</span> <span class="o">:=</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"%d + %d = %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">defer</span> <span class="n">n</span><span class="o">.</span><span class="n">Done</span><span class="p">()</span> <span class="c">//goroutinue完成后, WaitGroup的计数-1</span>
+
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="n">go_sync</span> <span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span> <span class="c">//声明一个WaitGroup变量</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span><span class="m">0</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="m">10</span> <span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">{</span>
+        <span class="n">go_sync</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="m">1</span><span class="p">)</span> <span class="c">// WaitGroup的计数加1</span>
+        <span class="k">go</span> <span class="n">cal</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="m">1</span><span class="p">,</span><span class="o">&amp;</span><span class="n">go_sync</span><span class="p">)</span>  
+    <span class="p">}</span>
+    <span class="n">go_sync</span><span class="o">.</span><span class="n">Wait</span><span class="p">()</span>  <span class="c">//等待所有goroutine执行完毕</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//结果
+9 + 10 = 19
+2 + 3 = 5
+3 + 4 = 7
+4 + 5 = 9
+5 + 6 = 11
+1 + 2 = 3
+6 + 7 = 13
+7 + 8 = 15
+0 + 1 = 1
+8 + 9 = 17
+</code></pre></div></div>
+
+<p>示例二：通过channel实现goroutine之间的同步。</p>
+
+<p>实现方式：通过channel能在多个groutine之间通讯，当一个goroutine完成时候向channel发送退出信号,等所有goroutine退出时候，利用for循环channe去channel中的信号，若取不到数据会阻塞原理，等待所有goroutine执行完毕，使用该方法有个前提是你已经知道了你启动了多少个goroutine。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"time"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">cal</span><span class="p">(</span><span class="n">a</span> <span class="kt">int</span> <span class="p">,</span> <span class="n">b</span> <span class="kt">int</span> <span class="p">,</span><span class="n">Exitchan</span> <span class="k">chan</span> <span class="kt">bool</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="n">c</span> <span class="o">:=</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"%d + %d = %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="o">*</span><span class="m">2</span><span class="p">)</span>
+    <span class="n">Exitchan</span> <span class="o">&lt;-</span> <span class="no">true</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="n">Exitchan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">bool</span><span class="p">,</span><span class="m">10</span><span class="p">)</span>  <span class="c">//声明并分配管道内存</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span><span class="m">0</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="m">10</span> <span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">{</span>
+        <span class="k">go</span> <span class="n">cal</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="m">1</span><span class="p">,</span><span class="n">Exitchan</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="o">:=</span><span class="m">0</span><span class="p">;</span> <span class="n">j</span><span class="o">&lt;</span><span class="m">10</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span><span class="p">{</span>
+         <span class="o">&lt;-</span> <span class="n">Exitchan</span>  <span class="c">//取信号数据，如果取不到则会阻塞</span>
+    <span class="p">}</span>
+    <span class="nb">close</span><span class="p">(</span><span class="n">Exitchan</span><span class="p">)</span> <span class="c">// 关闭管道</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="goroutine之间的通讯">goroutine之间的通讯</h4>
+
+<p>goroutine本质上是协程，可以理解为不受内核调度，而受go调度器管理的线程。goroutine之间可以通过channel进行通信或者说是数据共享，当然你也可以使用全局变量来进行数据共享。</p>
+
+<p>示例：使用channel模拟消费者和生产者模式</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"sync"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">Productor</span><span class="p">(</span><span class="n">mychan</span> <span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="n">data</span> <span class="kt">int</span><span class="p">,</span><span class="n">wait</span> <span class="o">*</span><span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="n">mychan</span> <span class="o">&lt;-</span> <span class="n">data</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"product data："</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">wait</span><span class="o">.</span><span class="n">Done</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">Consumer</span><span class="p">(</span><span class="n">mychan</span> <span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="n">wait</span> <span class="o">*</span><span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span><span class="p">)</span>  <span class="p">{</span>
+     <span class="n">a</span> <span class="o">:=</span> <span class="o">&lt;-</span> <span class="n">mychan</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"consumer data："</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
+     <span class="n">wait</span><span class="o">.</span><span class="n">Done</span><span class="p">()</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+
+    <span class="n">datachan</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="m">100</span><span class="p">)</span>   <span class="c">//通讯数据管道</span>
+    <span class="k">var</span> <span class="n">wg</span> <span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+        <span class="k">go</span> <span class="n">Productor</span><span class="p">(</span><span class="n">datachan</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span><span class="o">&amp;</span><span class="n">wg</span><span class="p">)</span> <span class="c">//生产数据</span>
+        <span class="n">wg</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="m">1</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span> <span class="p">{</span>
+        <span class="k">go</span> <span class="n">Consumer</span><span class="p">(</span><span class="n">datachan</span><span class="p">,</span><span class="o">&amp;</span><span class="n">wg</span><span class="p">)</span>  <span class="c">//消费数据</span>
+        <span class="n">wg</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="m">1</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">wg</span><span class="o">.</span><span class="n">Wait</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//结果
+consumer data： 4
+product data： 5
+product data： 6
+product data： 7
+product data： 8
+product data： 9
+consumer data： 1
+consumer data： 5
+consumer data： 6
+consumer data： 7
+consumer data： 8
+consumer data： 9
+product data： 2
+consumer data： 2
+product data： 3
+consumer data： 3
+product data： 4
+consumer data： 0
+product data： 0
+product data： 1
+</code></pre></div></div>
+
+<h3 id="channel">channel</h3>
+
+<h4 id="简介">简介</h4>
+
+<p>channel俗称管道，用于数据传递或数据共享，其本质是一个先进先出的队列，使用goroutine+channel进行数据通讯简单高效，同时也线程安全，多个goroutine可同时修改一个channel，不需要加锁。</p>
+
+<p>channel可分为三种类型：</p>
+
+<p>只读channel：只能读channel里面数据，不可写入</p>
+
+<p>只写channel：只能写数据，不可读</p>
+
+<p>一般channel：可读可写</p>
+
+<h4 id="channel使用">channel使用</h4>
+
+<p>定义和声明</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span> <span class="n">readOnlyChan</span> <span class="o">&lt;-</span><span class="k">chan</span> <span class="kt">int</span>            <span class="c">// 只读chan</span>
+<span class="k">var</span> <span class="n">writeOnlyChan</span> <span class="k">chan</span><span class="o">&lt;-</span> <span class="kt">int</span>           <span class="c">// 只写chan</span>
+<span class="k">var</span> <span class="n">mychan</span>  <span class="k">chan</span> <span class="kt">int</span>                     <span class="c">//读写channel</span>
+<span class="c">//定义完成以后需要make来分配内存空间，不然使用会deadlock</span>
+<span class="n">mychannel</span> <span class="o">=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="m">10</span><span class="p">)</span>
+
+<span class="c">//或者</span>
+<span class="n">read_only</span> <span class="o">:=</span> <span class="nb">make</span> <span class="p">(</span><span class="o">&lt;-</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="m">10</span><span class="p">)</span><span class="c">//定义只读的channel</span>
+<span class="n">write_only</span> <span class="o">:=</span> <span class="nb">make</span> <span class="p">(</span><span class="k">chan</span><span class="o">&lt;-</span> <span class="kt">int</span><span class="p">,</span><span class="m">10</span><span class="p">)</span><span class="c">//定义只写的channel</span>
+<span class="n">read_write</span> <span class="o">:=</span> <span class="nb">make</span> <span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="m">10</span><span class="p">)</span><span class="c">//可同时读写</span>
+</code></pre></div></div>
+
+<p>读写数据</p>
+
+<p>需要注意的是：</p>
+
+<ul>
+  <li>管道如果未关闭，在读取超时会则会引发deadlock异常</li>
+  <li>管道如果关闭进行写入数据会pannic</li>
+  <li>当管道中没有数据时候再行读取或读取到默认值，如int类型默认值是0</li>
+</ul>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ch</span> <span class="o">&lt;-</span> <span class="s">"wd"</span>  <span class="c">//写数据</span>
+<span class="n">a</span> <span class="o">:=</span> <span class="o">&lt;-</span> <span class="n">ch</span> <span class="c">//读取数据</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="n">ch</span>  <span class="c">//优雅的读取数据</span>
+</code></pre></div></div>
+
+<p>循环管道</p>
+
+<p>需要注意的是：</p>
+
+<ul>
+  <li>使用range循环管道，如果管道未关闭会引发deadlock错误。</li>
+  <li>如果采用for死循环已经关闭的管道，当管道没有数据时候，读取的数据会是管道的默认值，并且循环不会退出。</li>
+</ul>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"time"</span>
+<span class="p">)</span>
+
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">mychannel</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="m">10</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span><span class="n">i</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">{</span>
+        <span class="n">mychannel</span> <span class="o">&lt;-</span> <span class="n">i</span>
+    <span class="p">}</span>
+    <span class="nb">close</span><span class="p">(</span><span class="n">mychannel</span><span class="p">)</span>  <span class="c">//关闭管道</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"data lenght: "</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">mychannel</span><span class="p">))</span>
+    <span class="k">for</span>  <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">mychannel</span> <span class="p">{</span>  <span class="c">//循环管道</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"data lenght:  %d"</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">mychannel</span><span class="p">))</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="带缓冲区channe和不带缓冲区channel">带缓冲区channe和不带缓冲区channel</h4>
+
+<p>带缓冲区channel：定义声明时候制定了缓冲区大小(长度)，可以保存多个数据。</p>
+
+<p>不带缓冲区channel：只能存一个数据，并且只有当该数据被取出时候才能存下一个数据。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="c">//不带缓冲区</span>
+<span class="n">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span> <span class="p">,</span><span class="m">10</span><span class="p">)</span> <span class="c">//带缓冲区</span>
+</code></pre></div></div>
+
+<p>不带缓冲区示例：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="k">func</span> <span class="n">test</span><span class="p">(</span><span class="n">c</span> <span class="k">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"send "</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">i</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">)</span>
+    <span class="k">go</span> <span class="n">test</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="n">j</span><span class="o">++</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"get "</span><span class="p">,</span> <span class="o">&lt;-</span><span class="n">ch</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//结果：
+send  0
+send  1
+get  0
+get  1
+send  2
+send  3
+get  2
+get  3
+send  4
+send  5
+get  4
+get  5
+send  6
+send  7
+get  6
+get  7
+send  8
+send  9
+get  8
+get  9
+</code></pre></div></div>
+
+<h4 id="channel实现作业池">channel实现作业池</h4>
+
+<p>我们创建三个channel，一个channel用于接受任务，一个channel用于保持结果，还有个channel用于决定程序退出的时候。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">Task</span><span class="p">(</span><span class="n">taskch</span><span class="p">,</span> <span class="n">resch</span> <span class="k">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="n">exitch</span> <span class="k">chan</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">defer</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>   <span class="c">//异常处理</span>
+        <span class="n">err</span> <span class="o">:=</span> <span class="nb">recover</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+            <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"do task error："</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="p">}</span>
+    <span class="p">}()</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">taskch</span> <span class="p">{</span> <span class="c">//  处理任务</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"do task :"</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">resch</span> <span class="o">&lt;-</span> <span class="n">t</span> <span class="c">//</span>
+    <span class="p">}</span>
+    <span class="n">exitch</span> <span class="o">&lt;-</span> <span class="no">true</span> <span class="c">//处理完发送退出信号</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">taskch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="m">20</span><span class="p">)</span> <span class="c">//任务管道</span>
+    <span class="n">resch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span> <span class="m">20</span><span class="p">)</span>  <span class="c">//结果管道</span>
+    <span class="n">exitch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">bool</span><span class="p">,</span> <span class="m">5</span><span class="p">)</span> <span class="c">//退出管道</span>
+    <span class="k">go</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+            <span class="n">taskch</span> <span class="o">&lt;-</span> <span class="n">i</span>
+        <span class="p">}</span>
+        <span class="nb">close</span><span class="p">(</span><span class="n">taskch</span><span class="p">)</span>
+    <span class="p">}()</span>
+
+
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="m">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>  <span class="c">//启动5个goroutine做任务</span>
+        <span class="k">go</span> <span class="n">Task</span><span class="p">(</span><span class="n">taskch</span><span class="p">,</span> <span class="n">resch</span><span class="p">,</span> <span class="n">exitch</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">go</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span> <span class="c">//等5个goroutine结束</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="m">5</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+            <span class="o">&lt;-</span><span class="n">exitch</span>
+        <span class="p">}</span>
+        <span class="nb">close</span><span class="p">(</span><span class="n">resch</span><span class="p">)</span>  <span class="c">//任务处理完成关闭结果管道，不然range报错</span>
+        <span class="nb">close</span><span class="p">(</span><span class="n">exitch</span><span class="p">)</span>  <span class="c">//关闭退出管道</span>
+    <span class="p">}()</span>
+
+    <span class="k">for</span> <span class="n">res</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">resch</span><span class="p">{</span>  <span class="c">//打印结果</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"task res："</span><span class="p">,</span><span class="n">res</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="只读channel和只写channel">只读channel和只写channel</h4>
+
+<p>一般定义只读和只写的管道意义不大，更多时候我们可以在参数传递时候指明管道可读还是可写，即使当前管道是可读写的。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"time"</span>
+<span class="p">)</span>
+
+<span class="c">//只能向chan里写数据</span>
+<span class="k">func</span> <span class="n">send</span><span class="p">(</span><span class="n">c</span> <span class="k">chan</span><span class="o">&lt;-</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span>
+        <span class="n">c</span> <span class="o">&lt;-</span> <span class="n">i</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c">//只能取channel中的数据</span>
+<span class="k">func</span> <span class="n">get</span><span class="p">(</span><span class="n">c</span> <span class="o">&lt;-</span><span class="k">chan</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">c</span> <span class="p">{</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">c</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">)</span>
+    <span class="k">go</span> <span class="n">send</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="k">go</span> <span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="o">*</span><span class="m">1</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//结果
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</code></pre></div></div>
+
+<h4 id="select-case实现非阻塞channel">select-case实现非阻塞channel</h4>
+
+<p>原理通过select+case加入一组管道，当满足（这里说的满足意思是有数据可读或者可写)select中的某个case时候，那么该case返回，若都不满足case，则走default分支。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">send</span><span class="p">(</span><span class="n">c</span> <span class="k">chan</span> <span class="kt">int</span><span class="p">)</span>  <span class="p">{</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span><span class="m">1</span> <span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="m">10</span> <span class="p">;</span><span class="n">i</span><span class="o">++</span>  <span class="p">{</span>
+     <span class="n">c</span> <span class="o">&lt;-</span><span class="n">i</span>
+     <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"send data : "</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">resch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span><span class="p">,</span><span class="m">20</span><span class="p">)</span>
+    <span class="n">strch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">string</span><span class="p">,</span><span class="m">10</span><span class="p">)</span>
+    <span class="k">go</span> <span class="n">send</span><span class="p">(</span><span class="n">resch</span><span class="p">)</span>
+    <span class="n">strch</span> <span class="o">&lt;-</span> <span class="s">"wd"</span>
+    <span class="k">select</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="n">a</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="n">resch</span><span class="o">:</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"get data : "</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">case</span> <span class="n">b</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="n">strch</span><span class="o">:</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"get data : "</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">default</span><span class="o">:</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"no channel actvie"</span><span class="p">)</span>
+
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">//结果：get data :  wd</span>
+</code></pre></div></div>
+
+<h4 id="channel频率控制">channel频率控制</h4>
+
+<p>在对channel进行读写的时，go还提供了非常人性化的操作，那就是对读写的频率控制，通过time.Ticke实现</p>
+
+<p>示例：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"time"</span>
+    <span class="s">"fmt"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">(){</span>
+    <span class="n">requests</span><span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="kt">int</span> <span class="p">,</span><span class="m">5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="o">:=</span><span class="m">1</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="m">5</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">{</span>
+        <span class="n">requests</span><span class="o">&lt;-</span><span class="n">i</span>
+    <span class="p">}</span>
+    <span class="nb">close</span><span class="p">(</span><span class="n">requests</span><span class="p">)</span>
+    <span class="n">limiter</span> <span class="o">:=</span> <span class="n">time</span><span class="o">.</span><span class="n">Tick</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="o">*</span><span class="m">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">req</span><span class="o">:=</span><span class="k">range</span> <span class="n">requests</span><span class="p">{</span>
+        <span class="o">&lt;-</span><span class="n">limiter</span>
+        <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"requets"</span><span class="p">,</span><span class="n">req</span><span class="p">,</span><span class="n">time</span><span class="o">.</span><span class="n">Now</span><span class="p">())</span> <span class="c">//执行到这里，需要隔1秒才继续往下执行，time.Tick(timer)上面已定义</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c">//结果：</span>
+<span class="c">// requets 1 2018-07-06 10:17:35.98056403 +0800 CST m=+1.004248763</span>
+<span class="c">// requets 2 2018-07-06 10:17:36.978123472 +0800 CST m=+2.001798205</span>
+<span class="c">// requets 3 2018-07-06 10:17:37.980869517 +0800 CST m=+3.004544250</span>
+<span class="c">// requets 4 2018-07-06 10:17:38.976868836 +0800 CST m=+4.000533569</span>
+</code></pre></div></div>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://www.zhihu.com/question/20862617/answer/27964865">知乎Yi Wang的回答</a></li>
+  <li>[2] <a href="https://zhuanlan.zhihu.com/p/22297799">Goroutine 浅析</a></li>
+</ul>
+:ET

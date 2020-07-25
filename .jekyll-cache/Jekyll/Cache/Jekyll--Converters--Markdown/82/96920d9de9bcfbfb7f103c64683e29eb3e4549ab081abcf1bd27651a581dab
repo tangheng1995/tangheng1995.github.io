@@ -1,0 +1,292 @@
+I"�[<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#golang-redis使用" id="markdown-toc-golang-redis使用">Golang redis使用</a>    <ul>
+      <li><a href="#安装" id="markdown-toc-安装">安装</a></li>
+      <li><a href="#使用" id="markdown-toc-使用">使用</a></li>
+      <li><a href="#开发规范" id="markdown-toc-开发规范">开发规范</a>        <ul>
+          <li><a href="#键值设计" id="markdown-toc-键值设计">键值设计</a>            <ul>
+              <li><a href="#key名设计" id="markdown-toc-key名设计">key名设计</a></li>
+              <li><a href="#value设计" id="markdown-toc-value设计">value设计</a></li>
+              <li><a href="#控制key的生命周期redis不是垃圾桶" id="markdown-toc-控制key的生命周期redis不是垃圾桶">控制key的生命周期，redis不是垃圾桶</a></li>
+            </ul>
+          </li>
+          <li><a href="#命令使用" id="markdown-toc-命令使用">命令使用</a>            <ul>
+              <li><a href="#on命令关注n的数量" id="markdown-toc-on命令关注n的数量">O(N)命令关注N的数量</a></li>
+              <li><a href="#禁用命令" id="markdown-toc-禁用命令">禁用命令</a></li>
+              <li><a href="#合理使用select" id="markdown-toc-合理使用select">合理使用select</a></li>
+              <li><a href="#使用批量操作提高效率" id="markdown-toc-使用批量操作提高效率">使用批量操作提高效率</a></li>
+              <li><a href="#redis事务功能较弱不建议过多使用" id="markdown-toc-redis事务功能较弱不建议过多使用">Redis事务功能较弱，不建议过多使用</a></li>
+              <li><a href="#redis集群版本在使用lua上有特殊要求" id="markdown-toc-redis集群版本在使用lua上有特殊要求">Redis集群版本在使用Lua上有特殊要求</a></li>
+              <li><a href="#必要情况下使用monitor命令时要注意不要长时间使用" id="markdown-toc-必要情况下使用monitor命令时要注意不要长时间使用">必要情况下使用monitor命令时，要注意不要长时间使用</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#示例" id="markdown-toc-示例">示例</a></li>
+      <li><a href="#参考" id="markdown-toc-参考">参考</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang redis 使用 及阿里redis开发规范。</p>
+
+<ul>
+  <li>github.com/gomodule/redigo/redis</li>
+</ul>
+
+<h2 id="golang-redis使用">Golang redis使用</h2>
+
+<p>使用 gomodule/redigo/redis 库处理redis数据库相关操作。</p>
+
+<h3 id="安装">安装</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get github.com/gomodule/redigo/redis
+</code></pre></div></div>
+
+<h3 id="使用">使用</h3>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">cache</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"time"</span>
+
+	<span class="s">"github.com/gomodule/redigo/redis"</span>
+<span class="p">)</span>
+
+<span class="c">// Pool redis conn pool</span>
+<span class="k">var</span> <span class="n">Pool</span> <span class="o">*</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span>
+
+<span class="c">// Redis 结构体</span>
+<span class="k">type</span> <span class="n">Redis</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Conn</span> <span class="n">redis</span><span class="o">.</span><span class="n">Conn</span>
+<span class="p">}</span>
+
+<span class="c">// InitPool 初始化redis conn pool</span>
+<span class="k">func</span> <span class="n">InitPool</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">pool</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span><span class="p">{</span>
+		<span class="n">MaxActive</span><span class="o">:</span>   <span class="m">500</span><span class="p">,</span>
+		<span class="n">MaxIdle</span><span class="o">:</span>     <span class="m">3</span><span class="p">,</span>
+		<span class="n">IdleTimeout</span><span class="o">:</span> <span class="m">240</span> <span class="o">*</span> <span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
+		<span class="n">Dial</span><span class="o">:</span>        <span class="k">func</span><span class="p">()</span> <span class="p">(</span><span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Dial</span><span class="p">(</span><span class="s">"tcp"</span><span class="p">,</span> <span class="s">"127.0.0.1:6379"</span><span class="p">)</span> <span class="p">},</span>
+	<span class="p">}</span>
+    <span class="n">Pool</span> <span class="o">=</span> <span class="n">pool</span>
+    <span class="n">RedisConn</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">Get</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c">// GetRedisConn get redis conn</span>
+<span class="k">func</span> <span class="n">GetRedisConn</span><span class="p">()</span> <span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">{</span> 
+	<span class="n">conn</span> <span class="o">=</span> <span class="n">Pool</span><span class="o">.</span><span class="n">Get</span><span class="p">()</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="n">Redis</span><span class="p">{</span><span class="n">Conn</span><span class="o">:</span> <span class="n">conn</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// AddStudentCourse 添加学生选修的课程</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span><span class="n">Redis</span><span class="p">)</span><span class="n">AddStudentCourse</span><span class="p">(</span><span class="n">stdID</span> <span class="kt">int</span><span class="p">,</span> <span class="n">cIDs</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">err</span> <span class="kt">error</span><span class="p">){</span>
+	<span class="k">defer</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span> 
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cID</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">cIDs</span> <span class="p">{</span>
+		<span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="s">"SADD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">StudentCourseFormat</span><span class="p">,</span> <span class="n">stdID</span><span class="p">),</span><span class="n">cID</span><span class="p">)</span>
+		<span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="s">"SADD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">CourseStudentFormat</span><span class="p">,</span> <span class="n">cID</span><span class="p">),</span><span class="n">stdID</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Flush</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c">// GetStudentCourseCount 学生选修的课程数</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span><span class="n">Redis</span><span class="p">)</span><span class="n">GetStudentCourseCount</span><span class="p">(</span><span class="n">stdID</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">courseCount</span> <span class="kt">int</span><span class="p">){</span>
+	<span class="k">defer</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span> 
+	<span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"SCARD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">StudentCourseFormat</span><span class="p">,</span> <span class="n">stdID</span><span class="p">)))</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="开发规范">开发规范</h3>
+
+<h4 id="键值设计">键值设计</h4>
+
+<h5 id="key名设计">key名设计</h5>
+
+<ul>
+  <li>可读性和可管理性</li>
+</ul>
+
+<p>以业务名(或数据库名)为前缀(防止key冲突)，用冒号分隔，比如业务名:表名:id</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ugc:video:1
+</code></pre></div></div>
+
+<ul>
+  <li>简洁性</li>
+</ul>
+
+<p>保证语义的前提下，控制key的长度，当key较多时，内存占用也不容忽视，例如：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>user:{uid}:friends:messages:{mid}
+
+# 简化
+u:{uid}:fr:m:{mid}
+</code></pre></div></div>
+
+<ul>
+  <li>不要包含特殊字符</li>
+</ul>
+
+<p>反例：包含空格、换行、单双引号以及其他转义字符</p>
+
+<h5 id="value设计">value设计</h5>
+
+<ul>
+  <li>拒绝bigkey(防止网卡流量、慢查询)</li>
+</ul>
+
+<p>string类型控制在10KB以内，hash、list、set、zset元素个数不要超过5000。</p>
+
+<p>反例：一个包含200万个元素的list。</p>
+
+<p>非字符串的bigkey，不要使用del删除，使用hscan、sscan、zscan方式渐进式删除，同时要注意防止bigkey过期时间自动删除问题(例如一个200万的zset设置1小时过期，会触发del操作，造成阻塞，而且该操作不会不出现在慢查询中(latency可查))</p>
+
+<ul>
+  <li>选择适合的数据类型。</li>
+</ul>
+
+<p>例如：实体类型(要合理控制和使用数据结构内存编码优化配置,例如ziplist，但也要注意节省内存和性能之间的平衡)</p>
+
+<p>反例：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>set user:1:name tom
+set user:1:age 19
+set user:1:favor football
+</code></pre></div></div>
+
+<p>正例:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hmset user:1 name tom age 19 favor football
+</code></pre></div></div>
+
+<h5 id="控制key的生命周期redis不是垃圾桶">控制key的生命周期，redis不是垃圾桶</h5>
+
+<p>建议使用expire设置过期时间(条件允许可以打散过期时间，防止集中过期)，不过期的数据重点关注idletime。</p>
+
+<h4 id="命令使用">命令使用</h4>
+
+<h5 id="on命令关注n的数量">O(N)命令关注N的数量</h5>
+
+<p>例如hgetall、lrange、smembers、zrange、sinter等并非不能使用，但是需要明确N的值。有遍历的需求可以使用hscan、sscan、zscan代替。</p>
+
+<h5 id="禁用命令">禁用命令</h5>
+
+<p>禁止线上使用keys、flushall、flushdb等，通过redis的rename机制禁掉命令，或者使用scan的方式渐进式处理。</p>
+
+<h5 id="合理使用select">合理使用select</h5>
+
+<p>redis的多数据库较弱，使用数字进行区分，很多客户端支持较差，同时多业务用多数据库实际还是单线程处理，会有干扰。</p>
+
+<h5 id="使用批量操作提高效率">使用批量操作提高效率</h5>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>原生命令：例如mget、mset。
+非原生命令：可以使用pipeline提高效率。
+</code></pre></div></div>
+
+<p>但要注意控制一次批量操作的元素个数(例如500以内，实际也和元素字节数有关)。</p>
+
+<p>注意两者不同：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 原生是原子操作，pipeline是非原子操作。
+2. pipeline可以打包不同的命令，原生做不到
+3. pipeline需要客户端和服务端同时支持。
+</code></pre></div></div>
+
+<h5 id="redis事务功能较弱不建议过多使用">Redis事务功能较弱，不建议过多使用</h5>
+
+<p>Redis的事务功能较弱(不支持回滚)，而且集群版本(自研和官方)要求一次事务操作的key必须在一个slot上(可以使用hashtag功能解决)</p>
+
+<h5 id="redis集群版本在使用lua上有特殊要求">Redis集群版本在使用Lua上有特殊要求</h5>
+
+<ul>
+  <li>
+    <p>1.所有key都应该由 KEYS 数组来传递，redis.call/pcall 里面调用的redis命令，key的位置，必须是KEYS array, 否则直接返回error，”-ERR bad lua script for redis cluster, all the keys that the script uses should be passed using the KEYS array”</p>
+  </li>
+  <li>
+    <p>2.所有key，必须在1个slot上，否则直接返回error, “-ERR eval/evalsha command keys must in same slot”</p>
+  </li>
+</ul>
+
+<h5 id="必要情况下使用monitor命令时要注意不要长时间使用">必要情况下使用monitor命令时，要注意不要长时间使用</h5>
+
+<h3 id="示例">示例</h3>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"fmt"</span>
+	<span class="s">"time"</span>
+
+	<span class="s">"github.com/gomodule/redigo/redis"</span>
+<span class="p">)</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="c">// StudentCourseFormat 学生选修的课程数</span>
+	<span class="n">StudentCourseFormat</span> <span class="o">=</span> <span class="s">"student:%d:course"</span>
+	<span class="c">// CourseStudentFormat 课程被选修的学生数</span>
+	<span class="n">CourseStudentFormat</span> <span class="o">=</span> <span class="s">"course:%d:student"</span>
+<span class="p">)</span>
+
+<span class="c">// Pool redis conn pool</span>
+<span class="k">var</span> <span class="n">Pool</span> <span class="o">*</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span>
+
+<span class="c">// Redis 结构体</span>
+<span class="k">type</span> <span class="n">Redis</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">Conn</span> <span class="n">redis</span><span class="o">.</span><span class="n">Conn</span>
+<span class="p">}</span>
+
+<span class="c">// InitRedis init redis</span>
+<span class="k">func</span> <span class="n">InitRedis</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">pool</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span><span class="p">{</span>
+		<span class="n">MaxActive</span><span class="o">:</span>   <span class="m">500</span><span class="p">,</span>
+		<span class="n">MaxIdle</span><span class="o">:</span>     <span class="m">3</span><span class="p">,</span>
+		<span class="n">IdleTimeout</span><span class="o">:</span> <span class="m">240</span> <span class="o">*</span> <span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
+		<span class="n">Dial</span><span class="o">:</span>        <span class="k">func</span><span class="p">()</span> <span class="p">(</span><span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Dial</span><span class="p">(</span><span class="s">"tcp"</span><span class="p">,</span> <span class="s">"127.0.0.1:10100"</span><span class="p">)</span> <span class="p">},</span>
+	<span class="p">}</span>
+	<span class="n">Pool</span> <span class="o">=</span> <span class="n">pool</span>
+<span class="p">}</span>
+
+<span class="c">// GetRedisConn get redis conn</span>
+<span class="k">func</span> <span class="n">GetRedisConn</span><span class="p">()</span> <span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">{</span> 
+	<span class="n">conn</span> <span class="o">=</span> <span class="n">Pool</span><span class="o">.</span><span class="n">Get</span><span class="p">()</span>
+	<span class="k">return</span> <span class="o">&amp;</span><span class="n">Redis</span><span class="p">{</span><span class="n">Conn</span><span class="o">:</span> <span class="n">conn</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// AddStudentCourse 添加学生选修的课程</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span><span class="n">Redis</span><span class="p">)</span><span class="n">AddStudentCourse</span><span class="p">(</span><span class="n">stdID</span> <span class="kt">int</span><span class="p">,</span> <span class="n">cIDs</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">err</span> <span class="kt">error</span><span class="p">){</span>
+	<span class="k">defer</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span> 
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cID</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">cIDs</span> <span class="p">{</span>
+		<span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="s">"SADD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">StudentCourseFormat</span><span class="p">,</span> <span class="n">stdID</span><span class="p">),</span><span class="n">cID</span><span class="p">)</span>
+		<span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Send</span><span class="p">(</span><span class="s">"SADD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">CourseStudentFormat</span><span class="p">,</span> <span class="n">cID</span><span class="p">),</span><span class="n">stdID</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Flush</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c">// GetStudentCourseCount 学生选修的课程数</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span><span class="n">Redis</span><span class="p">)</span><span class="n">GetStudentCourseCount</span><span class="p">(</span><span class="n">stdID</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">courseCount</span> <span class="kt">int</span><span class="p">){</span>
+	<span class="k">defer</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span> 
+	<span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"SCARD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">StudentCourseFormat</span><span class="p">,</span> <span class="n">stdID</span><span class="p">)))</span>
+<span class="p">}</span>
+
+<span class="c">// GetCourseStudentCount 获取选修的课程学生数</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span><span class="n">Redis</span><span class="p">)</span><span class="n">GetCourseStudentCount</span><span class="p">(</span><span class="n">cID</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="n">studentCount</span> <span class="kt">int</span><span class="p">){</span>
+	<span class="k">defer</span> <span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span> 
+	<span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">Conn</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"SCARD"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="n">CourseStudentFormat</span><span class="p">,</span> <span class="n">cID</span><span class="p">)))</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">(){</span>
+	<span class="n">r</span> <span class="o">:=</span> <span class="n">GetRedisConn</span><span class="p">()</span>
+	<span class="n">r</span><span class="o">.</span><span class="n">AddStudentCourse</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="m">2</span><span class="p">,</span><span class="m">3</span><span class="p">,</span><span class="m">4</span><span class="p">])</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">GetStudentCourseCount</span><span class="p">(</span><span class="m">1</span><span class="p">))</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h3 id="参考">参考</h3>
+
+<ul>
+  <li>[1] <a href="https://developer.aliyun.com/article/531067">阿里云redis开发规范</a></li>
+</ul>
+:ET

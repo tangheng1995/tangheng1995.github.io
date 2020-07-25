@@ -1,0 +1,118 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu安装ssr客户端和polipo转换http代理" id="markdown-toc-ubuntu安装ssr客户端和polipo转换http代理">Ubuntu安装SSR客户端和polipo转换http代理</a>    <ul>
+      <li><a href="#配置ssr客户端" id="markdown-toc-配置ssr客户端">配置SSR客户端</a></li>
+      <li><a href="#转换http" id="markdown-toc-转换http">转换http</a></li>
+      <li><a href="#设置监控进程" id="markdown-toc-设置监控进程">设置监控进程</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 安装SSR客户端和polipo转换http代理。</p>
+
+<h2 id="ubuntu安装ssr客户端和polipo转换http代理">Ubuntu安装SSR客户端和polipo转换http代理</h2>
+
+<h3 id="配置ssr客户端">配置SSR客户端</h3>
+
+<p>下载SSR客户端(本次下载为python版)：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://github.com/shadowsocks/shadowsocks/archive/2.9.1.zip
+</code></pre></div></div>
+
+<p>解压至目录：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unzip shadowsocks-2.9.1.zip /home/brook/profile
+</code></pre></div></div>
+
+<p>进入目录安装：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> /home/brook/profile/shadowsocks-2.9.1 <span class="o">&amp;&amp;</span> python setup.py build <span class="o">&amp;&amp;</span> python setup.py <span class="nb">install</span>
+</code></pre></div></div>
+
+<p>创建SSR配置文件：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>vim /etc/shadowsocks.json
+</code></pre></div></div>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"server"</span><span class="p">:</span><span class="s2">"185.171.120.112"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"server_port"</span><span class="p">:</span><span class="mi">6666</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"local_address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"127.0.0.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"local_port"</span><span class="p">:</span><span class="mi">1080</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"password"</span><span class="p">:</span><span class="s2">"www.freevpnnet.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"timeout"</span><span class="p">:</span><span class="mi">300</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"method"</span><span class="p">:</span><span class="s2">"aes-256-cfb"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fast_open"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span></code></pre></div></div>
+
+<p>启动SSR客户端：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">brook</span><span class="o">/</span><span class="n">profile</span><span class="o">/</span><span class="n">shadowsocks</span><span class="o">-</span><span class="mf">2.9</span><span class="p">.</span><span class="mi">1</span><span class="o">/</span><span class="n">shadowsocks</span><span class="o">/</span><span class="n">local</span><span class="p">.</span><span class="n">py</span> <span class="o">-</span><span class="n">c</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">shadowsocks</span><span class="p">.</span><span class="n">json</span> 
+</code></pre></div></div>
+
+<p>启动后如下：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>INFO: loading config from /etc/shadowsocks.json
+2019-07-29 21:40:00 INFO     loading libcrypto from libcrypto.so.1.1
+2019-07-29 21:40:00 INFO     starting local at 127.0.0.1:1080
+2019-07-29 22:01:02 INFO     connecting www.google.com:443 from 127.0.0.1:35646
+</code></pre></div></div>
+
+<h3 id="转换http">转换http</h3>
+
+<p>Shadowsocks默认是用Socks5协议的，对于Terminal的get,wget等走http协议的地方是无能为力的，所以需要转换成http代理，加强通用性，这里使用的转换方法是基于Polipo</p>
+
+<p>安装polipo：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install </span>polipo
+</code></pre></div></div>
+
+<p>修改配置文件：</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">logSyslog</span> = <span class="n">true</span>
+<span class="n">logFile</span> = /<span class="n">var</span>/<span class="n">log</span>/<span class="n">polipo</span>/<span class="n">polipo</span>.<span class="n">log</span>
+
+<span class="n">socksParentProxy</span> = <span class="s2">"127.0.0.1:1080"</span>
+<span class="n">socksProxyType</span> = <span class="n">socks5</span>
+
+<span class="n">chunkHighMark</span> = <span class="m">50331648</span>
+<span class="n">objectHighMark</span> = <span class="m">16384</span>
+
+<span class="n">serverMaxSlots</span> = <span class="m">64</span>
+<span class="n">serverSlots</span> = <span class="m">16</span>
+<span class="n">serverSlots1</span> = <span class="m">32</span>
+
+<span class="n">proxyAddress</span> = <span class="s2">"0.0.0.0"</span>
+<span class="n">proxyPort</span> = <span class="m">8123</span>
+
+</code></pre></div></div>
+
+<p>重启polipo服务：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo</span> /etc/init.d/polipo restart
+</code></pre></div></div>
+
+<p>验证代理是否正常工作：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">http_proxy</span><span class="o">=</span><span class="s2">"http://127.0.0.1:8123"</span>
+curl www.google.com
+</code></pre></div></div>
+
+<p>又返回结果极为正常，在浏览器中输入<code class="language-plaintext highlighter-rouge">http://127.0.0.1:8123</code>可进入到Polipo的使用说明和配置界面</p>
+
+<p>可在chorme插件SwitchyOmega配置http代理
+代理协议：http
+代理服务器：127.0.0.1
+端口：8123</p>
+
+<p>firefox可直接在设置里设置，如上
+或者配置系统网络配置，如上</p>
+
+<h3 id="设置监控进程">设置监控进程</h3>
+
+<p>参考 <a href="https://tangheng1995.github.io/centos/2019/07/25/CentOS-install-Supervisor/">首页-简书</a></p>
+:ET

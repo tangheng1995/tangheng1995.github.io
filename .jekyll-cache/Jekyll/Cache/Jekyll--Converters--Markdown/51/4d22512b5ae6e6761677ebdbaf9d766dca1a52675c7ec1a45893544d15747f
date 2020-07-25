@@ -1,0 +1,76 @@
+I"<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#centos安装docker" id="markdown-toc-centos安装docker">CentOS安装docker</a>    <ul>
+      <li><a href="#安装" id="markdown-toc-安装">安装</a></li>
+      <li><a href="#更换镜像源修改或创建vim-etcdockerdaemonjson文件" id="markdown-toc-更换镜像源修改或创建vim-etcdockerdaemonjson文件">更换镜像源，修改或创建vim /etc/docker/daemon.json文件</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 安装 Docker。</p>
+
+<h2 id="centos安装docker">CentOS安装docker</h2>
+
+<h3 id="安装">安装</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># yum 包更新到最新</span>
+<span class="nb">sudo </span>yum update
+
+<span class="c"># 卸载旧版本(如果安装过旧版本的话)</span>
+<span class="nb">sudo </span>yum remove docker  docker-common docker-selinux docker-engine
+
+<span class="c"># 安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖</span>
+<span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> yum-utils device-mapper-persistent-data lvm2
+
+<span class="c"># 设置yum源</span>
+<span class="nb">sudo </span>yum-config-manager <span class="nt">--add-repo</span> https://download.docker.com/linux/centos/docker-ce.repo
+
+<span class="c"># 设置换国内源</span>
+<span class="nb">sudo </span>yum-config-manager <span class="nt">--add-repo</span> http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+<span class="c"># 安装docker</span>
+<span class="nb">sudo </span>yum <span class="nb">install </span>docker-ce
+
+<span class="c"># 设置开机自启</span>
+systemctl start docker
+systemctl <span class="nb">enable </span>docker
+
+<span class="c"># 查看版本</span>
+docker version
+</code></pre></div></div>
+
+<h3 id="更换镜像源修改或创建vim-etcdockerdaemonjson文件">更换镜像源，修改或创建vim /etc/docker/daemon.json文件</h3>
+
+<ul>
+  <li>方法一:</li>
+</ul>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"registry-mirrors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"https://dockerhub.azk8s.cn"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"https://reg-mirror.qiniu.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"https://docker.mirrors.ustc.edu.cn"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li>方法二:</li>
+</ul>
+
+<p>修改或创建vim /etc/sysconfig/docker</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">OPTIONS</span><span class="o">=</span><span class="s1">'--selinux-enabled \
+--log-driver=journald \
+--signature-verification=false \
+--registry-mirror=https://kfwkfulq.mirror.aliyuncs.com'</span>
+<span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="k">${</span><span class="nv">DOCKER_CERT_PATH</span><span class="k">}</span><span class="s2">"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
+    </span><span class="nv">DOCKER_CERT_PATH</span><span class="o">=</span>/etc/docker
+<span class="k">fi</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl restart docker
+</code></pre></div></div>
+:ET

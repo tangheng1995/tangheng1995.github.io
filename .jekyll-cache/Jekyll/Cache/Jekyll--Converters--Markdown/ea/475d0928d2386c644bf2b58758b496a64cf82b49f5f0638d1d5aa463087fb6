@@ -1,0 +1,74 @@
+I"Q<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#linux安装go" id="markdown-toc-linux安装go">Linux安装go</a>    <ul>
+      <li><a href="#下载二进制文件" id="markdown-toc-下载二进制文件">下载二进制文件</a></li>
+      <li><a href="#解压到指定目录" id="markdown-toc-解压到指定目录">解压到指定目录</a></li>
+      <li><a href="#配置环境变量" id="markdown-toc-配置环境变量">配置环境变量</a></li>
+      <li><a href="#设置-gopath-编译目录需要编译的项目都应该放到该目录" id="markdown-toc-设置-gopath-编译目录需要编译的项目都应该放到该目录">设置 GOPATH 编译目录，需要编译的项目都应该放到该目录</a></li>
+      <li><a href="#加载环境变量" id="markdown-toc-加载环境变量">加载环境变量</a></li>
+      <li><a href="#验证go版本" id="markdown-toc-验证go版本">验证go版本</a></li>
+      <li><a href="#开启go-module" id="markdown-toc-开启go-module">开启Go Module</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 安装 Golang。</p>
+
+<h2 id="linux安装go">Linux安装go</h2>
+
+<h3 id="下载二进制文件">下载二进制文件</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget <span class="nt">-c</span> https://studygolang.com/dl/golang/go1.10.3.linux-amd64.tar.gz
+</code></pre></div></div>
+
+<h3 id="解压到指定目录">解压到指定目录</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-C</span> /usr/local <span class="nt">-xzf</span> go1.10.3.linux-amd64.tar.gz
+</code></pre></div></div>
+
+<h3 id="配置环境变量">配置环境变量</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/profile
+<span class="nb">export </span><span class="nv">GOROOT</span><span class="o">=</span>/usr/local/go
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$GOROOT</span>/bin
+</code></pre></div></div>
+
+<h3 id="设置-gopath-编译目录需要编译的项目都应该放到该目录">设置 GOPATH 编译目录，需要编译的项目都应该放到该目录</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> /home/gopath
+vim /etc/profile
+<span class="nb">export </span><span class="nv">GOPATH</span><span class="o">=</span>/home/gopath
+</code></pre></div></div>
+
+<h3 id="加载环境变量">加载环境变量</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> /etc/profile
+</code></pre></div></div>
+
+<h3 id="验证go版本">验证go版本</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go version
+</code></pre></div></div>
+
+<h3 id="开启go-module">开启Go Module</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># -w 设置env变量，-u还原</span>
+go <span class="nb">env</span> <span class="nt">-w</span> <span class="nv">GO111MODULE</span><span class="o">=</span>on
+
+<span class="c"># 设置代理</span>
+go <span class="nb">env</span> <span class="nt">-w</span> <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy.io,direct
+</code></pre></div></div>
+
+<p>deme测试：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├─gingo
+│  │  main.go
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go mod init com.example/gingo
+</code></pre></div></div>
+
+<p>运行完生成 <code class="language-plaintext highlighter-rouge">go.mod</code> 文件，再根据项目需要下载包，<code class="language-plaintext highlighter-rouge">go.mod</code>会统一管理包版本</p>
+:ET

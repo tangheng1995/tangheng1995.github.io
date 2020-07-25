@@ -1,0 +1,164 @@
+I"�/<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu-安装-nginx配置ssl加密" id="markdown-toc-ubuntu-安装-nginx配置ssl加密">Ubuntu 安装 nginx，配置SSL加密</a>    <ul>
+      <li><a href="#安装nginx" id="markdown-toc-安装nginx">安装nginx</a></li>
+      <li><a href="#修改nginx配置文件" id="markdown-toc-修改nginx配置文件">修改nginx配置文件</a></li>
+      <li><a href="#配置ssl证书" id="markdown-toc-配置ssl证书">配置SSL证书</a>        <ul>
+          <li><a href="#添加-certbot-ppa" id="markdown-toc-添加-certbot-ppa">添加 Certbot PPA</a></li>
+          <li><a href="#安装certbot" id="markdown-toc-安装certbot">安装Certbot</a></li>
+          <li><a href="#选择获取证书还是安装证书" id="markdown-toc-选择获取证书还是安装证书">选择获取证书还是安装证书</a></li>
+          <li><a href="#验证自动更新证书" id="markdown-toc-验证自动更新证书">验证自动更新证书</a></li>
+          <li><a href="#验证你的网站是否生效" id="markdown-toc-验证你的网站是否生效">验证你的网站是否生效</a></li>
+        </ul>
+      </li>
+      <li><a href="#查看被certbot修改后的nginx配置文件" id="markdown-toc-查看被certbot修改后的nginx配置文件">查看被Certbot修改后的nginx配置文件</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Ubuntu 安装 nginx，配置SSL加密。</p>
+
+<h2 id="ubuntu-安装-nginx配置ssl加密">Ubuntu 安装 nginx，配置SSL加密</h2>
+
+<h3 id="安装nginx">安装nginx</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get nginx
+</code></pre></div></div>
+
+<h3 id="修改nginx配置文件">修改nginx配置文件</h3>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 进入 `/etc/nginx/sites-enabled` 目录，可查看nginx配置文件 `default -&gt; /etc/nginx/sites-available/default`
+# 创建新配置文件 go.conf
+</span><span class="n">server</span> {
+        <span class="n">listen</span>       <span class="m">80</span>;
+        <span class="n">server_name</span>  <span class="n">blog</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+        <span class="n">location</span> / {
+                <span class="n">proxy_pass</span> <span class="n">https</span>://<span class="n">tangheng1995</span>.<span class="n">github</span>.<span class="n">io</span>/;
+        }
+  <span class="n">location</span> /<span class="n">admin</span> {
+                <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9000</span>;
+        }
+        <span class="n">error_page</span> <span class="m">404</span> /<span class="m">404</span>.<span class="n">html</span>;
+            <span class="n">location</span> = /<span class="m">40</span><span class="n">x</span>.<span class="n">html</span> {
+        }
+    }
+<span class="n">server</span> {
+        <span class="n">listen</span>       <span class="m">80</span>;
+        <span class="n">server_name</span>  <span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+  <span class="n">location</span> / {
+                <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9000</span>;
+        }
+        <span class="n">error_page</span> <span class="m">404</span> /<span class="m">404</span>.<span class="n">html</span>;
+            <span class="n">location</span> = /<span class="m">40</span><span class="n">x</span>.<span class="n">html</span> {
+        }
+    }
+</code></pre></div></div>
+
+<h3 id="配置ssl证书">配置SSL证书</h3>
+
+<blockquote>
+  <p>本次选用的SSL证书是由 <a href="https://letsencrypt.org/">Let’s Encrypt</a> 提供的，本次系统及环境为 Ubuntu 18.04 和 nginx
+配置详情页为 <a href="https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx">certbot instructions</a></p>
+</blockquote>
+
+<h4 id="添加-certbot-ppa">添加 Certbot PPA</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get update
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>software-properties-common
+<span class="nb">sudo </span>add-apt-repository universe
+<span class="nb">sudo </span>add-apt-repository ppa:certbot/certbot
+<span class="nb">sudo </span>apt-get update
+</code></pre></div></div>
+
+<h4 id="安装certbot">安装Certbot</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install </span>certbot python-certbot-nginx
+</code></pre></div></div>
+
+<h4 id="选择获取证书还是安装证书">选择获取证书还是安装证书</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 安装证书</span>
+<span class="nb">sudo </span>certbot <span class="nt">--nginx</span>
+<span class="c"># 获取证书</span>
+<span class="nb">sudo </span>certbot certonly <span class="nt">--nginx</span>
+</code></pre></div></div>
+
+<h4 id="验证自动更新证书">验证自动更新证书</h4>
+
+<blockquote>
+  <p>Certbot 会在证书过期前自动更新证书，除非你修改了配置</p>
+</blockquote>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 验证自动更新证书</span>
+<span class="nb">sudo </span>certbot renew <span class="nt">--dry-run</span>
+</code></pre></div></div>
+
+<p>此命令会更新以下目录下安装的配置：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/etc/crontab/
+/etc/cron.<span class="k">*</span>/<span class="k">*</span>
+systemctl list-timers
+</code></pre></div></div>
+
+<h4 id="验证你的网站是否生效">验证你的网站是否生效</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://yourwebsite.com/
+</code></pre></div></div>
+
+<h3 id="查看被certbot修改后的nginx配置文件">查看被Certbot修改后的nginx配置文件</h3>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">server</span> {
+        <span class="n">server_name</span>  <span class="n">blog</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+        <span class="n">location</span> / {
+                <span class="n">proxy_pass</span> <span class="n">https</span>://<span class="n">tangheng1995</span>.<span class="n">github</span>.<span class="n">io</span>/;
+        }
+        <span class="n">error_page</span> <span class="m">404</span> /<span class="m">404</span>.<span class="n">html</span>;
+            <span class="n">location</span> = /<span class="m">40</span><span class="n">x</span>.<span class="n">html</span> {
+        }
+    <span class="n">listen</span> <span class="m">443</span> <span class="n">ssl</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">ssl_certificate</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">live</span>/<span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>/<span class="n">fullchain</span>.<span class="n">pem</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">ssl_certificate_key</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">live</span>/<span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>/<span class="n">privkey</span>.<span class="n">pem</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">include</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">options</span>-<span class="n">ssl</span>-<span class="n">nginx</span>.<span class="n">conf</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">ssl_dhparam</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">ssl</span>-<span class="n">dhparams</span>.<span class="n">pem</span>; <span class="c"># managed by Certbot
+</span>}
+<span class="n">server</span> {
+        <span class="n">server_name</span>  <span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+        <span class="n">location</span> / {
+                <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9000</span>;
+        }
+        <span class="n">error_page</span> <span class="m">404</span> /<span class="m">404</span>.<span class="n">html</span>;
+            <span class="n">location</span> = /<span class="m">40</span><span class="n">x</span>.<span class="n">html</span> {
+        }
+    <span class="n">listen</span> <span class="m">443</span> <span class="n">ssl</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">ssl_certificate</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">live</span>/<span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>/<span class="n">fullchain</span>.<span class="n">pem</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">ssl_certificate_key</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">live</span>/<span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>/<span class="n">privkey</span>.<span class="n">pem</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">include</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">options</span>-<span class="n">ssl</span>-<span class="n">nginx</span>.<span class="n">conf</span>; <span class="c"># managed by Certbot
+</span>    <span class="n">ssl_dhparam</span> /<span class="n">etc</span>/<span class="n">letsencrypt</span>/<span class="n">ssl</span>-<span class="n">dhparams</span>.<span class="n">pem</span>; <span class="c"># managed by Certbot
+</span>
+}
+<span class="n">server</span> {
+    <span class="n">if</span> ($<span class="n">host</span> = <span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>) {
+        <span class="n">return</span> <span class="m">301</span> <span class="n">https</span>://$<span class="n">host</span>$<span class="n">request_uri</span>;
+    } <span class="c"># managed by Certbot
+</span>        <span class="n">listen</span>       <span class="m">80</span>;
+        <span class="n">server_name</span>  <span class="n">admin</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+    <span class="n">return</span> <span class="m">404</span>; <span class="c"># managed by Certbot
+</span>}<span class="n">server</span> {
+    <span class="n">if</span> ($<span class="n">host</span> = <span class="n">blog</span>.<span class="n">heygolang</span>.<span class="n">cn</span>) {
+        <span class="n">return</span> <span class="m">301</span> <span class="n">https</span>://$<span class="n">host</span>$<span class="n">request_uri</span>;
+    } <span class="c"># managed by Certbot
+</span>        <span class="n">listen</span>       <span class="m">80</span>;
+        <span class="n">server_name</span>  <span class="n">blog</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+    <span class="n">return</span> <span class="m">404</span>; <span class="c"># managed by Certbot
+</span>}
+</code></pre></div></div>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://caddyserver.com/">Caddy</a>, 可以自动给http加密成https</li>
+</ul>
+:ET

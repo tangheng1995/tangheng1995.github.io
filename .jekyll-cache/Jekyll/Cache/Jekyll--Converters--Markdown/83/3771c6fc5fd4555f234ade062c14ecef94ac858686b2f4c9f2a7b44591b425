@@ -1,0 +1,38 @@
+I"M<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#windows-git-免密登录github" id="markdown-toc-windows-git-免密登录github">Windows git 免密登录github</a>    <ul>
+      <li><a href="#git生成公钥" id="markdown-toc-git生成公钥">git生成公钥</a></li>
+      <li><a href="#复制公钥内容至github" id="markdown-toc-复制公钥内容至github">复制公钥内容至github</a></li>
+      <li><a href="#验证ssh-keys是否成功" id="markdown-toc-验证ssh-keys是否成功">验证ssh keys是否成功</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Windows Git 免密登录 Github。</p>
+
+<h2 id="windows-git-免密登录github">Windows git 免密登录github</h2>
+
+<h3 id="git生成公钥">git生成公钥</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 其中邮箱为GitHub的邮箱，直接下一步，默认安装在Windows用户目录下：C:\Users\myuser\.ssh</span>
+ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-C</span> <span class="s2">"email@email.com"</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 目录下文件如下：</span>
+id_rsa
+id_rsa.pub
+</code></pre></div></div>
+
+<h3 id="复制公钥内容至github">复制公钥内容至github</h3>
+
+<p><img src="/assets/images/2019/2019-08-23-git-access-github-02.png?raw=true" alt="pub" /></p>
+
+<h3 id="验证ssh-keys是否成功">验证ssh keys是否成功</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh <span class="nt">-T</span> git@github.com
+</code></pre></div></div>
+
+<p><img src="/assets/images/2019/2019-08-23-git-access-github.png" alt="ssh keys" /></p>
+:ET

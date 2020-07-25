@@ -1,0 +1,92 @@
+I"<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#python优雅编程-字典" id="markdown-toc-python优雅编程-字典">Python优雅编程-字典</a>    <ul>
+      <li><a href="#字典取键值" id="markdown-toc-字典取键值">字典取键值</a></li>
+      <li><a href="#根据字典的值进行排序" id="markdown-toc-根据字典的值进行排序">根据字典的值进行排序</a></li>
+      <li><a href="#初始化字典值为列表" id="markdown-toc-初始化字典值为列表">初始化字典值为列表</a></li>
+      <li><a href="#将list中的所有元素转为单个字符串" id="markdown-toc-将list中的所有元素转为单个字符串">将list中的所有元素转为单个字符串</a></li>
+      <li><a href="#key-value对构建字典" id="markdown-toc-key-value对构建字典">key-value对构建字典</a></li>
+      <li><a href="#静态方法staticmethod" id="markdown-toc-静态方法staticmethod">静态方法staticmethod</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Python优雅编程之字典。</p>
+
+<h2 id="python优雅编程-字典">Python优雅编程-字典</h2>
+
+<h3 id="字典取键值">字典取键值</h3>
+
+<p>如果目标key值不存在字典中，以下代码返回None或default</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name_age</span> <span class="o">=</span> <span class="p">{</span><span class="s">"Jack"</span><span class="p">:</span><span class="mi">26</span><span class="p">,</span> <span class="s">"Tim"</span><span class="p">:</span><span class="mi">25</span><span class="p">}</span>
+<span class="n">jack_age</span> <span class="o">=</span> <span class="n">name_age</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"Jack"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">jack_age</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: 26
+</code></pre></div></div>
+
+<h3 id="根据字典的值进行排序">根据字典的值进行排序</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name_age</span> <span class="o">=</span> <span class="p">{</span><span class="s">"Jack"</span><span class="p">:</span><span class="mi">26</span><span class="p">,</span> <span class="s">"Tim"</span><span class="p">:</span><span class="mi">25</span><span class="p">,</span> <span class="s">"Tom"</span><span class="p">:</span><span class="mi">27</span><span class="p">}</span>
+<span class="n">sort_name_age</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">name_age</span><span class="p">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sort_name_age</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: [("Tom", 27), ("Jack", 26), ("Tim", 25)]
+</code></pre></div></div>
+
+<h3 id="初始化字典值为列表">初始化字典值为列表</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="n">name_age_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="n">name_age_dict</span><span class="p">[</span><span class="s">"name"</span><span class="p">].</span><span class="n">append</span><span class="p">(</span><span class="s">"Jack"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">name_age_dict</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: defaultdict(&lt;type 'list'&gt;, {'name': ['Jack']})
+</code></pre></div></div>
+
+<h3 id="将list中的所有元素转为单个字符串">将list中的所有元素转为单个字符串</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Jack"</span><span class="p">,</span> <span class="s">"Tim"</span><span class="p">]</span>
+<span class="n">name_str</span> <span class="o">=</span> <span class="s">","</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">name_list</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">name_str</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: Jack,Tim
+</code></pre></div></div>
+
+<h3 id="key-value对构建字典">key-value对构建字典</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">"Jack"</span><span class="p">,</span> <span class="s">"Tim"</span><span class="p">]</span>
+<span class="n">age_lsit</span> <span class="o">=</span> <span class="p">[</span><span class="mi">26</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+<span class="n">name_age_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">name_list</span><span class="p">,</span> <span class="n">age_lsit</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">name_age_dict</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: {"Jack": 26, "Tim": 25}
+</code></pre></div></div>
+
+<h3 id="静态方法staticmethod">静态方法staticmethod</h3>
+
+<p>Python中用staticmethod修饰的函数属于类级别的静态方法，可以不用实例化直接调用，主要定义辅助函数、公用函数</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="k">class</span> <span class="nc">Demo</span><span class="p">():</span>
+    <span class="o">@</span><span class="nb">staticmethod</span>
+    <span class="k">def</span> <span class="nf">init_dict</span><span class="p">():</span>
+        <span class="n">name_age_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name_age_dict</span>
+
+
+<span class="k">print</span><span class="p">(</span><span class="n">Demo</span><span class="p">.</span><span class="n">init_dict</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output: defaultdict(&lt;type 'list'&gt;, {})
+</code></pre></div></div>
+:ET

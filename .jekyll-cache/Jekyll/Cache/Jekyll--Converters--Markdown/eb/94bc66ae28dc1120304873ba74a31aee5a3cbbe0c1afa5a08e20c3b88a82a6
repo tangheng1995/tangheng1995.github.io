@@ -1,0 +1,258 @@
+I"oM<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#golang-redis实践-性能测试及优化" id="markdown-toc-golang-redis实践-性能测试及优化">Golang redis实践 性能测试及优化</a>    <ul>
+      <li><a href="#redis测试" id="markdown-toc-redis测试">redis测试</a></li>
+      <li><a href="#redis-连接池" id="markdown-toc-redis-连接池">redis 连接池</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang redis 实践 性能测试及优化。</p>
+
+<p>本文简单测试redis连接开启关闭连接的性能情况，以及连接池性能情况。</p>
+
+<h2 id="golang-redis实践-性能测试及优化">Golang redis实践 性能测试及优化</h2>
+
+<p>本次实践测试，是由于公司项目里大量redis开启关闭写在service层，一是感觉代码重复较多，二是感觉反复开启关闭连接会造成性能损耗，就简单demo测试。</p>
+
+<p>package:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>github.com/garyburd/redigo/redis
+</code></pre></div></div>
+
+<h3 id="redis测试">redis测试</h3>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">cache</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"fmt"</span>
+
+	<span class="s">"github.com/garyburd/redigo/redis"</span>
+<span class="p">)</span>
+
+<span class="c">// RedisConn RedisConn</span>
+<span class="k">var</span> <span class="n">RedisConn</span> <span class="n">redis</span><span class="o">.</span><span class="n">Conn</span>
+
+<span class="c">// Init Init</span>
+<span class="k">func</span> <span class="n">Init</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">c</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Dial</span><span class="p">(</span><span class="s">"tcp"</span><span class="p">,</span> <span class="s">"127.0.0.1:6379"</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Connect to redis error"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="n">RedisConn</span> <span class="o">=</span> <span class="n">c</span>
+	<span class="c">//defer c.Close()</span>
+<span class="p">}</span>
+
+<span class="c">// SetTest SetTest</span>
+<span class="k">func</span> <span class="n">SetTest</span><span class="p">(</span><span class="n">c</span> <span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">c</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"SET"</span><span class="p">,</span> <span class="s">"mykey"</span><span class="p">,</span> <span class="s">"superWang"</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"redis set failed:"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// GetTest1 GetTest1</span>
+<span class="k">func</span> <span class="n">GetTest1</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">c</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Dial</span><span class="p">(</span><span class="s">"tcp"</span><span class="p">,</span> <span class="s">"127.0.0.1:6379"</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Connect to redis error"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="k">defer</span> <span class="n">c</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+	<span class="n">username</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">redis</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"GET"</span><span class="p">,</span> <span class="s">"mykey"</span><span class="p">))</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"redis get failed:"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"Get mykey: %v </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c">// GetTest2 GetTest2</span>
+<span class="k">func</span> <span class="n">GetTest2</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">username</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">redis</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">RedisConn</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"GET"</span><span class="p">,</span> <span class="s">"mykey"</span><span class="p">))</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"redis get failed:"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"Get mykey: %v </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">GetTest1()</code> 每次调用开启关闭连接</p>
+
+<p><code class="language-plaintext highlighter-rouge">GetTest2()</code> 则使用全局创建的连接</p>
+
+<p>测试Demo</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">test</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"benchmark/cache"</span>
+	<span class="s">"testing"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">BenchmarkGetTest1</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">B</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">.</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span> <span class="c">// b.N，测试循环次数</span>
+		<span class="n">cache</span><span class="o">.</span><span class="n">GetTest1</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">BenchmarkGetTest2</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">B</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">cache</span><span class="o">.</span><span class="n">Init</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">.</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span> <span class="c">// b.N，测试循环次数</span>
+		<span class="n">cache</span><span class="o">.</span><span class="n">GetTest2</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>执行：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go test -v -bench=. -cpu=8 -benchtime="3s" -timeout="5s" -benchmem
+</code></pre></div></div>
+
+<ul>
+  <li>benchmem：输出内存分配统计</li>
+  <li>benchtime：指定测试时间</li>
+  <li>cpu：指定GOMAXPROCS</li>
+  <li>timeout：超时限制</li>
+</ul>
+
+<p>输出：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code># GetTest1()
+# 反复开启关闭连接
+
+BenchmarkGetTest1-8         6477            504956 ns/op            9428 B/op         28 allocs/op
+PASS
+ok      branchmark/test 3.336s
+</code></pre></div></div>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code># GetTest2()
+
+BenchmarkGetTest2-8        24621            142355 ns/op              96 B/op          5 allocs/op
+PASS
+ok      branchmark/test 4.994s
+</code></pre></div></div>
+
+<ul>
+  <li>BenchmarkGetTest1-8 ：-cpu参数指定，-8表示8个CPU线程执行</li>
+  <li>6477：表示总共执行了6477次</li>
+  <li>504956 ns/op ：表示每次执行耗时504956纳秒</li>
+  <li>9428 B/op:表示每次执行分配的内存（字节）</li>
+  <li>28 allocs/op：表示每次执行分配了多少次对象</li>
+</ul>
+
+<p>对比发现，反复开启关闭连接耗时增加了3.5倍，分配内存增加了98倍，分配对象增加了5.6倍。</p>
+
+<p>结论： 建议不要反复开启关闭redis连接</p>
+
+<h3 id="redis-连接池">redis 连接池</h3>
+
+<p>以上，不反复开启关闭连接性能更好，但是在高并发情况下，并不适用，刚好查看文档，发现有 <a href="https://pkg.go.dev/github.com/garyburd/redigo/redis?tab=doc#Pool">连接池</a></p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">cache</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"time"</span>
+
+	<span class="s">"github.com/garyburd/redigo/redis"</span>
+<span class="p">)</span>
+
+<span class="c">// Pool redis conn pool</span>
+<span class="k">var</span> <span class="n">Pool</span> <span class="o">*</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span>
+
+<span class="c">// InitPool 初始化redis conn pool</span>
+<span class="k">func</span> <span class="n">InitPool</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">pool</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span><span class="p">{</span>
+		<span class="n">MaxActive</span><span class="o">:</span>   <span class="m">500</span><span class="p">,</span>
+		<span class="n">MaxIdle</span><span class="o">:</span>     <span class="m">3</span><span class="p">,</span>
+		<span class="n">IdleTimeout</span><span class="o">:</span> <span class="m">240</span> <span class="o">*</span> <span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
+		<span class="n">Dial</span><span class="o">:</span>        <span class="k">func</span><span class="p">()</span> <span class="p">(</span><span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Dial</span><span class="p">(</span><span class="s">"tcp"</span><span class="p">,</span> <span class="s">"127.0.0.1:6379"</span><span class="p">)</span> <span class="p">},</span>
+	<span class="p">}</span>
+	<span class="n">Pool</span> <span class="o">=</span> <span class="n">pool</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>调用：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">conn</span> <span class="o">:=</span> <span class="n">cache</span><span class="o">.</span><span class="n">Pool</span><span class="o">.</span><span class="n">Get</span><span class="p">()</span>
+<span class="k">defer</span> <span class="n">conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>此时 <code class="language-plaintext highlighter-rouge">defer conn.Close()</code> 则不是关闭连接，而是释放连接到连接池</p>
+
+<p>测试：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">cache</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"fmt"</span>
+	<span class="s">"time"</span>
+
+	<span class="s">"github.com/garyburd/redigo/redis"</span>
+<span class="p">)</span>
+
+<span class="c">// Pool redis conn pool</span>
+<span class="k">var</span> <span class="n">Pool</span> <span class="o">*</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span>
+
+<span class="c">// InitPool 初始化redis conn pool</span>
+<span class="k">func</span> <span class="n">InitPool</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">pool</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="n">redis</span><span class="o">.</span><span class="n">Pool</span><span class="p">{</span>
+		<span class="n">MaxIdle</span><span class="o">:</span>     <span class="m">3</span><span class="p">,</span>
+		<span class="n">IdleTimeout</span><span class="o">:</span> <span class="m">240</span> <span class="o">*</span> <span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span>
+		<span class="n">Dial</span><span class="o">:</span>        <span class="k">func</span><span class="p">()</span> <span class="p">(</span><span class="n">redis</span><span class="o">.</span><span class="n">Conn</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">redis</span><span class="o">.</span><span class="n">Dial</span><span class="p">(</span><span class="s">"tcp"</span><span class="p">,</span> <span class="s">"127.0.0.1:6379"</span><span class="p">)</span> <span class="p">},</span>
+	<span class="p">}</span>
+	<span class="n">Pool</span> <span class="o">=</span> <span class="n">pool</span>
+<span class="p">}</span>
+
+<span class="c">// GetTest3 GetTest3</span>
+<span class="k">func</span> <span class="n">GetTest3</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">conn</span> <span class="o">:=</span> <span class="n">Pool</span><span class="o">.</span><span class="n">Get</span><span class="p">()</span>
+	<span class="k">defer</span> <span class="n">conn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+	<span class="n">username</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">redis</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">Do</span><span class="p">(</span><span class="s">"GET"</span><span class="p">,</span> <span class="s">"mykey"</span><span class="p">))</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"redis get failed:"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"Get mykey: %v </span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">test</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"benchmark/cache"</span>
+	<span class="s">"testing"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">BenchmarkGetTest3</span><span class="p">(</span><span class="n">b</span> <span class="o">*</span><span class="n">testing</span><span class="o">.</span><span class="n">B</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">cache</span><span class="o">.</span><span class="n">InitPool</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">.</span><span class="n">N</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span> <span class="p">{</span> <span class="c">// b.N，测试循环次数</span>
+		<span class="n">cache</span><span class="o">.</span><span class="n">GetTest3</span><span class="p">()</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>输出：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Pool
+
+BenchmarkGetTest3-8        24814            145063 ns/op             208 B/op          8 allocs/op
+PASS
+ok      benchmark/test  5.082s
+</code></pre></div></div>
+
+<p>对比发现，执行时间差不多，分配内存增加2倍，分配对象增加1.6倍，但是由单连接变成连接池，高并发场景下性能还是提升很大</p>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://pkg.go.dev/github.com/garyburd/redigo/redis?tab=doc#Pool">redis连接池</a></li>
+</ul>
+:ET

@@ -1,0 +1,140 @@
+I"x<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#效率软件" id="markdown-toc-效率软件">效率软件</a>    <ul>
+      <li><a href="#系统烧录" id="markdown-toc-系统烧录">系统烧录</a></li>
+      <li><a href="#ppt插件" id="markdown-toc-ppt插件">ppt插件</a></li>
+      <li><a href="#图片素材" id="markdown-toc-图片素材">图片素材</a></li>
+      <li><a href="#gif图片" id="markdown-toc-gif图片">gif图片</a></li>
+      <li><a href="#截图" id="markdown-toc-截图">截图</a></li>
+      <li><a href="#图片上传" id="markdown-toc-图片上传">图片上传</a></li>
+      <li><a href="#脑图" id="markdown-toc-脑图">脑图</a></li>
+      <li><a href="#笔记本" id="markdown-toc-笔记本">笔记本</a></li>
+      <li><a href="#桌面美化" id="markdown-toc-桌面美化">桌面美化</a></li>
+      <li><a href="#录屏" id="markdown-toc-录屏">录屏</a></li>
+      <li><a href="#视频剪辑" id="markdown-toc-视频剪辑">视频剪辑</a></li>
+      <li><a href="#视频播放器" id="markdown-toc-视频播放器">视频播放器</a></li>
+      <li><a href="#剪贴板" id="markdown-toc-剪贴板">剪贴板</a></li>
+      <li><a href="#文件搜索" id="markdown-toc-文件搜索">文件搜索</a></li>
+      <li><a href="#应用卸载" id="markdown-toc-应用卸载">应用卸载</a></li>
+      <li><a href="#文件预览" id="markdown-toc-文件预览">文件预览</a></li>
+      <li><a href="#下载器" id="markdown-toc-下载器">下载器</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>汇集办公类常用效率软件。</p>
+
+<h2 id="效率软件">效率软件</h2>
+
+<h3 id="系统烧录">系统烧录</h3>
+
+<ul>
+  <li><a href="https://www.balena.io/etcher/">Etcher</a></li>
+</ul>
+
+<h3 id="ppt插件">ppt插件</h3>
+
+<ul>
+  <li><a href="www.islide.cc">Nordri Tools / iSlide</a></li>
+</ul>
+
+<h3 id="图片素材">图片素材</h3>
+
+<ul>
+  <li><a href="www.iconfont.cn/">阿里巴巴矢量图icon</a></li>
+</ul>
+
+<h3 id="gif图片">gif图片</h3>
+
+<ul>
+  <li><a href="https://www.screentogif.com/?l=zh_cn">ScreenToGIF</a></li>
+</ul>
+
+<h3 id="截图">截图</h3>
+
+<ul>
+  <li><a href="https://www.faststone.org/FSCaptureDetail.htm">FastStone Capture</a></li>
+</ul>
+
+<h3 id="图片上传">图片上传</h3>
+
+<ul>
+  <li><a href="https://molunerfinn.com/PicGo/">PicGo</a></li>
+</ul>
+
+<h3 id="脑图">脑图</h3>
+
+<ul>
+  <li><a href="https://www.xmind.cn/">Xmind</a></li>
+  <li><a href="mubu.com">幕布</a></li>
+</ul>
+
+<h3 id="笔记本">笔记本</h3>
+
+<ul>
+  <li><a href="note.youdao.com">有道云</a></li>
+</ul>
+
+<h3 id="桌面美化">桌面美化</h3>
+
+<ul>
+  <li><a href="http://www.upupoo.com/">UPUPOO</a></li>
+</ul>
+
+<h3 id="录屏">录屏</h3>
+
+<ul>
+  <li><a href="https://obsproject.com/download">OBS Studio</a></li>
+  <li><a href="https://github.com/MathewSachin/Captura/releases">Captura</a></li>
+</ul>
+
+<h3 id="视频剪辑">视频剪辑</h3>
+
+<ul>
+  <li><a href="https://www.shencut.com/">喵影工厂</a></li>
+</ul>
+
+<h3 id="视频播放器">视频播放器</h3>
+
+<ul>
+  <li><a href="https://potplayer.daum.net/">Potplayer</a></li>
+</ul>
+
+<h3 id="剪贴板">剪贴板</h3>
+
+<ul>
+  <li><a href="https://ditto-cp.sourceforge.io/">Ditto</a></li>
+</ul>
+
+<h3 id="文件搜索">文件搜索</h3>
+
+<ul>
+  <li>
+    <p><a href="http://www.wox.one/">Wox &amp; Everything</a></p>
+  </li>
+  <li>
+    <p><a href="https://www.voidtools.com/zh-cn/">Everything</a></p>
+  </li>
+</ul>
+
+<h3 id="应用卸载">应用卸载</h3>
+
+<ul>
+  <li><a href="https://geekuninstaller.com/">Geek Uninstaller</a></li>
+</ul>
+
+<h3 id="文件预览">文件预览</h3>
+
+<ul>
+  <li><a href="https://github.com/QL-Win/QuickLook/releases">QuickLook</a></li>
+</ul>
+
+<h3 id="下载器">下载器</h3>
+
+<ul>
+  <li><a href="http://www.internetdownloadmanager.com/">IDM</a></li>
+  <li><a href="https://github.com/agalwood/Motrix/releases">Motrix</a></li>
+</ul>
+:ET

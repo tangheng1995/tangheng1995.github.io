@@ -1,0 +1,429 @@
+I"j�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#centos安装supervisor" id="markdown-toc-centos安装supervisor">CentOS安装Supervisor</a>    <ul>
+      <li><a href="#supervisor简介" id="markdown-toc-supervisor简介">Supervisor简介</a></li>
+      <li><a href="#supervisor安装" id="markdown-toc-supervisor安装">Supervisor安装</a></li>
+      <li><a href="#supervisor的配置" id="markdown-toc-supervisor的配置">Supervisor的配置</a>        <ul>
+          <li><a href="#配置supervisordconf默认配置" id="markdown-toc-配置supervisordconf默认配置">配置supervisord.conf默认配置</a></li>
+          <li><a href="#自定义配置supervisordconf" id="markdown-toc-自定义配置supervisordconf">自定义配置supervisord.conf</a></li>
+        </ul>
+      </li>
+      <li><a href="#配置需要监控的应用" id="markdown-toc-配置需要监控的应用">配置需要监控的应用</a></li>
+      <li><a href="#surpervisor的启动" id="markdown-toc-surpervisor的启动">Surpervisor的启动</a>        <ul>
+          <li><a href="#二进制启动" id="markdown-toc-二进制启动">二进制启动</a></li>
+          <li><a href="#以systemd的方式管理启动" id="markdown-toc-以systemd的方式管理启动">以systemd的方式管理启动</a></li>
+        </ul>
+      </li>
+      <li><a href="#supervisorctlsupervisord" id="markdown-toc-supervisorctlsupervisord">supervisorctl&amp;supervisord</a>        <ul>
+          <li><a href="#supervisorctl" id="markdown-toc-supervisorctl">supervisorctl</a></li>
+          <li><a href="#supervisord" id="markdown-toc-supervisord">supervisord</a></li>
+        </ul>
+      </li>
+      <li><a href="#supervisor控制台" id="markdown-toc-supervisor控制台">Supervisor控制台</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 安装 Supervisor 监控进程。</p>
+
+<h2 id="centos安装supervisor">CentOS安装Supervisor</h2>
+
+<h3 id="supervisor简介">Supervisor简介</h3>
+
+<p>Supervisord 是用 Python 实现的一款的进程管理工具，supervisord 要求管理的程序是非 daemon 程序，supervisord 会帮你把它转成 daemon 程序，因此如果用 supervisord 来管理进程，进程需要以非daemon的方式启动。</p>
+
+<p>例如：管理nginx 的话，必须在 nginx 的配置文件里添加一行设置 daemon off 让 nginx 以非 daemon 方式启动。</p>
+
+<h3 id="supervisor安装">Supervisor安装</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># yum install 的方式</span>
+yum <span class="nb">install</span> <span class="nt">-y</span> supervisor
+
+<span class="c"># easy_install的方式</span>
+yum <span class="nb">install</span> <span class="nt">-y</span> python-setuptools
+easy_install supervisor
+echo_supervisord_conf <span class="o">&gt;</span>/etc/supervisord.conf
+</code></pre></div></div>
+
+<h3 id="supervisor的配置">Supervisor的配置</h3>
+
+<h4 id="配置supervisordconf默认配置">配置supervisord.conf默认配置</h4>
+
+<p>如果使用yum install -y supervisor的命令安装，会生成默认配置/etc/supervisord.conf和目录/etc/supervisord.d，如果没有则自行创建。</p>
+
+<p>supervisord.conf默认配置：</p>
+
+<ul>
+  <li>加载目录/etc/supervisord.d所有 .ini 文件</li>
+  <li>supervisord 日志目录 /var/log/supervisor/supervisord.log</li>
+</ul>
+
+<p>vim /etc/supervisord.conf</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+; <span class="n">Sample</span> <span class="n">supervisor</span> <span class="n">config</span> <span class="n">file</span>.
+
+[<span class="n">unix_http_server</span>]
+<span class="n">file</span>=/<span class="n">var</span>/<span class="n">run</span>/<span class="n">supervisor</span>/<span class="n">supervisor</span>.<span class="n">sock</span>   ; (<span class="n">the</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">socket</span> <span class="n">file</span>)
+;<span class="n">chmod</span>=<span class="m">0700</span>                 ; <span class="n">sockef</span> <span class="n">file</span> <span class="n">mode</span> (<span class="n">default</span> <span class="m">0700</span>)
+;<span class="n">chown</span>=<span class="n">nobody</span>:<span class="n">nogroup</span>       ; <span class="n">socket</span> <span class="n">file</span> <span class="n">uid</span>:<span class="n">gid</span> <span class="n">owner</span>
+;<span class="n">username</span>=<span class="n">user</span>              ; (<span class="n">default</span> <span class="n">is</span> <span class="n">no</span> <span class="n">username</span> (<span class="n">open</span> <span class="n">server</span>))
+;<span class="n">password</span>=<span class="m">123</span>               ; (<span class="n">default</span> <span class="n">is</span> <span class="n">no</span> <span class="n">password</span> (<span class="n">open</span> <span class="n">server</span>))
+
+;[<span class="n">inet_http_server</span>]         ; <span class="n">inet</span> (<span class="n">TCP</span>) <span class="n">server</span> <span class="n">disabled</span> <span class="n">by</span> <span class="n">default</span>
+;<span class="n">port</span>=<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9001</span>        ; (<span class="n">ip_address</span>:<span class="n">port</span> <span class="n">specifier</span>, *:<span class="n">port</span> <span class="n">for</span> <span class="n">all</span> <span class="n">iface</span>)
+;<span class="n">username</span>=<span class="n">user</span>              ; (<span class="n">default</span> <span class="n">is</span> <span class="n">no</span> <span class="n">username</span> (<span class="n">open</span> <span class="n">server</span>))
+;<span class="n">password</span>=<span class="m">123</span>               ; (<span class="n">default</span> <span class="n">is</span> <span class="n">no</span> <span class="n">password</span> (<span class="n">open</span> <span class="n">server</span>))
+
+[<span class="n">supervisord</span>]
+<span class="n">logfile</span>=/<span class="n">var</span>/<span class="n">log</span>/<span class="n">supervisor</span>/<span class="n">supervisord</span>.<span class="n">log</span>  ; (<span class="n">main</span> <span class="n">log</span> <span class="n">file</span>;<span class="n">default</span> $<span class="n">CWD</span>/<span class="n">supervisord</span>.<span class="n">log</span>)
+<span class="n">logfile_maxbytes</span>=<span class="m">50</span><span class="n">MB</span>       ; (<span class="n">max</span> <span class="n">main</span> <span class="n">logfile</span> <span class="n">bytes</span> <span class="n">b4</span> <span class="n">rotation</span>;<span class="n">default</span> <span class="m">50</span><span class="n">MB</span>)
+<span class="n">logfile_backups</span>=<span class="m">10</span>          ; (<span class="n">num</span> <span class="n">of</span> <span class="n">main</span> <span class="n">logfile</span> <span class="n">rotation</span> <span class="n">backups</span>;<span class="n">default</span> <span class="m">10</span>)
+<span class="n">loglevel</span>=<span class="n">info</span>               ; (<span class="n">log</span> <span class="n">level</span>;<span class="n">default</span> <span class="n">info</span>; <span class="n">others</span>: <span class="n">debug</span>,<span class="n">warn</span>,<span class="n">trace</span>)
+<span class="n">pidfile</span>=/<span class="n">var</span>/<span class="n">run</span>/<span class="n">supervisord</span>.<span class="n">pid</span> ; (<span class="n">supervisord</span> <span class="n">pidfile</span>;<span class="n">default</span> <span class="n">supervisord</span>.<span class="n">pid</span>)
+<span class="n">nodaemon</span>=<span class="n">false</span>              ; (<span class="n">start</span> <span class="n">in</span> <span class="n">foreground</span> <span class="n">if</span> <span class="n">true</span>;<span class="n">default</span> <span class="n">false</span>)
+<span class="n">minfds</span>=<span class="m">1024</span>                 ; (<span class="n">min</span>. <span class="n">avail</span> <span class="n">startup</span> <span class="n">file</span> <span class="n">descriptors</span>;<span class="n">default</span> <span class="m">1024</span>)
+<span class="n">minprocs</span>=<span class="m">200</span>                ; (<span class="n">min</span>. <span class="n">avail</span> <span class="n">process</span> <span class="n">descriptors</span>;<span class="n">default</span> <span class="m">200</span>)
+;<span class="n">umask</span>=<span class="m">022</span>                  ; (<span class="n">process</span> <span class="n">file</span> <span class="n">creation</span> <span class="n">umask</span>;<span class="n">default</span> <span class="m">022</span>)
+;<span class="n">user</span>=<span class="n">chrism</span>                 ; (<span class="n">default</span> <span class="n">is</span> <span class="n">current</span> <span class="n">user</span>, <span class="n">required</span> <span class="n">if</span> <span class="n">root</span>)
+;<span class="n">identifier</span>=<span class="n">supervisor</span>       ; (<span class="n">supervisord</span> <span class="n">identifier</span>, <span class="n">default</span> <span class="n">is</span> <span class="s1">'supervisor'</span>)
+;<span class="n">directory</span>=/<span class="n">tmp</span>              ; (<span class="n">default</span> <span class="n">is</span> <span class="n">not</span> <span class="n">to</span> <span class="n">cd</span> <span class="n">during</span> <span class="n">start</span>)
+;<span class="n">nocleanup</span>=<span class="n">true</span>              ; (<span class="n">don</span><span class="err">'</span><span class="n">t</span> <span class="n">clean</span> <span class="n">up</span> <span class="n">tempfiles</span> <span class="n">at</span> <span class="n">start</span>;<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">childlogdir</span>=/<span class="n">tmp</span>            ; (<span class="s1">'AUTO'</span> <span class="n">child</span> <span class="n">log</span> <span class="n">dir</span>, <span class="n">default</span> $<span class="n">TEMP</span>)
+;<span class="n">environment</span>=<span class="n">KEY</span>=<span class="n">value</span>       ; (<span class="n">key</span> <span class="n">value</span> <span class="n">pairs</span> <span class="n">to</span> <span class="n">add</span> <span class="n">to</span> <span class="n">environment</span>)
+;<span class="n">strip_ansi</span>=<span class="n">false</span>            ; (<span class="n">strip</span> <span class="n">ansi</span> <span class="n">escape</span> <span class="n">codes</span> <span class="n">in</span> <span class="n">logs</span>; <span class="n">def</span>. <span class="n">false</span>)
+
+; <span class="n">the</span> <span class="n">below</span> <span class="n">section</span> <span class="n">must</span> <span class="n">remain</span> <span class="n">in</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span> <span class="n">for</span> <span class="n">RPC</span>
+; (<span class="n">supervisorctl</span>/<span class="n">web</span> <span class="n">interface</span>) <span class="n">to</span> <span class="n">work</span>, <span class="n">additional</span> <span class="n">interfaces</span> <span class="n">may</span> <span class="n">be</span>
+; <span class="n">added</span> <span class="n">by</span> <span class="n">defining</span> <span class="n">them</span> <span class="n">in</span> <span class="n">separate</span> <span class="n">rpcinterface</span>: <span class="n">sections</span>
+[<span class="n">rpcinterface</span>:<span class="n">supervisor</span>]
+<span class="n">supervisor</span>.<span class="n">rpcinterface_factory</span> = <span class="n">supervisor</span>.<span class="n">rpcinterface</span>:<span class="n">make_main_rpcinterface</span>
+
+[<span class="n">supervisorctl</span>]
+<span class="n">serverurl</span>=<span class="n">unix</span>:///<span class="n">var</span>/<span class="n">run</span>/<span class="n">supervisor</span>/<span class="n">supervisor</span>.<span class="n">sock</span> ; <span class="n">use</span> <span class="n">a</span> <span class="n">unix</span>:// <span class="n">URL</span>  <span class="n">for</span> <span class="n">a</span> <span class="n">unix</span> <span class="n">socket</span>
+;<span class="n">serverurl</span>=<span class="n">http</span>://<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9001</span> ; <span class="n">use</span> <span class="n">an</span> <span class="n">http</span>:// <span class="n">url</span> <span class="n">to</span> <span class="n">specify</span> <span class="n">an</span> <span class="n">inet</span> <span class="n">socket</span>
+;<span class="n">username</span>=<span class="n">chris</span>              ; <span class="n">should</span> <span class="n">be</span> <span class="n">same</span> <span class="n">as</span> <span class="n">http_username</span> <span class="n">if</span> <span class="n">set</span>
+;<span class="n">password</span>=<span class="m">123</span>                ; <span class="n">should</span> <span class="n">be</span> <span class="n">same</span> <span class="n">as</span> <span class="n">http_password</span> <span class="n">if</span> <span class="n">set</span>
+;<span class="n">prompt</span>=<span class="n">mysupervisor</span>         ; <span class="n">cmd</span> <span class="n">line</span> <span class="n">prompt</span> (<span class="n">default</span> <span class="s2">"supervisor"</span>)
+;<span class="n">history_file</span>=~/.<span class="n">sc_history</span>  ; <span class="n">use</span> <span class="n">readline</span> <span class="n">history</span> <span class="n">if</span> <span class="n">available</span>
+
+; <span class="n">The</span> <span class="n">below</span> <span class="n">sample</span> <span class="n">program</span> <span class="n">section</span> <span class="n">shows</span> <span class="n">all</span> <span class="n">possible</span> <span class="n">program</span> <span class="n">subsection</span> <span class="n">values</span>,
+; <span class="n">create</span> <span class="n">one</span> <span class="n">or</span> <span class="n">more</span> <span class="s1">'real'</span> <span class="n">program</span>: <span class="n">sections</span> <span class="n">to</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">control</span> <span class="n">them</span> <span class="n">under</span>
+; <span class="n">supervisor</span>.
+
+;[<span class="n">program</span>:<span class="n">theprogramname</span>]
+;<span class="n">command</span>=/<span class="n">bin</span>/<span class="n">cat</span>              ; <span class="n">the</span> <span class="n">program</span> (<span class="n">relative</span> <span class="n">uses</span> <span class="n">PATH</span>, <span class="n">can</span> <span class="n">take</span> <span class="n">args</span>)
+;<span class="n">process_name</span>=%(<span class="n">program_name</span>)<span class="n">s</span> ; <span class="n">process_name</span> <span class="n">expr</span> (<span class="n">default</span> %(<span class="n">program_name</span>)<span class="n">s</span>)
+;<span class="n">numprocs</span>=<span class="m">1</span>                    ; <span class="n">number</span> <span class="n">of</span> <span class="n">processes</span> <span class="n">copies</span> <span class="n">to</span> <span class="n">start</span> (<span class="n">def</span> <span class="m">1</span>)
+;<span class="n">directory</span>=/<span class="n">tmp</span>                ; <span class="n">directory</span> <span class="n">to</span> <span class="n">cwd</span> <span class="n">to</span> <span class="n">before</span> <span class="n">exec</span> (<span class="n">def</span> <span class="n">no</span> <span class="n">cwd</span>)
+;<span class="n">umask</span>=<span class="m">022</span>                     ; <span class="n">umask</span> <span class="n">for</span> <span class="n">process</span> (<span class="n">default</span> <span class="n">None</span>)
+;<span class="n">priority</span>=<span class="m">999</span>                  ; <span class="n">the</span> <span class="n">relative</span> <span class="n">start</span> <span class="n">priority</span> (<span class="n">default</span> <span class="m">999</span>)
+;<span class="n">autostart</span>=<span class="n">true</span>                ; <span class="n">start</span> <span class="n">at</span> <span class="n">supervisord</span> <span class="n">start</span> (<span class="n">default</span>: <span class="n">true</span>)
+;<span class="n">autorestart</span>=<span class="n">true</span>              ; <span class="n">retstart</span> <span class="n">at</span> <span class="n">unexpected</span> <span class="n">quit</span> (<span class="n">default</span>: <span class="n">true</span>)
+;<span class="n">startsecs</span>=<span class="m">10</span>                  ; <span class="n">number</span> <span class="n">of</span> <span class="n">secs</span> <span class="n">prog</span> <span class="n">must</span> <span class="n">stay</span> <span class="n">running</span> (<span class="n">def</span>. <span class="m">1</span>)
+;<span class="n">startretries</span>=<span class="m">3</span>                ; <span class="n">max</span> <span class="c"># of serial start failures (default 3)
+</span>;<span class="n">exitcodes</span>=<span class="m">0</span>,<span class="m">2</span>                 ; <span class="s1">'expected'</span> <span class="n">exit</span> <span class="n">codes</span> <span class="n">for</span> <span class="n">process</span> (<span class="n">default</span> <span class="m">0</span>,<span class="m">2</span>)
+;<span class="n">stopsignal</span>=<span class="n">QUIT</span>               ; <span class="n">signal</span> <span class="n">used</span> <span class="n">to</span> <span class="n">kill</span> <span class="n">process</span> (<span class="n">default</span> <span class="n">TERM</span>)
+;<span class="n">stopwaitsecs</span>=<span class="m">10</span>               ; <span class="n">max</span> <span class="n">num</span> <span class="n">secs</span> <span class="n">to</span> <span class="n">wait</span> <span class="n">b4</span> <span class="n">SIGKILL</span> (<span class="n">default</span> <span class="m">10</span>)
+;<span class="n">user</span>=<span class="n">chrism</span>                   ; <span class="n">setuid</span> <span class="n">to</span> <span class="n">this</span> <span class="n">UNIX</span> <span class="n">account</span> <span class="n">to</span> <span class="n">run</span> <span class="n">the</span> <span class="n">program</span>
+;<span class="n">redirect_stderr</span>=<span class="n">true</span>          ; <span class="n">redirect</span> <span class="n">proc</span> <span class="n">stderr</span> <span class="n">to</span> <span class="n">stdout</span> (<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">stdout_logfile</span>=/<span class="n">a</span>/<span class="n">path</span>        ; <span class="n">stdout</span> <span class="n">log</span> <span class="n">path</span>, <span class="n">NONE</span> <span class="n">for</span> <span class="n">none</span>; <span class="n">default</span> <span class="n">AUTO</span>
+;<span class="n">stdout_logfile_maxbytes</span>=<span class="m">1</span><span class="n">MB</span>   ; <span class="n">max</span> <span class="c"># logfile bytes b4 rotation (default 50MB)
+</span>;<span class="n">stdout_logfile_backups</span>=<span class="m">10</span>     ; <span class="c"># of stdout logfile backups (default 10)
+</span>;<span class="n">stdout_capture_maxbytes</span>=<span class="m">1</span><span class="n">MB</span>   ; <span class="n">number</span> <span class="n">of</span> <span class="n">bytes</span> <span class="n">in</span> <span class="s1">'capturemode'</span> (<span class="n">default</span> <span class="m">0</span>)
+;<span class="n">stdout_events_enabled</span>=<span class="n">false</span>   ; <span class="n">emit</span> <span class="n">events</span> <span class="n">on</span> <span class="n">stdout</span> <span class="n">writes</span> (<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">stderr_logfile</span>=/<span class="n">a</span>/<span class="n">path</span>        ; <span class="n">stderr</span> <span class="n">log</span> <span class="n">path</span>, <span class="n">NONE</span> <span class="n">for</span> <span class="n">none</span>; <span class="n">default</span> <span class="n">AUTO</span>
+;<span class="n">stderr_logfile_maxbytes</span>=<span class="m">1</span><span class="n">MB</span>   ; <span class="n">max</span> <span class="c"># logfile bytes b4 rotation (default 50MB)
+</span>;<span class="n">stderr_logfile_backups</span>=<span class="m">10</span>     ; <span class="c"># of stderr logfile backups (default 10)
+</span>;<span class="n">stderr_capture_maxbytes</span>=<span class="m">1</span><span class="n">MB</span>   ; <span class="n">number</span> <span class="n">of</span> <span class="n">bytes</span> <span class="n">in</span> <span class="s1">'capturemode'</span> (<span class="n">default</span> <span class="m">0</span>)
+;<span class="n">stderr_events_enabled</span>=<span class="n">false</span>   ; <span class="n">emit</span> <span class="n">events</span> <span class="n">on</span> <span class="n">stderr</span> <span class="n">writes</span> (<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">environment</span>=<span class="n">A</span>=<span class="m">1</span>,<span class="n">B</span>=<span class="m">2</span>           ; <span class="n">process</span> <span class="n">environment</span> <span class="n">additions</span> (<span class="n">def</span> <span class="n">no</span> <span class="n">adds</span>)
+;<span class="n">serverurl</span>=<span class="n">AUTO</span>                ; <span class="n">override</span> <span class="n">serverurl</span> <span class="n">computation</span> (<span class="n">childutils</span>)
+
+; <span class="n">The</span> <span class="n">below</span> <span class="n">sample</span> <span class="n">eventlistener</span> <span class="n">section</span> <span class="n">shows</span> <span class="n">all</span> <span class="n">possible</span>
+; <span class="n">eventlistener</span> <span class="n">subsection</span> <span class="n">values</span>, <span class="n">create</span> <span class="n">one</span> <span class="n">or</span> <span class="n">more</span> <span class="s1">'real'</span>
+; <span class="n">eventlistener</span>: <span class="n">sections</span> <span class="n">to</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">handle</span> <span class="n">event</span> <span class="n">notifications</span>
+; <span class="n">sent</span> <span class="n">by</span> <span class="n">supervisor</span>.
+
+;[<span class="n">eventlistener</span>:<span class="n">theeventlistenername</span>]
+;<span class="n">command</span>=/<span class="n">bin</span>/<span class="n">eventlistener</span>    ; <span class="n">the</span> <span class="n">program</span> (<span class="n">relative</span> <span class="n">uses</span> <span class="n">PATH</span>, <span class="n">can</span> <span class="n">take</span> <span class="n">args</span>)
+;<span class="n">process_name</span>=%(<span class="n">program_name</span>)<span class="n">s</span> ; <span class="n">process_name</span> <span class="n">expr</span> (<span class="n">default</span> %(<span class="n">program_name</span>)<span class="n">s</span>)
+;<span class="n">numprocs</span>=<span class="m">1</span>                    ; <span class="n">number</span> <span class="n">of</span> <span class="n">processes</span> <span class="n">copies</span> <span class="n">to</span> <span class="n">start</span> (<span class="n">def</span> <span class="m">1</span>)
+;<span class="n">events</span>=<span class="n">EVENT</span>                  ; <span class="n">event</span> <span class="n">notif</span>. <span class="n">types</span> <span class="n">to</span> <span class="n">subscribe</span> <span class="n">to</span> (<span class="n">req</span><span class="err">'</span><span class="n">d</span>)
+;<span class="n">buffer_size</span>=<span class="m">10</span>                ; <span class="n">event</span> <span class="n">buffer</span> <span class="n">queue</span> <span class="n">size</span> (<span class="n">default</span> <span class="m">10</span>)
+;<span class="n">directory</span>=/<span class="n">tmp</span>                ; <span class="n">directory</span> <span class="n">to</span> <span class="n">cwd</span> <span class="n">to</span> <span class="n">before</span> <span class="n">exec</span> (<span class="n">def</span> <span class="n">no</span> <span class="n">cwd</span>)
+;<span class="n">umask</span>=<span class="m">022</span>                     ; <span class="n">umask</span> <span class="n">for</span> <span class="n">process</span> (<span class="n">default</span> <span class="n">None</span>)
+;<span class="n">priority</span>=-<span class="m">1</span>                   ; <span class="n">the</span> <span class="n">relative</span> <span class="n">start</span> <span class="n">priority</span> (<span class="n">default</span> -<span class="m">1</span>)
+;<span class="n">autostart</span>=<span class="n">true</span>                ; <span class="n">start</span> <span class="n">at</span> <span class="n">supervisord</span> <span class="n">start</span> (<span class="n">default</span>: <span class="n">true</span>)
+;<span class="n">autorestart</span>=<span class="n">unexpected</span>        ; <span class="n">restart</span> <span class="n">at</span> <span class="n">unexpected</span> <span class="n">quit</span> (<span class="n">default</span>: <span class="n">unexpected</span>)
+;<span class="n">startsecs</span>=<span class="m">10</span>                  ; <span class="n">number</span> <span class="n">of</span> <span class="n">secs</span> <span class="n">prog</span> <span class="n">must</span> <span class="n">stay</span> <span class="n">running</span> (<span class="n">def</span>. <span class="m">1</span>)
+;<span class="n">startretries</span>=<span class="m">3</span>                ; <span class="n">max</span> <span class="c"># of serial start failures (default 3)
+</span>;<span class="n">exitcodes</span>=<span class="m">0</span>,<span class="m">2</span>                 ; <span class="s1">'expected'</span> <span class="n">exit</span> <span class="n">codes</span> <span class="n">for</span> <span class="n">process</span> (<span class="n">default</span> <span class="m">0</span>,<span class="m">2</span>)
+;<span class="n">stopsignal</span>=<span class="n">QUIT</span>               ; <span class="n">signal</span> <span class="n">used</span> <span class="n">to</span> <span class="n">kill</span> <span class="n">process</span> (<span class="n">default</span> <span class="n">TERM</span>)
+;<span class="n">stopwaitsecs</span>=<span class="m">10</span>               ; <span class="n">max</span> <span class="n">num</span> <span class="n">secs</span> <span class="n">to</span> <span class="n">wait</span> <span class="n">b4</span> <span class="n">SIGKILL</span> (<span class="n">default</span> <span class="m">10</span>)
+;<span class="n">user</span>=<span class="n">chrism</span>                   ; <span class="n">setuid</span> <span class="n">to</span> <span class="n">this</span> <span class="n">UNIX</span> <span class="n">account</span> <span class="n">to</span> <span class="n">run</span> <span class="n">the</span> <span class="n">program</span>
+;<span class="n">redirect_stderr</span>=<span class="n">true</span>          ; <span class="n">redirect</span> <span class="n">proc</span> <span class="n">stderr</span> <span class="n">to</span> <span class="n">stdout</span> (<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">stdout_logfile</span>=/<span class="n">a</span>/<span class="n">path</span>        ; <span class="n">stdout</span> <span class="n">log</span> <span class="n">path</span>, <span class="n">NONE</span> <span class="n">for</span> <span class="n">none</span>; <span class="n">default</span> <span class="n">AUTO</span>
+;<span class="n">stdout_logfile_maxbytes</span>=<span class="m">1</span><span class="n">MB</span>   ; <span class="n">max</span> <span class="c"># logfile bytes b4 rotation (default 50MB)
+</span>;<span class="n">stdout_logfile_backups</span>=<span class="m">10</span>     ; <span class="c"># of stdout logfile backups (default 10)
+</span>;<span class="n">stdout_events_enabled</span>=<span class="n">false</span>   ; <span class="n">emit</span> <span class="n">events</span> <span class="n">on</span> <span class="n">stdout</span> <span class="n">writes</span> (<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">stderr_logfile</span>=/<span class="n">a</span>/<span class="n">path</span>        ; <span class="n">stderr</span> <span class="n">log</span> <span class="n">path</span>, <span class="n">NONE</span> <span class="n">for</span> <span class="n">none</span>; <span class="n">default</span> <span class="n">AUTO</span>
+;<span class="n">stderr_logfile_maxbytes</span>=<span class="m">1</span><span class="n">MB</span>   ; <span class="n">max</span> <span class="c"># logfile bytes b4 rotation (default 50MB)
+</span>;<span class="n">stderr_logfile_backups</span>        ; <span class="c"># of stderr logfile backups (default 10)
+</span>;<span class="n">stderr_events_enabled</span>=<span class="n">false</span>   ; <span class="n">emit</span> <span class="n">events</span> <span class="n">on</span> <span class="n">stderr</span> <span class="n">writes</span> (<span class="n">default</span> <span class="n">false</span>)
+;<span class="n">environment</span>=<span class="n">A</span>=<span class="m">1</span>,<span class="n">B</span>=<span class="m">2</span>           ; <span class="n">process</span> <span class="n">environment</span> <span class="n">additions</span>
+;<span class="n">serverurl</span>=<span class="n">AUTO</span>                ; <span class="n">override</span> <span class="n">serverurl</span> <span class="n">computation</span> (<span class="n">childutils</span>)
+
+; <span class="n">The</span> <span class="n">below</span> <span class="n">sample</span> <span class="n">group</span> <span class="n">section</span> <span class="n">shows</span> <span class="n">all</span> <span class="n">possible</span> <span class="n">group</span> <span class="n">values</span>,
+; <span class="n">create</span> <span class="n">one</span> <span class="n">or</span> <span class="n">more</span> <span class="s1">'real'</span> <span class="n">group</span>: <span class="n">sections</span> <span class="n">to</span> <span class="n">create</span> <span class="s2">"heterogeneous"</span>
+; <span class="n">process</span> <span class="n">groups</span>.
+
+;[<span class="n">group</span>:<span class="n">thegroupname</span>]
+;<span class="n">programs</span>=<span class="n">progname1</span>,<span class="n">progname2</span>  ; <span class="n">each</span> <span class="n">refers</span> <span class="n">to</span> <span class="s1">'x'</span> <span class="n">in</span> [<span class="n">program</span>:<span class="n">x</span>] <span class="n">definitions</span>
+;<span class="n">priority</span>=<span class="m">999</span>                  ; <span class="n">the</span> <span class="n">relative</span> <span class="n">start</span> <span class="n">priority</span> (<span class="n">default</span> <span class="m">999</span>)
+
+; <span class="n">The</span> [<span class="n">include</span>] <span class="n">section</span> <span class="n">can</span> <span class="n">just</span> <span class="n">contain</span> <span class="n">the</span> <span class="s2">"files"</span> <span class="n">setting</span>.  <span class="n">This</span>
+; <span class="n">setting</span> <span class="n">can</span> <span class="n">list</span> <span class="n">multiple</span> <span class="n">files</span> (<span class="n">separated</span> <span class="n">by</span> <span class="n">whitespace</span> <span class="n">or</span>
+; <span class="n">newlines</span>).  <span class="n">It</span> <span class="n">can</span> <span class="n">also</span> <span class="n">contain</span> <span class="n">wildcards</span>.  <span class="n">The</span> <span class="n">filenames</span> <span class="n">are</span>
+; <span class="n">interpreted</span> <span class="n">as</span> <span class="n">relative</span> <span class="n">to</span> <span class="n">this</span> <span class="n">file</span>.  <span class="n">Included</span> <span class="n">files</span> *<span class="n">cannot</span>*
+; <span class="n">include</span> <span class="n">files</span> <span class="n">themselves</span>.
+
+[<span class="n">include</span>]
+<span class="n">files</span> = <span class="n">supervisord</span>.<span class="n">d</span>/*.<span class="n">ini</span>
+</code></pre></div></div>
+
+<h4 id="自定义配置supervisordconf">自定义配置supervisord.conf</h4>
+
+<p>在/etc/supervisord.d的目录下创建conf和log两个目录，conf用于存放管理进程的配置，log用于存放管理进程的日志。</p>
+
+<p>修改/etc/supervisord.conf的[include]部分，加载配置文件</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">include</span>]
+<span class="n">files</span> = <span class="n">supervisord</span>.<span class="n">d</span>/<span class="n">conf</span>/*.<span class="n">conf</span>
+</code></pre></div></div>
+
+<p>修改/etc/supervisord.conf的[supervisord]部分，应用日志的目录</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">supervisord</span>]
+<span class="n">logfile</span>=/<span class="n">var</span>/<span class="n">log</span>/<span class="n">supervisor</span>/<span class="n">supervisord</span>.<span class="n">log</span>
+...
+</code></pre></div></div>
+
+<h3 id="配置需要监控的应用">配置需要监控的应用</h3>
+
+<p>修改/etc/supervisord.conf的[[program:theprogramname]]部分，配置需要被监控的进程</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> /home/python-workspace
+vim hello.py
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">'Hello World!'</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">program</span>:<span class="n">hello</span>]
+<span class="n">directory</span> = /<span class="n">home</span>/<span class="n">python</span>-<span class="n">workspace</span> ; 程序的启动目录
+<span class="n">command</span> = <span class="n">python</span> <span class="n">hello</span>.<span class="n">py</span> ; 启动命令，与命令行启动的命令是一样的
+<span class="n">autostart</span> = <span class="n">true</span>     ; 在 <span class="n">supervisord</span> 启动的时候也自动启动
+<span class="n">startsecs</span> = <span class="m">5</span>        ; 启动 <span class="m">5</span> 秒后没有异常退出，就当作已经正常启动了
+<span class="n">autorestart</span> = <span class="n">true</span>   ; 程序异常退出后自动重启
+<span class="n">startretries</span> = <span class="m">3</span>     ; 启动失败自动重试次数，默认是 <span class="m">3</span>
+<span class="n">user</span> = <span class="n">root</span>          ; 用哪个用户启动
+<span class="n">redirect_stderr</span> = <span class="n">true</span>  ; 把 <span class="n">stderr</span> 重定向到 <span class="n">stdout</span>，默认 <span class="n">false</span>
+<span class="n">stdout_logfile_maxbytes</span> = <span class="m">20</span><span class="n">MB</span>  ; <span class="n">stdout</span> 日志文件大小，默认 <span class="m">50</span><span class="n">MB</span>
+<span class="n">stdout_logfile_backups</span> = <span class="m">20</span>     ; <span class="n">stdout</span> 日志文件备份数
+; <span class="n">stdout</span> 日志文件，需要注意当指定目录不存在时无法正常启动，所以需要手动创建目录（<span class="n">supervisord</span> 会自动创建日志文件）
+<span class="n">stdout_logfile</span> = /<span class="n">etc</span>/<span class="n">supervisord</span>.<span class="n">d</span>/<span class="n">log</span>/<span class="n">hello</span>.<span class="n">log</span>  ;日志统一放在<span class="n">log</span>目录下
+</code></pre></div></div>
+
+<h3 id="surpervisor的启动">Surpervisor的启动</h3>
+
+<h4 id="二进制启动">二进制启动</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># supervisord二进制启动</span>
+supervisord <span class="nt">-c</span> /etc/supervisord.conf
+<span class="c"># 检查进程</span>
+ps aux | <span class="nb">grep </span>supervisord
+</code></pre></div></div>
+
+<h4 id="以systemd的方式管理启动">以systemd的方式管理启动</h4>
+
+<p>查看/etc/rc.d/init.d/supervisord是否存在，若不存在，则新建内容：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+<span class="c">#</span>
+<span class="c"># /etc/rc.d/init.d/supervisord</span>
+<span class="c">#</span>
+<span class="c"># Supervisor is a client/server system that</span>
+<span class="c"># allows its users to monitor and control a</span>
+<span class="c"># number of processes on UNIX-like operating</span>
+<span class="c"># systems.</span>
+<span class="c">#</span>
+<span class="c"># chkconfig: - 64 36</span>
+<span class="c"># description: Supervisor Server</span>
+<span class="c"># processname: supervisord</span>
+
+<span class="c"># Source init functions</span>
+<span class="nb">.</span> /etc/rc.d/init.d/functions
+
+<span class="nv">prog</span><span class="o">=</span><span class="s2">"supervisord"</span>
+
+<span class="nv">prefix</span><span class="o">=</span><span class="s2">"/usr"</span>
+<span class="nv">exec_prefix</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">prefix</span><span class="k">}</span><span class="s2">"</span>
+<span class="nv">prog_bin</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">exec_prefix</span><span class="k">}</span><span class="s2">/bin/supervisord"</span>
+<span class="nv">PIDFILE</span><span class="o">=</span><span class="s2">"/var/run/</span><span class="nv">$prog</span><span class="s2">.pid"</span>
+
+start<span class="o">()</span>
+<span class="o">{</span>
+       <span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">$"Starting </span><span class="nv">$prog</span><span class="s2">: "</span>
+       daemon <span class="nv">$prog_bin</span> <span class="nt">--pidfile</span> <span class="nv">$PIDFILE</span> <span class="nt">-c</span> /etc/supervisord.conf
+       <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$PIDFILE</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> success <span class="s2">$"</span><span class="nv">$prog</span><span class="s2"> startup"</span> <span class="o">||</span> failure <span class="s2">$"</span><span class="nv">$prog</span><span class="s2"> startup"</span>
+       <span class="nb">echo</span>
+<span class="o">}</span>
+
+stop<span class="o">()</span>
+<span class="o">{</span>
+       <span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">$"Shutting down </span><span class="nv">$prog</span><span class="s2">: "</span>
+       <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$PIDFILE</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> killproc <span class="nv">$prog</span> <span class="o">||</span> success <span class="s2">$"</span><span class="nv">$prog</span><span class="s2"> shutdown"</span>
+       <span class="nb">echo</span>
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="s2">"</span><span class="nv">$1</span><span class="s2">"</span> <span class="k">in
+
+ </span>start<span class="p">)</span>
+   start
+ <span class="p">;;</span>
+
+ stop<span class="p">)</span>
+   stop
+ <span class="p">;;</span>
+
+ status<span class="p">)</span>
+       status <span class="nv">$prog</span>
+ <span class="p">;;</span>
+
+ restart<span class="p">)</span>
+   stop
+   start
+ <span class="p">;;</span>
+
+ <span class="k">*</span><span class="p">)</span>
+   <span class="nb">echo</span> <span class="s2">"Usage: </span><span class="nv">$0</span><span class="s2"> {start|stop|restart|status}"</span>
+ <span class="p">;;</span>
+
+<span class="k">esac</span>
+</code></pre></div></div>
+
+<p>设置开机启动及systemd方式启动</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo chmod</span> +x /etc/rc.d/init.d/supervisord
+<span class="nb">sudo </span>chkconfig <span class="nt">--add</span> supervisord
+<span class="nb">sudo </span>chkconfig supervisord on
+<span class="nb">sudo </span>service supervisord start
+</code></pre></div></div>
+
+<p>查看管理进程状态：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>supervisorctl status
+</code></pre></div></div>
+
+<p>可看到如下：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hello                            RUNNING   pid 23125, uptime 0:01:10
+</code></pre></div></div>
+
+<p>即监控hello.py进程成功，若hello.py异常退出，Surpervisor可自动启动hello.py进程</p>
+
+<h3 id="supervisorctlsupervisord">supervisorctl&amp;supervisord</h3>
+
+<p>Supervisord 安装完成后有两个可用的命令行 supervisord 和 supervisorctl，命令使用解释如下：</p>
+
+<h4 id="supervisorctl">supervisorctl</h4>
+
+<ul>
+  <li>supervisorctl stop programxxx，停止某一个进程(programxxx)，programxxx 为 [program:beepkg] 里配置的值，这个示例就是 beepkg。</li>
+  <li>supervisorctl start programxxx，启动某个进程。</li>
+  <li>supervisorctl restart programxxx，重启某个进程。</li>
+  <li>supervisorctl status，查看进程状态。</li>
+  <li>supervisorctl stop groupworker ，重启所有属于名为 groupworker 这个分组的进程(start,restart 同理)。</li>
+  <li>supervisorctl stop all，停止全部进程，注：start、restart、stop 都不会载入最新的配置文件。</li>
+  <li>supervisorctl reload，载入最新的配置文件，停止原有进程并按新的配置启动、管理所有进程。</li>
+  <li>supervisorctl update，根据最新的配置文件，启动新配置或有改动的进程，配置没有改动的进程不会受影响而重启</li>
+</ul>
+
+<h4 id="supervisord">supervisord</h4>
+
+<p>supervisord，初始启动 Supervisord，启动、管理配置中设置的进程。</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>supervisord -- run a set of applications as daemons.
+
+Usage: /usr/bin/supervisord [options]
+
+Options:
+-c/--configuration FILENAME -- configuration file
+-n/--nodaemon -- run in the foreground (same as 'nodaemon true' in config file)
+-h/--help -- print this usage message and exit
+-v/--version -- print supervisord version number and exit
+-u/--user USER -- run supervisord as this user (or numeric uid)
+-m/--umask UMASK -- use this umask for daemon subprocess (default is 022)
+-d/--directory DIRECTORY -- directory to chdir to when daemonized
+-l/--logfile FILENAME -- use FILENAME as logfile path
+-y/--logfile_maxbytes BYTES -- use BYTES to limit the max size of logfile
+-z/--logfile_backups NUM -- number of backups to keep when max bytes reached
+-e/--loglevel LEVEL -- use LEVEL as log level (debug,info,warn,error,critical)
+-j/--pidfile FILENAME -- write a pid file for the daemon process to FILENAME
+-i/--identifier STR -- identifier used for this instance of supervisord
+-q/--childlogdir DIRECTORY -- the log directory for child process logs
+-k/--nocleanup --  prevent the process from performing cleanup (removal of
+                   old automatic child log files) at startup.
+-a/--minfds NUM -- the minimum number of file descriptors for start success
+-t/--strip_ansi -- strip ansi escape codes from process output
+--minprocs NUM  -- the minimum number of processes available for start success
+--profile_options OPTIONS -- run supervisord under profiler and output
+                             results based on OPTIONS, which  is a comma-sep'd
+                             list of 'cumulative', 'calls', and/or 'callers',
+                             e.g. 'cumulative,callers')
+</code></pre></div></div>
+
+<h3 id="supervisor控制台">Supervisor控制台</h3>
+
+<p>修改/etc/supervisord.conf中[inet_http_server]部分：</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">inet_http_server</span>]         ; <span class="n">inet</span> (<span class="n">TCP</span>) <span class="n">server</span> <span class="n">disabled</span> <span class="n">by</span> <span class="n">default</span>
+<span class="n">port</span>=<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">0</span>:<span class="m">9001</span>        ; (<span class="n">ip_address</span>:<span class="n">port</span> <span class="n">specifier</span>, *:<span class="n">port</span> <span class="n">for</span> <span class="n">all</span> <span class="n">iface</span>)
+<span class="n">username</span>=<span class="n">user</span>              ; (<span class="n">default</span> <span class="n">is</span> <span class="n">no</span> <span class="n">username</span> (<span class="n">open</span> <span class="n">server</span>))
+<span class="n">password</span>=<span class="m">123</span>               ; (<span class="n">default</span> <span class="n">is</span> <span class="n">no</span> <span class="n">password</span> (<span class="n">open</span> <span class="n">server</span>))
+</code></pre></div></div>
+
+<p>修改后重启supervisor进程，在浏览器访问 <code class="language-plaintext highlighter-rouge">http://&lt;host-ip&gt;:9001</code>。</p>
+
+<p>修改 vim /etc/nginx/nginx.conf</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">server</span> {
+        <span class="n">listen</span>       <span class="m">80</span>;
+        <span class="n">server_name</span>  <span class="n">supervisor</span>.<span class="n">heygolang</span>.<span class="n">cn</span>;
+
+        <span class="n">location</span> / {
+                <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="n">supervisor</span>.<span class="n">heygolang</span>.<span class="n">cn</span>:<span class="m">9001</span>;
+        }
+    }
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> /usr/sbin/
+./nginx <span class="nt">-t</span>   <span class="c"># 检查配置文件语法</span>
+./nginx <span class="nt">-s</span> reload   <span class="c"># 重新加载配置文件</span>
+</code></pre></div></div>
+
+<p>访问 <code class="language-plaintext highlighter-rouge">http://supervisor.heygolang.cn/</code> ,结果如下</p>
+
+<p><img src="/assets/images/2019/2019-07-25-supervisor.png" alt="supervisor" /></p>
+:ET

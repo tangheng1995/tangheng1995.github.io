@@ -1,0 +1,74 @@
+I"0<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#mysql-储存引擎之innodb" id="markdown-toc-mysql-储存引擎之innodb">Mysql 储存引擎之Innodb</a>    <ul>
+      <li><a href="#innodb是一种事务型存储引擎innodb是支持事务的acid特性的" id="markdown-toc-innodb是一种事务型存储引擎innodb是支持事务的acid特性的">innodb是一种事务型存储引擎。innodb是支持事务的ACID特性的</a></li>
+      <li><a href="#innodb支持行级锁" id="markdown-toc-innodb支持行级锁">innodb支持行级锁</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Mysql 储存引擎之 Innodb。</p>
+
+<h2 id="mysql-储存引擎之innodb">Mysql 储存引擎之Innodb</h2>
+
+<h3 id="innodb是一种事务型存储引擎innodb是支持事务的acid特性的">innodb是一种事务型存储引擎。innodb是支持事务的ACID特性的</h3>
+
+<ul>
+  <li>
+    <p>A, atomacity 原子性 事务必须是原子工作单元；对于其数据修改，要么全都执行，要么全都不执行。通常，与某个事务关联的操作具有共同的目标，并且是相互依赖的。如果系统只执行这些操作的一个子集，则可能会破坏事务的总体目标。原子性消除了系统处理操作子集的可能性。</p>
+  </li>
+  <li>
+    <p>C, consistency 一致性</p>
+  </li>
+</ul>
+
+<p>事务将数据库从一种一致状态转变为下一种一致状态。也就是说，事务在完成时，必须使所有的数据都保持一致状态（各种 constraint 不被破坏）。</p>
+
+<ul>
+  <li>
+    <p>I, isolation 隔离性 由并发事务所作的修改必须与任何其它并发事务所作的修改隔离。事务查看数据时数据所处的状态，要么是另一并发事务修改它之前的状态，要么是另一事务修改它之后的状态，事务不会查看中间状态的数据。换句话说，一个事务的影响在该事务提交前对其他事务都不可见。</p>
+  </li>
+  <li>
+    <p>D, durability 持久性</p>
+  </li>
+</ul>
+
+<p>事务完成之后，它对于系统的影响是永久性的。该修改即使出现致命的系统故障也将一直保持。</p>
+
+<blockquote>
+  <p><a href="https://hit-alibaba.github.io/interview/Server/db/Transaction.html">参考：事务的概念</a></p>
+</blockquote>
+
+<h3 id="innodb支持行级锁">innodb支持行级锁</h3>
+
+<p>行级锁的特点是在进行写操作时，我们所需要锁定的资源更少，这样可以支持的并发就更多。需要注意的是，innodb的行级锁是由存储引擎层实现的，mysql服务器完全不了解存储引擎中锁的实现方式。</p>
+
+<p><strong>锁的常见分类</strong>：</p>
+
+<p>共享锁（也称读锁）：可以看出读锁是共享的，不会被阻塞的， 多个线程可以在同一时间读取同一资源，而不相互干扰。
+独占锁（也称写锁）：写锁是独占的，是排它的，会阻塞其他的写锁和读锁。这是对数据完整性的考虑，只有这样才能保证在给定的时间里，只有一个线程可以执行写入，并防止其他用户正在读取写入的资源，也就是我们前面说的事务的隔离性。
+  
+对于innodb来说，读锁和写锁都是行锁。兼容性指的是对同一行记录可见兼容的情况</p>
+
+<p><strong>锁的粒度</strong>：</p>
+
+<p>锁的粒度就是锁的策略，指被加锁资源的最小单位。比如在行上加锁，那么最小单位就是行，这锁就称为行级锁。如果说的最小单位是列，那就称为锁的列级锁。同理，如果锁的最小单位是表的话，那么锁的最小单位就是表级锁。</p>
+
+<p>表级锁：mysql中最基本的表策略，开销最小的策略，并发性低。表锁会在加锁时锁定整张表，一个用户在对表进行写操作前，需要先获得写锁。这会阻塞其他用户的读写操作，只有没有写锁时，其他用户才可以获取读锁，读锁之前说了是相互间不会阻塞的。表级锁通常是在mysql服务器层实现的，所以虽然innodb实现了行级锁，但是在一些时候，mysql数据服务层还是会对innodb表加上表级锁。</p>
+
+<p>行级锁：可以最大程度的支持并发处理，同时锁的开销比表级锁要大。目前innodb和其他的存储引擎中实现了行级锁，行级锁只在存储引擎中进行实现，而mysql服务层并没有实现。</p>
+
+<blockquote>
+  <p><a href="https://segmentfault.com/a/1190000015468361">参考：MySQL常用存储引擎之Innodb</a></p>
+</blockquote>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://hit-alibaba.github.io/interview/Server/db/Transaction.html">事务的概念</a></li>
+  <li>[2] <a href="https://segmentfault.com/a/1190000015468361">MySQL常用存储引擎之Innodb</a></li>
+</ul>
+:ET

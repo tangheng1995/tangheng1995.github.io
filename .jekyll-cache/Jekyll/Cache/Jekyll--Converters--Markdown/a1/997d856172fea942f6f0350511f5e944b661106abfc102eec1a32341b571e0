@@ -1,0 +1,88 @@
+I"4<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu创建应用桌面快捷图标" id="markdown-toc-ubuntu创建应用桌面快捷图标">Ubuntu创建应用桌面快捷图标</a>    <ul>
+      <li><a href="#配置环境变量" id="markdown-toc-配置环境变量">配置环境变量</a></li>
+      <li><a href="#创建桌面图标" id="markdown-toc-创建桌面图标">创建桌面图标</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 创建应用桌面快捷图标。</p>
+
+<h2 id="ubuntu创建应用桌面快捷图标">Ubuntu创建应用桌面快捷图标</h2>
+
+<h3 id="配置环境变量">配置环境变量</h3>
+
+<p>下载最新安装包：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://www.jetbrains.com/go/download/#section=linux
+</code></pre></div></div>
+
+<p>解压至目录：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/home/brook/profile/dev-tool
+</code></pre></div></div>
+
+<p>GOland启动程序如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/home/brook/profile/dev-tool/goland-2019.2/GoLand-2019.2/bin/golang.sh
+</code></pre></div></div>
+
+<p>添加golang.sh至环境变量中,即可全局启动golang.sh：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>vim /etc/profile
+</code></pre></div></div>
+
+<p>添加内容如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/home/brook/profile/dev-tool/pycharm-professional-2019.2/pycharm-2019.2/bin
+</code></pre></div></div>
+
+<h3 id="创建桌面图标">创建桌面图标</h3>
+
+<p>进入 /usr/share/applications 目录，Ubuntu安装的软件快捷方式都保存在/usr/share/applications目录下，该目录下所有文件名都类似*.desktop</p>
+
+<p>创建golang.desktop文件：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Desktop Entry]
+Name=GoLand
+Comment=Coding Golang
+Exec=/home/brook/profile/dev-tool/goland-2019.2/GoLand-2019.2/bin/goland.sh
+Icon=/home/brook/profile/dev-tool/goland-2019.2/GoLand-2019.2/bin/goland.png
+Terminal=false
+Type=Application
+Categories=Development;
+StartupNotify=true
+NoDisplay=true
+</code></pre></div></div>
+
+<p>[Desktop Entry]是组名称，在规范文档中说明了必须放在所有属性前，其前面只能有注释
+Type表示Desktop Entry类型，有Application , Link 和Directory 三种，使用Application表示可执行文件
+Name是图标下边显示的名称
+Icon是图标文件的路径，推荐使用png
+Exec是启动命令，一般为可执行文件的路径，可以带有参数
+Terminal表示是否在终端中运行</p>
+
+<p>.desktop文件不需要可执行权限来启动程序，推荐将权限设置为644</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo chmod </span>744 goland.desktop
+</code></pre></div></div>
+
+<p>使用xdg-desktop-menu命令来将自己编写的Desktop entry文件添加到系统应用列表，使用xdg-desktop-icon来将自己的Desktop entry文件添加到桌面上</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 安装到应用列表</span>
+<span class="c"># 我们一般不会填vendor属性，使用novender选项</span>
+xdg-desktop-menu <span class="nb">install</span> <span class="nt">--novendor</span> goland.desktop
+<span class="c"># 卸载</span>
+xdg-desktop-menu uninstall goland.desktop
+
+<span class="c"># 安装到桌面</span>
+xdg-desktop-icon <span class="nb">install</span> <span class="nt">--novendor</span> goland.desktop
+<span class="c"># 卸载</span>
+xdg-desktop-icon uninstall goland.desktop
+</code></pre></div></div>
+
+<p>即可在桌面查看</p>
+:ET

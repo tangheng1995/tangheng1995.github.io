@@ -1,0 +1,67 @@
+I"
+<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#vmware-安装-ubuntu" id="markdown-toc-vmware-安装-ubuntu">VMware 安装 Ubuntu</a>    <ul>
+      <li><a href="#下载ubuntu-server" id="markdown-toc-下载ubuntu-server">下载ubuntu server</a></li>
+      <li><a href="#安装ubuntu虚拟机" id="markdown-toc-安装ubuntu虚拟机">安装ubuntu虚拟机</a></li>
+      <li><a href="#验证ssh" id="markdown-toc-验证ssh">验证ssh</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>VMware安装Ubuntu，多台虚拟机网络互通。</p>
+
+<h2 id="vmware-安装-ubuntu">VMware 安装 Ubuntu</h2>
+
+<h3 id="下载ubuntu-server">下载ubuntu server</h3>
+
+<p>下载地址 <a href="https://ubuntu.com/download/server">Ubuntu server</a></p>
+
+<h3 id="安装ubuntu虚拟机">安装ubuntu虚拟机</h3>
+
+<p>配置虚拟机网络时选择 <code class="language-plaintext highlighter-rouge">VMnet8(NAT模式)</code>
+<img src="/assets/images/2019/2019-09-13-vm-net.png" alt="VMnet8" /></p>
+
+<p>配置虚拟机mirror连接时设置阿里云：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://mirrors.aliyun.com/ubuntu/
+</code></pre></div></div>
+
+<p><img src="/assets/images/2019/2019-09-13-ubuntu-mirror.png" alt="aliyun" /></p>
+
+<p>mirror服务器列表为：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>可将 http://cn.archive.ubuntu.com/ubuntu/ 替换为下列任意服务器：
+
+<span class="c"># Ubuntu 官方（欧洲，国内较慢，无同步延迟）</span>
+http://archive.ubuntu.com/ubuntu/
+
+<span class="c"># Ubuntu 官方中国（目前是阿里云）</span>
+http://cn.archive.ubuntu.com/ubuntu/
+
+<span class="c"># 网易（广东广州电信/联通千兆双线接入）</span>
+http://mirrors.163.com/ubuntu/
+
+<span class="c"># 搜狐（山东联通千兆接入）</span>
+http://mirrors.sohu.com/ubuntu/
+
+<span class="c"># 阿里云（北京万网/浙江杭州阿里云服务器双线接入）</span>
+http://mirrors.aliyun.com/ubuntu/
+
+<span class="c"># 中国开源软件中心</span>
+http://mirrors.oss.org.cn/ubuntu/
+
+<span class="c"># 首都在线科技</span>
+http://mirrors.yun-idc.com/ubuntu/
+</code></pre></div></div>
+
+<p>安装OpenSSH</p>
+
+<p><img src="/assets/images/2019/2019-09-13-install-openssh.png" alt="OpenSSH" /></p>
+
+<h3 id="验证ssh">验证ssh</h3>
+
+<p>查看多台虚拟机内网ip，ssh命令，登录正常，OK，搭建集群的前置条件完成</p>
+:ET

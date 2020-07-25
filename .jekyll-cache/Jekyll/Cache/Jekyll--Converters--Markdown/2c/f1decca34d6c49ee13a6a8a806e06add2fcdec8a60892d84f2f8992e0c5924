@@ -1,0 +1,118 @@
+I"�	<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#vscode开发插件" id="markdown-toc-vscode开发插件">Vscode开发插件</a></li>
+  <li><a href="#kubernetes" id="markdown-toc-kubernetes">Kubernetes</a></li>
+  <li><a href="#mysql" id="markdown-toc-mysql">MySQL</a></li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>常用开发利器汇总。目前收集：</p>
+
+<ul>
+  <li>VScode</li>
+  <li>Kubernetes</li>
+  <li>MySQL</li>
+</ul>
+
+<h2 id="vscode开发插件">Vscode开发插件</h2>
+
+<p>VSCode 插件列表（欢迎大家补充）：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>插件名称</th>
+      <th>插件描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Go</td>
+      <td>Go 语言插件。</td>
+    </tr>
+    <tr>
+      <td>VSCode Great Icons</td>
+      <td>VSCode 美化不同的文件。</td>
+    </tr>
+    <tr>
+      <td>vscode-icons</td>
+      <td>VSCode 美化不同的文件。</td>
+    </tr>
+    <tr>
+      <td>Vim</td>
+      <td>Vim 插件</td>
+    </tr>
+    <tr>
+      <td>Better Comments</td>
+      <td>代码注释</td>
+    </tr>
+    <tr>
+      <td>Terminal</td>
+      <td>命令行工具插件。</td>
+    </tr>
+    <tr>
+      <td>filesize</td>
+      <td>在 VSCode 底部工具栏，非常方便的显示文件大小。</td>
+    </tr>
+    <tr>
+      <td>WakaTime</td>
+      <td>统计项目代码的时间。</td>
+    </tr>
+    <tr>
+      <td>Code Runner</td>
+      <td>针对非常多的语言而快速方便执行的小插件。</td>
+    </tr>
+    <tr>
+      <td>GitLens</td>
+      <td>非常方便的查看文件代码的 commit 信息（提交时间，提交人等）。</td>
+    </tr>
+    <tr>
+      <td>markdownlint</td>
+      <td>格式化markdown语法</td>
+    </tr>
+    <tr>
+      <td>Docker</td>
+      <td>创建、管理docker应用</td>
+    </tr>
+    <tr>
+      <td>Bracket Pair Colorizer 2</td>
+      <td>代码块染色</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="kubernetes">Kubernetes</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>插件名称</th>
+      <th>插件描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>kube-shell</td>
+      <td>kubectl语法提示</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="mysql">MySQL</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>插件名称</th>
+      <th>插件描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>navicat</td>
+      <td>连接MySQL客户端工具</td>
+    </tr>
+  </tbody>
+</table>
+:ET

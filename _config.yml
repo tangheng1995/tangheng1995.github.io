@@ -1,100 +1,79 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+encoding: utf-8
 # Site settings
-title: Archer Blog
-SEOTitle: Coding...
-header-img: img/home-bg.jpg
+title: Archer
+brief-intro: stay hungry stay foolish
+baseurl: '' # the subpath of your site, e.g. /blog
+url: 'https://tangheng1995.github.io' # the base hostname & protocol for your site
+
+permalink: /:year/:month/:day/:title/
+
+# other links
+twitter_username:
+facebook_username:
+github_username: tangheng1995
 email: 347420070@qq.com
-description: "简单 乐观 爱创造"
-keyword: "Archer Blog,Archer,Blog,blog,archer blog,技术笔记,技术博客,线程,进程,协程,GO,Golang,golang,go,channal,goroutine,docker,Docker,k8s,K8S,kubernetes,Kubernetes"
-url: "https://importpkg.com"              # your host, for absolute URL
-baseurl: ""         # for example, '/blog' if your blog hosted on 'host/blog'
+weibo_username: saymololy
+zhihu_username: saymololy
+linkedIn_username:
+dribbble_username:
 
+description_footer: 本站记录我成长之路的点点滴滴！
 
+# comments
+# 三种评论插件，选一个就好了
+disqus_shortname: #lework
+gitalk:
+  enable: false
+  clientID: aa4ee6a59f0cfd9ed9b2
+  clientSecret: 617a322486aa0d38fbee4b5dddb62f9c92c58ee2
+  repo: https://github.com/tangheng1995/Comments
+  owner: tangheng1995
+  admin: tangheng1995
+utteranc_es:
+  enable: true
+  repo: 'tangheng1995/tangheng1995.github.io'
+  issue-term: pathname
+  theme: github-light
 
-# SNS settings
-RSS: false
-#weibo_username:     saymololy
-zhihu_username:     saymololy
-github_username:    tangheng1995
-#twitter_username:  saymololy
-#facebook_username:  saymololy
+# 赞赏
+reward:
+  enable: true
+  wechat: /assets/images/reward/wechat.png
+  alipay: /assets/images/reward/alipay.png
 
-
+# statistic analysis 统计代码
+# 百度统计 id，将统计代码替换为自己的百度统计id，即
+# hm.src = "//hm.baidu.com/hm.js?xxxxxxxxxxxx";
+# xxxxx字符串
+baidu_tongji_id: 23fa40cf36cb3e7226dea6957fdacb23
+google_analytics_id:
 
 # Build settings
-# from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
-highlighter: rouge
-permalink: pretty
-paginate: 10
-exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
-anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
-
-
-
-# Gems
-# from PR#40, to support local preview for Jekyll 3.0
-gems: [jekyll-paginate]
-
-
-
-# Markdown settings
-# replace redcarpet to kramdown,
-# although redcarpet can auto highlight code, the lack of header-id make the catalog impossible, so I switch to kramdown
-# document: http://jekyllrb.com/docs/configuration/#kramdown
 markdown: kramdown
+
 kramdown:
-  input: GFM                            # use Github Flavored Markdown !important
+  input: GFM
+  syntax_highlighter: rouge
 
+# port
+# port: 1234
 
+# url
+category_dir: category/
+tag_dir: tag/
 
-# Disqus settings
-#disqus_username: _your_disqus_short_name_
+# excerpt
+excerpt_separator: "\n\n\n\n"
 
-# Duoshuo settings
-#duoshuo_username: tangheng1995
-# Share component is depend on Comment so we can NOT use share only.
-#duoshuo_share: true                     # set to false if you want to use Comment without Sharing
+# paginate
+plugins: [jekyll-paginate]
+paginate: 10
 
+exclude: ["README.md", "LICENSE", ".post-template", ".gitignore", "start.bat"]
 
-
-
-# Analytics settings
-# Baidu Analytics
-#ba_track_id: 4cc1f2d8f3067386cc5cdb626a202900
-## Google Analytics
-#ga_track_id: 'UA-49627206-1'            # Format: UA-xxxxxx-xx
-#ga_domain: huangxuan.me
-
-
-
-# Sidebar settings
-sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "写写代码，做做设计，看看产品。世界那么大，多玩玩看看。"
-sidebar-avatar: /img/avatar-archer.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
-
-
-
-# Featured Tags
-featured-tags: true                     # whether or not using Feature-Tags
-featured-condition-size: 1              # A tag will be featured if the size of it is more than this condition value
-
-
-
-# Friends
-#friends: [
-#    {
-#        title: "Archer Blog",
-#        href: "http://blog.heygolang.cn"
-#    },{
-#        title: "Foo",
-#        href: "#"
-#    },{
-#        title: "Bar",
-#        href: "#"
-#    },{
-#        title: "Example Friends",
-#        href: "#"
-#    },{
-#        title: "It helps SEO",
-#        href: "#"
-#    }
-#]

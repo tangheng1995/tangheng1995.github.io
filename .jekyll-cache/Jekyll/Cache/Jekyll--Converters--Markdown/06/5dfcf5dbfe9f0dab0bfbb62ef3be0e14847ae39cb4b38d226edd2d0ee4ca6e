@@ -1,0 +1,153 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu-安装-docker" id="markdown-toc-ubuntu-安装-docker">Ubuntu 安装 docker</a>    <ul>
+      <li><a href="#安装docker" id="markdown-toc-安装docker">安装Docker</a></li>
+      <li><a href="#脚本自动安装" id="markdown-toc-脚本自动安装">脚本自动安装</a></li>
+      <li><a href="#镜像加速" id="markdown-toc-镜像加速">镜像加速</a></li>
+      <li><a href="#安装portainer" id="markdown-toc-安装portainer">安装Portainer</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Ubuntu 安装 docker 并配置docker管理工具Portainer。</p>
+
+<h2 id="ubuntu-安装-docker">Ubuntu 安装 docker</h2>
+
+<h3 id="安装docker">安装Docker</h3>
+
+<p>Ubuntu版本为18.04</p>
+
+<p>更新包</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt update
+</code></pre></div></div>
+
+<p>安装一些必备包，让apt可以使用https</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>apt-transport-https ca-certificates curl software-properties-common
+</code></pre></div></div>
+
+<p>添加GPG key 官方仓库公钥</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 国内源</span>
+curl <span class="nt">-fsSL</span> https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu/gpg | <span class="nb">sudo </span>apt-key add -
+
+<span class="c"># 官方源</span>
+curl <span class="nt">-fsSL</span> https://download.docker.com/linux/ubuntu/gpg | <span class="nb">sudo </span>apt-key add -
+</code></pre></div></div>
+
+<p>添加Docker仓库到apt源：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 国内源</span>
+<span class="nb">sudo </span>add-apt-repository <span class="s2">"deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux/ubuntu </span><span class="si">$(</span>lsb_release <span class="nt">-cs</span><span class="si">)</span><span class="s2"> stable"</span>
+
+<span class="c"># 官方源</span>
+<span class="nb">sudo </span>add-apt-repository <span class="s2">"deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"</span>
+</code></pre></div></div>
+
+<p>从docker最新仓库上更新包：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt update
+</code></pre></div></div>
+
+<p>确认安装Docker是从最新的docker仓库而不是默认Ubuntu仓库：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt-cache policy docker-ce
+</code></pre></div></div>
+
+<p>可以看到终端输出结果：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-ce:
+  Installed: (none)
+  Candidate: 18.03.1~ce~3-0~ubuntu
+  Version table:
+     18.03.1~ce~3-0~ubuntu 500
+        500 https://download.docker.com/linux/ubuntu bionic/stable amd64 Packages
+</code></pre></div></div>
+
+<p>安装docker：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>docker-ce
+</code></pre></div></div>
+
+<p>设置开机自启：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl status docker
+</code></pre></div></div>
+
+<p>可以看到终端输出为：</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Output
+● docker.service - Docker Application Container Engine
+   Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
+   Active: active (running) since Thu 2019-09-11 13:08:39 UTC; 2min 55s ago
+     Docs: https://docs.docker.com
+ Main PID: 10096 (dockerd)
+    Tasks: 16
+   CGroup: /system.slice/docker.service
+           ├─10096 /usr/bin/dockerd -H fd://
+           └─10113 docker-containerd --config /var/run/docker/containerd/containerd.toml
+</code></pre></div></div>
+
+<h3 id="脚本自动安装">脚本自动安装</h3>
+
+<p>Docker 官方为了简化安装流程，提供了一套便捷的安装脚本，Ubuntu 系统上可以使用这套脚本安装：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-fsSL</span> get.docker.com <span class="nt">-o</span> get-docker.sh
+
+<span class="nb">sudo </span>sh get-docker.sh <span class="nt">--mirror</span> Aliyun
+</code></pre></div></div>
+
+<h3 id="镜像加速">镜像加速</h3>
+
+<p>修改 /etc/docker/daemon.json 文件</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"registry-mirrors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"https://dockerhub.azk8s.cn"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"https://reg-mirror.qiniu.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"https://docker.mirrors.ustc.edu.cn"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>systemctl daemon-reload
+<span class="nb">sudo </span>systemctl restart docker
+</code></pre></div></div>
+
+<p>检查镜像是否生效：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker info
+</code></pre></div></div>
+
+<p>从结果中看到了如下内容，说明配置成功</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Registry Mirrors:
+  https://dockerhub.azk8s.cn/
+  https://reg-mirror.qiniu.com/
+</code></pre></div></div>
+
+<h3 id="安装portainer">安装Portainer</h3>
+
+<p>创建卷：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker volume create portainer_data
+</code></pre></div></div>
+
+<p>运行Portainer容器：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-d</span> <span class="nt">-p</span> 8000:8000 <span class="nt">-p</span> 9000:9000 <span class="nt">-v</span> /var/run/docker.sock:/var/run/docker.sock <span class="nt">-v</span> portainer_data:/data portainer/portainer
+</code></pre></div></div>
+
+<p>访问端口9000，进入Portainer配置页面</p>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04">How To Install and Use Docker on Ubuntu 18.04</a></li>
+  <li>[2] <a href="https://www.portainer.io/installation/">How simple is it to deploy Portainer?</a></li>
+</ul>
+:ET

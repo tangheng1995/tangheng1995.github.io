@@ -1,0 +1,31 @@
+I"�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#ubuntu安装sysv-rc-conf无法定位软件包" id="markdown-toc-ubuntu安装sysv-rc-conf无法定位软件包">Ubuntu安装sysv-rc-conf无法定位软件包</a></li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 安装 sysv-rc-conf 报错。</p>
+
+<h2 id="ubuntu安装sysv-rc-conf无法定位软件包">Ubuntu安装sysv-rc-conf无法定位软件包</h2>
+
+<p>安装sysv-rc-conf时提示</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt-get install sysv-rc-conf
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树
+正在读取状态信息... 完成
+E: 无法定位软件包 sysv-rc-conf
+</code></pre></div></div>
+
+<p>解决方案，添加镜像源：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>vim /etc/apt/sources.list
+
+deb http://archive.ubuntu.com/ubuntu/ trusty main universe restricted multiverse
+
+<span class="nb">sudo </span>apt update
+
+<span class="nb">sudo </span>apt <span class="nb">install </span>sysv-rc-conf
+</code></pre></div></div>
+:ET

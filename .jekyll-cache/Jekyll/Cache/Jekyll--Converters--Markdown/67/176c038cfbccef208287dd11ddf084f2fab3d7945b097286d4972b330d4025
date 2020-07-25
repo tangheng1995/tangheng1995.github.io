@@ -1,0 +1,88 @@
+I"x<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#centos安装mysql-docker" id="markdown-toc-centos安装mysql-docker">CentOS安装Mysql docker</a>    <ul>
+      <li><a href="#启动docker" id="markdown-toc-启动docker">启动docker</a></li>
+      <li><a href="#启动mysql容器" id="markdown-toc-启动mysql容器">启动mysql容器</a></li>
+      <li><a href="#进入mysql容器" id="markdown-toc-进入mysql容器">进入mysql容器</a></li>
+      <li><a href="#修改远端连接mysql数据库" id="markdown-toc-修改远端连接mysql数据库">修改远端连接mysql数据库</a></li>
+      <li><a href="#查看挂载卷位置获取容器镜像的元数据" id="markdown-toc-查看挂载卷位置获取容器镜像的元数据">查看挂载卷位置：获取容器/镜像的元数据</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Linux 安装 Docker Mysql 常用配置。</p>
+
+<h2 id="centos安装mysql-docker">CentOS安装Mysql docker</h2>
+
+<h3 id="启动docker">启动docker</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 切换root用户</span>
+su root
+<span class="c"># 启动docker</span>
+systemctl start docker
+</code></pre></div></div>
+
+<h3 id="启动mysql容器">启动mysql容器</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull mysql:5.7
+</code></pre></div></div>
+
+<p>创建并启动容器</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-p: 映射本地端口3306
+--restart-always: docker服务启动时，自动启动容器，并且当容器停止时，尝试重启容器。
+--restart具体参数值详细信息：
+    no -  容器退出时，不重启容器；
+    on-failure - 只有在非0状态退出时才从新启动容器；
+    always - 无论退出状态是如何，都重启容器；
+MYSQL_ROOT_PASSWORD：设置root密码为root
+设置默认数据库编码为utf8mb4,默认排序规则为utf8mb4_unicode_ci
+-v : 挂载本地卷
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">--name</span> mysql <span class="nt">-p</span> 3306:3306 <span class="nt">--restart</span><span class="o">=</span>always <span class="nt">-e</span> <span class="nv">MYSQL_ROOT_PASSWORD</span><span class="o">=</span>qaqa123456 <span class="nt">-v</span> <span class="s2">"</span><span class="nv">$PWD</span><span class="s2">/data"</span>:/var/lib/mysql <span class="nt">-d</span> mysql:5.7 <span class="nt">--character-set-server</span><span class="o">=</span>utf8mb4 <span class="nt">--collation-server</span><span class="o">=</span>utf8mb4_unicode_ci
+</code></pre></div></div>
+
+<h3 id="进入mysql容器">进入mysql容器</h3>
+
+<p>进入docker的mysql容器</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 进入docker的mysql容器</span>
+docker <span class="nb">exec</span> <span class="nt">-it</span> mysql /bin/bash
+
+<span class="c"># 登录数据库（此处的密码为参数-e MYSQL_ROOT_PASSWORD=root对应的值，此处密码为root）</span>
+mysql <span class="nt">-u</span> root <span class="nt">-p</span> my_password
+</code></pre></div></div>
+
+<h3 id="修改远端连接mysql数据库">修改远端连接mysql数据库</h3>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">use</span> <span class="n">mysql</span><span class="p">;</span>
+
+<span class="k">alter</span> <span class="k">user</span> <span class="s1">'root'</span><span class="o">@</span><span class="s1">'localhost'</span> <span class="n">identified</span> <span class="k">with</span> <span class="n">mysql_native_password</span> <span class="k">by</span> <span class="s1">'my_password'</span><span class="p">;</span>
+
+<span class="n">flush</span> <span class="k">privileges</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="查看挂载卷位置获取容器镜像的元数据">查看挂载卷位置：获取容器/镜像的元数据</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker inspect container_id
+</code></pre></div></div>
+
+<p>能查看带如下：</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">"Mounts"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"Type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bind"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"Source"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/home/mysql-docker/data"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"Destination"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/var/lib/mysql"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"Mode"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"RW"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"Propagation"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rprivate"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>即linux本地宿主机目录 /home/mysql-docker/data 映射容器目录 /var/lib/mysql</p>
+:ET

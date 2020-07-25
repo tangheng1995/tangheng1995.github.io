@@ -1,0 +1,365 @@
+I"{�<ul id="markdown-toc">
+  <li><a href="#介绍" id="markdown-toc-介绍">介绍</a></li>
+  <li><a href="#golang堆栈" id="markdown-toc-golang堆栈">Golang堆栈</a>    <ul>
+      <li><a href="#什么是堆栈" id="markdown-toc-什么是堆栈">什么是堆栈</a>        <ul>
+          <li><a href="#数据结构的堆栈" id="markdown-toc-数据结构的堆栈">数据结构的堆栈</a></li>
+          <li><a href="#内存分配中的堆和栈" id="markdown-toc-内存分配中的堆和栈">内存分配中的堆和栈</a></li>
+        </ul>
+      </li>
+      <li><a href="#堆栈缓存方式" id="markdown-toc-堆栈缓存方式">堆栈缓存方式</a></li>
+      <li><a href="#堆栈跟踪" id="markdown-toc-堆栈跟踪">堆栈跟踪</a>        <ul>
+          <li><a href="#methods" id="markdown-toc-methods">Methods</a></li>
+          <li><a href="#packing" id="markdown-toc-packing">Packing</a></li>
+        </ul>
+      </li>
+      <li><a href="#变量是堆heap还是堆栈stack" id="markdown-toc-变量是堆heap还是堆栈stack">变量是堆（heap）还是堆栈（stack）</a></li>
+      <li><a href="#引用" id="markdown-toc-引用">引用</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="介绍">介绍</h2>
+
+<p>Golang堆栈。</p>
+
+<h2 id="golang堆栈">Golang堆栈</h2>
+
+<h3 id="什么是堆栈">什么是堆栈</h3>
+
+<p>在计算机中堆栈的概念分为：数据结构的堆栈和内存分配中堆栈。</p>
+
+<h4 id="数据结构的堆栈">数据结构的堆栈</h4>
+
+<p>堆：堆可以被看成是一棵树，如：堆排序。在队列中，调度程序反复提取队列中第一个作业并运行，因为实际情况中某些时间较短的任务将等待很长时间才能结束，或者某些不短小，但具有重要性的作业，同样应当具有优先权。堆即为解决此类问题设计的一种数据结构。</p>
+
+<p>栈：一种先进后出的数据结构。</p>
+
+<p>这里着重讲的是内存分配中的堆和栈。</p>
+
+<h4 id="内存分配中的堆和栈">内存分配中的堆和栈</h4>
+
+<p>栈（操作系统）：由操作系统自动分配释放 ，存放函数的参数值，局部变量的值等。其操作方式类似于数据结构中的栈。</p>
+
+<p>堆（操作系统）： 一般由程序员分配释放， 若程序员不释放，程序结束时可能由OS回收，分配方式倒是类似于链表。</p>
+
+<h3 id="堆栈缓存方式">堆栈缓存方式</h3>
+
+<p>栈使用的是一级缓存， 他们通常都是被调用时处于存储空间中，调用完毕立即释放。</p>
+
+<p>堆则是存放在二级缓存中，生命周期由虚拟机的垃圾回收算法来决定（并不是一旦成为孤儿对象就能被回收）。所以调用这些对象的速度要相对来得低一些。</p>
+
+<h3 id="堆栈跟踪">堆栈跟踪</h3>
+
+<p>下面讨论堆栈跟踪信息以及如何在堆栈中识别函数所传递的参数。</p>
+
+<p>以下测试案例的版本是Go 1.11</p>
+
+<p>示例：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"runtime/debug"</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">slice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+   <span class="n">Example</span><span class="p">(</span><span class="n">slice</span><span class="p">,</span> <span class="s">"hello"</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">Example</span><span class="p">(</span><span class="n">slice</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">str</span> <span class="kt">string</span><span class="p">,</span> <span class="n">i</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">debug</span><span class="o">.</span><span class="n">PrintStack</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>列表1是一个简单的程序， main函数在第5行调用Example函数。Example函数在第9行声明，它有三个参数，一个字符串slice,一个字符串和一个整数。它的方法体也很简单，只有一行，debug.PrintStack（），这会立即产生一个堆栈跟踪信息:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">goroutine</span> <span class="m">1</span> <span class="p">[</span><span class="n">running</span><span class="p">]</span><span class="o">:</span>
+<span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">.</span><span class="n">Stack</span><span class="p">(</span><span class="m">0x1</span><span class="p">,</span> <span class="m">0x0</span><span class="p">,</span> <span class="m">0x0</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">:/</span><span class="n">Go</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">stack</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">24</span> <span class="o">+</span><span class="m">0xae</span>
+<span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">.</span><span class="n">PrintStack</span><span class="p">()</span>
+    <span class="n">C</span><span class="o">:/</span><span class="n">Go</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">stack</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">16</span> <span class="o">+</span><span class="m">0x29</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0xc000077f48</span><span class="p">,</span> <span class="m">0x2</span><span class="p">,</span> <span class="m">0x4</span><span class="p">,</span> <span class="m">0x4abd9e</span><span class="p">,</span> <span class="m">0x5</span><span class="p">,</span> <span class="m">0xa</span><span class="p">)</span>
+    <span class="n">D</span><span class="o">:/</span><span class="n">gopath</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">10</span> <span class="o">+</span><span class="m">0x27</span>
+<span class="n">main</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+    <span class="n">D</span><span class="o">:/</span><span class="n">gopath</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">7</span> <span class="o">+</span><span class="m">0x79</span>
+</code></pre></div></div>
+
+<p>堆栈跟踪信息：</p>
+
+<p>第一行显示运行的goroutine是id为 1的goroutine。</p>
+
+<p>第二行 debug.Stack()被调用</p>
+
+<p>第四行 debug.PrintStack() 被调用</p>
+
+<p>第六行 调用debug.PrintStack()的代码位置，位于main package下的Example函数。它也显示了代码所在的文件和路径，以及debug.PrintStack()发生的行数(第10行)。</p>
+
+<p>第八行 也调用Example的函数的名字，它是main package的main函数。它也显示了文件名和路径，以及调用Example函数的行数。</p>
+
+<p>下面主要分析 传递Example函数传参信息</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Declaration</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="n">slice</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">str</span> <span class="kt">string</span><span class="p">,</span> <span class="n">i</span> <span class="kt">int</span><span class="p">)</span>
+<span class="c">// Call to Example by main.</span>
+<span class="n">slice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+<span class="n">Example</span><span class="p">(</span><span class="n">slice</span><span class="p">,</span> <span class="s">"hello"</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+<span class="c">// Stack trace</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0x2080c3f50</span><span class="p">,</span> <span class="m">0x2</span><span class="p">,</span> <span class="m">0x4</span><span class="p">,</span> <span class="m">0x425c0</span><span class="p">,</span> <span class="m">0x5</span><span class="p">,</span> <span class="m">0xa</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>上面列举了Example函数的声明，调用以及传递给它的值的信息。当你比较函数的声明以及传递的值时，发现它们并不一致。函数声明只接收三个参数，而堆栈中却显示6个16进制表示的值。理解这一点的关键是要知道每个参数类型的实现机制。</p>
+
+<p>让我们看第一个[]string类型的参数。slice是引用类型，这意味着那个值是一个指针的头信息(header value)，它指向一个字符串。对于slice,它的头是三个word数，指向一个数组。因此前三个值代表这个slice。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Slice parameter value</span>
+<span class="n">slice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+<span class="c">// Slice header values</span>
+<span class="n">Pointer</span><span class="o">:</span>  <span class="m">0xc00006df48</span>
+<span class="n">Length</span><span class="o">:</span>   <span class="m">0x2</span>
+<span class="n">Capacity</span><span class="o">:</span> <span class="m">0x4</span>
+<span class="c">// Declaration</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="n">slice</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">str</span> <span class="kt">string</span><span class="p">,</span> <span class="n">i</span> <span class="kt">int</span><span class="p">)</span>
+<span class="c">// Stack trace</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0xc00006df48</span><span class="p">,</span> <span class="m">0x2</span><span class="p">,</span> <span class="m">0x4</span><span class="p">,</span> <span class="m">0x4abd9e</span><span class="p">,</span> <span class="m">0x5</span><span class="p">,</span> <span class="m">0xa</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>显示了0xc00006df48代表第一个参数[]string的指针，0x2代表slice长度，0x4代表容量。这三个值代表第一个参数。</p>
+
+<p><img src="/assets/images/2019/2019-10-04-1.png" alt="图一" /></p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// String parameter value</span>
+<span class="err">“</span><span class="n">hello</span><span class="err">”</span>
+<span class="c">// String header values</span>
+<span class="n">Pointer</span><span class="o">:</span> <span class="m">0x4abd9e</span>
+<span class="n">Length</span><span class="o">:</span>  <span class="m">0x5</span>
+<span class="c">// Declaration</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="n">slice</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">str</span> <span class="kt">string</span><span class="p">,</span> <span class="n">i</span> <span class="kt">int</span><span class="p">)</span>
+<span class="c">// Stack trace</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0xc00006df48</span><span class="p">,</span> <span class="m">0x2</span><span class="p">,</span> <span class="m">0x4</span><span class="p">,</span> <span class="m">0x4abd9e</span><span class="p">,</span> <span class="m">0x5</span><span class="p">,</span> <span class="m">0xa</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>显示堆栈跟踪信息中的第4个和第5个参数代表字符串的参数。0x4abd9e是指向这个字符串底层数组的指针，0x5是”hello”字符串的长度，他们俩作为第二个参数。</p>
+
+<p><img src="/assets/images/2019/2019-10-04-2.png" alt="图二" /></p>
+
+<p>第三个参数是一个整数，它是一个简单的word值</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Integer parameter value</span>
+<span class="m">10</span>
+<span class="c">// Integer value</span>
+<span class="n">Base</span> <span class="m">16</span><span class="o">:</span> <span class="m">0xa</span>
+<span class="c">// Declaration</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="n">slice</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">str</span> <span class="kt">string</span><span class="p">,</span> <span class="n">i</span> <span class="kt">int</span><span class="p">)</span>
+<span class="c">// Stack trace</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0xc00006df48</span><span class="p">,</span> <span class="m">0x2</span><span class="p">,</span> <span class="m">0x4</span><span class="p">,</span> <span class="m">0x4abd9e</span><span class="p">,</span> <span class="m">0x5</span><span class="p">,</span> <span class="m">0xa</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>显示堆栈中的最后一个参数就是Example声明中的第三个参数，它的值是0xa，也就是整数10。</p>
+
+<p><img src="/assets/images/2019/2019-10-04-3.png" alt="图三" /></p>
+
+<h4 id="methods">Methods</h4>
+
+<p>接下来让我们稍微改动一下程序，让Example变成方法。</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+   <span class="s">"fmt"</span>
+   <span class="s">"runtime/debug"</span>
+<span class="p">)</span>
+
+<span class="k">type</span> <span class="n">trace</span> <span class="k">struct</span><span class="p">{}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">slice</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">4</span><span class="p">)</span>
+   <span class="k">var</span> <span class="n">t</span> <span class="n">trace</span>
+   <span class="n">t</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="n">slice</span><span class="p">,</span> <span class="s">"hello"</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">t</span> <span class="o">*</span><span class="n">trace</span><span class="p">)</span> <span class="n">Example</span><span class="p">(</span><span class="n">slice</span> <span class="p">[]</span><span class="kt">string</span><span class="p">,</span> <span class="n">str</span> <span class="kt">string</span><span class="p">,</span> <span class="n">i</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+   <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"Receiver Address: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+   <span class="n">debug</span><span class="o">.</span><span class="n">PrintStack</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>上例在第8行新增加了一个类型trace，在第15将example改变为trace的pointer receiver的一个方法。第12行声明t的类型为trace，第13行调用它的方法。</p>
+
+<p>因为这个方法声明为pointer receiver的方法，Go使用t的指针来支持receiver type，即使代码中使用值来调用这个方法。当程序运行时，堆栈跟踪信息如下：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Receiver</span> <span class="n">Address</span><span class="o">:</span> <span class="m">0x5781c8</span>
+<span class="n">goroutine</span> <span class="m">1</span> <span class="p">[</span><span class="n">running</span><span class="p">]</span><span class="o">:</span>
+<span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">.</span><span class="n">Stack</span><span class="p">(</span><span class="m">0x15</span><span class="p">,</span> <span class="m">0xc000071ef0</span><span class="p">,</span> <span class="m">0x1</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">:/</span><span class="n">Go</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">stack</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">24</span> <span class="o">+</span><span class="m">0xae</span>
+<span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">.</span><span class="n">PrintStack</span><span class="p">()</span>
+    <span class="n">C</span><span class="o">:/</span><span class="n">Go</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">stack</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">16</span> <span class="o">+</span><span class="m">0x29</span>
+<span class="n">main</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">trace</span><span class="p">)</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0x5781c8</span><span class="p">,</span> <span class="m">0xc000071f48</span><span class="p">,</span> <span class="m">0x2</span><span class="p">,</span> <span class="m">0x4</span><span class="p">,</span> <span class="m">0x4c04bb</span><span class="p">,</span> <span class="m">0x5</span><span class="p">,</span> <span class="m">0xa</span><span class="p">)</span>
+    <span class="n">D</span><span class="o">:/</span><span class="n">gopath</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">17</span> <span class="o">+</span><span class="m">0x7c</span>
+<span class="n">main</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+    <span class="n">D</span><span class="o">:/</span><span class="n">gopath</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">13</span> <span class="o">+</span><span class="m">0x9a</span>
+</code></pre></div></div>
+
+<p>第7行清晰的表明方法的receiver为pointer type。方法名和报包名中间有(*trace)。第二个值得注意的是堆栈信息中方法的第一个参数为receiver的值。方法调用总是转换成函数调用，并将receiver的值作为函数的第一个参数。我们可以总堆栈信息中看到实现的细节。</p>
+
+<h4 id="packing">Packing</h4>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">(</span>
+   <span class="s">"runtime/debug"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="n">Example</span><span class="p">(</span><span class="no">true</span><span class="p">,</span> <span class="no">false</span><span class="p">,</span> <span class="no">true</span><span class="p">,</span> <span class="m">25</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">Example</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b3</span> <span class="kt">bool</span><span class="p">,</span> <span class="n">i</span> <span class="kt">uint8</span><span class="p">)</span> <span class="p">{</span>
+
+   <span class="n">debug</span><span class="o">.</span><span class="n">PrintStack</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>再次改变Example的方法，让它接收4个参数。前三个参数是布尔类型的，第四个参数是8bit无符号整数。布尔类型也是8bit表示的，所以这四个参数可以被打包成一个word，包括32位架构和64位架构。当程序运行的时候，会产生有趣的堆栈：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">goroutine</span> <span class="m">1</span> <span class="p">[</span><span class="n">running</span><span class="p">]</span><span class="o">:</span>
+<span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">.</span><span class="n">Stack</span><span class="p">(</span><span class="m">0x4</span><span class="p">,</span> <span class="m">0xc00007a010</span><span class="p">,</span> <span class="m">0xc000077f88</span><span class="p">)</span>
+    <span class="n">C</span><span class="o">:/</span><span class="n">Go</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">stack</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">24</span> <span class="o">+</span><span class="m">0xae</span>
+<span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">.</span><span class="n">PrintStack</span><span class="p">()</span>
+    <span class="n">C</span><span class="o">:/</span><span class="n">Go</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">runtime</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">stack</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">16</span> <span class="o">+</span><span class="m">0x29</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0xc019010001</span><span class="p">)</span>
+    <span class="n">D</span><span class="o">:/</span><span class="n">gopath</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">12</span> <span class="o">+</span><span class="m">0x27</span>
+<span class="n">main</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+    <span class="n">D</span><span class="o">:/</span><span class="n">gopath</span><span class="o">/</span><span class="n">src</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">example</span><span class="o">/</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">8</span> <span class="o">+</span><span class="m">0x30</span>
+</code></pre></div></div>
+
+<p>可以看到四个值被打包成一个单一的值了0xc019010001</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// Parameter values</span>
+<span class="no">true</span><span class="p">,</span> <span class="no">false</span><span class="p">,</span> <span class="no">true</span><span class="p">,</span> <span class="m">25</span>
+
+<span class="c">// Word value</span>
+<span class="n">Bits</span>    <span class="n">Binary</span>      <span class="n">Hex</span>   <span class="n">Value</span>
+<span class="m">00</span><span class="o">-</span><span class="m">07</span>   <span class="m">0000</span> <span class="m">0001</span>   <span class="m">01</span>    <span class="no">true</span>
+<span class="m">08</span><span class="o">-</span><span class="m">15</span>   <span class="m">0000</span> <span class="m">0000</span>   <span class="m">00</span>    <span class="no">false</span>
+<span class="m">16</span><span class="o">-</span><span class="m">23</span>   <span class="m">0000</span> <span class="m">0001</span>   <span class="m">01</span>    <span class="no">true</span>
+<span class="m">24</span><span class="o">-</span><span class="m">31</span>   <span class="m">0001</span> <span class="m">1001</span>   <span class="m">19</span>    <span class="m">25</span>
+
+<span class="c">// Declaration</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b3</span> <span class="kt">bool</span><span class="p">,</span> <span class="n">i</span> <span class="kt">uint8</span><span class="p">)</span>
+
+<span class="c">// Stack trace</span>
+<span class="n">main</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span><span class="m">0x19010001</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>显示了堆栈的值如何和参数进行匹配的。true用1表示，占8bit, false用0表示，占8bit,uint8值25的16进制为x19,用8bit表示。我们课哟看到它们是如何表示成一个word值的。</p>
+
+<p>Go运行时提供了详细的信息来帮助我们调试程序。通过堆栈跟踪信息stack trace，解码传递个堆栈中的方法的参数有助于我们快速定位BUG。</p>
+
+<h3 id="变量是堆heap还是堆栈stack">变量是堆（heap）还是堆栈（stack）</h3>
+
+<p>Go中的每个变量都存在，只要有对它的引用即可。实现选择的存储位置与语言的语义无关。</p>
+
+<p>存储位置确实会影响编写高效的程序。如果可能，Go编译器将为该函数的堆栈帧中的函数分配本地变量。但是，如果编译器在函数返回后无法证明变量未被引用，则编译器必须在垃圾收集堆上分配变量以避免悬空指针错误。此外，如果局部变量非常大，将它存储在堆而不是堆栈上可能更有意义。</p>
+
+<p>在当前的编译器中，如果变量具有其地址，则该变量是堆上分配的候选变量。但是，基础的逃逸分析可以将那些生存不超过函数返回值的变量识别出来，并且因此可以分配在栈上。</p>
+
+<p>Go的编译器会决定在哪(堆or栈)分配内存，保证程序的正确性。</p>
+
+<p>下面通过反汇编查看具体内存分配情况：</p>
+
+<p>新建 main.go</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="s">"fmt"</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="k">var</span> <span class="n">a</span> <span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="kt">int</span>
+   <span class="n">c</span> <span class="o">:=</span> <span class="n">a</span><span class="p">[</span><span class="o">:</span><span class="p">]</span>
+   <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>查看汇编代码</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">go</span> <span class="n">tool</span> <span class="n">compile</span> <span class="o">-</span><span class="n">S</span> <span class="n">main</span><span class="o">.</span><span class="k">go</span>
+</code></pre></div></div>
+
+<p>输出：</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">example</span><span class="p">]</span><span class="err">#</span> <span class="k">go</span> <span class="n">tool</span> <span class="n">compile</span> <span class="o">-</span><span class="n">S</span> <span class="n">main</span><span class="o">.</span><span class="k">go</span>
+<span class="s">""</span><span class="o">.</span><span class="n">main</span> <span class="n">STEXT</span> <span class="n">size</span><span class="o">=</span><span class="m">183</span> <span class="n">args</span><span class="o">=</span><span class="m">0x0</span> <span class="n">locals</span><span class="o">=</span><span class="m">0x60</span>
+    <span class="m">0x0000</span> <span class="m">00000</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">TEXT</span>    <span class="s">""</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">SB</span><span class="p">),</span> <span class="err">$</span><span class="m">96</span><span class="o">-</span><span class="m">0</span>
+    <span class="m">0x0000</span> <span class="m">00000</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="p">(</span><span class="n">TLS</span><span class="p">),</span> <span class="n">CX</span>
+    <span class="m">0x0009</span> <span class="m">00009</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">CMPQ</span>    <span class="n">SP</span><span class="p">,</span> <span class="m">16</span><span class="p">(</span><span class="n">CX</span><span class="p">)</span>
+    <span class="m">0x000d</span> <span class="m">00013</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">JLS</span>    <span class="m">173</span>
+    <span class="m">0x0013</span> <span class="m">00019</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">SUBQ</span>    <span class="err">$</span><span class="m">96</span><span class="p">,</span> <span class="n">SP</span>
+    <span class="m">0x0017</span> <span class="m">00023</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="n">BP</span><span class="p">,</span> <span class="m">88</span><span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x001c</span> <span class="m">00028</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">LEAQ</span>    <span class="m">88</span><span class="p">(</span><span class="n">SP</span><span class="p">),</span> <span class="n">BP</span>
+    <span class="m">0x0021</span> <span class="m">00033</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">FUNCDATA</span>    <span class="err">$</span><span class="m">0</span><span class="p">,</span> <span class="n">gclocals</span><span class="err">·</span><span class="n">f6bd6b3389b872033d462029172c8612</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x0021</span> <span class="m">00033</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">FUNCDATA</span>    <span class="err">$</span><span class="m">1</span><span class="p">,</span> <span class="n">gclocals</span><span class="err">·</span><span class="m">3</span><span class="n">ea58e42e2dc6c51a9f33c0d03361a27</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x0021</span> <span class="m">00033</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">5</span><span class="p">)</span>    <span class="n">FUNCDATA</span>    <span class="err">$</span><span class="m">3</span><span class="p">,</span> <span class="n">gclocals</span><span class="err">·</span><span class="m">9</span><span class="n">fb7f0986f647f17cb53dda1484e0f7a</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x0021</span> <span class="m">00033</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">1</span>
+    <span class="m">0x0021</span> <span class="m">00033</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">0</span><span class="p">,</span> <span class="err">$</span><span class="m">0</span>
+    <span class="m">0x0021</span> <span class="m">00033</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">LEAQ</span>    <span class="k">type</span><span class="o">.</span><span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="kt">int</span><span class="p">(</span><span class="n">SB</span><span class="p">),</span> <span class="n">AX</span>
+    <span class="m">0x0028</span> <span class="m">00040</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">0</span>
+    <span class="m">0x0028</span> <span class="m">00040</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="n">AX</span><span class="p">,</span> <span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x002c</span> <span class="m">00044</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">CALL</span>    <span class="n">runtime</span><span class="o">.</span><span class="n">newobject</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x0031</span> <span class="m">00049</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">1</span>
+    <span class="m">0x0031</span> <span class="m">00049</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="m">8</span><span class="p">(</span><span class="n">SP</span><span class="p">),</span> <span class="n">AX</span>
+    <span class="m">0x0036</span> <span class="m">00054</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">8</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">0</span>
+    <span class="m">0x0036</span> <span class="m">00054</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">8</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">0</span><span class="p">,</span> <span class="err">$</span><span class="m">1</span>
+    <span class="m">0x0036</span> <span class="m">00054</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">8</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="n">AX</span><span class="p">,</span> <span class="s">""</span><span class="o">..</span><span class="n">autotmp_4</span><span class="o">+</span><span class="m">64</span><span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>注意到有调用newobject！其中main.go:6说明变量a的内存是在堆上分配的!</p>
+
+<p>修改main.go</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+   <span class="k">var</span> <span class="n">a</span> <span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="kt">int</span>
+   <span class="n">c</span> <span class="o">:=</span> <span class="n">a</span><span class="p">[</span><span class="o">:</span><span class="p">]</span>
+   <span class="nb">println</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>再查看汇编代码</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">example</span><span class="p">]</span><span class="err">#</span> <span class="k">go</span> <span class="n">tool</span> <span class="n">compile</span> <span class="o">-</span><span class="n">S</span> <span class="n">main</span><span class="o">.</span><span class="k">go</span>
+<span class="err">\</span><span class="s">""</span><span class="o">.</span><span class="n">main</span> <span class="n">STEXT</span> <span class="n">size</span><span class="o">=</span><span class="m">102</span> <span class="n">args</span><span class="o">=</span><span class="m">0x0</span> <span class="n">locals</span><span class="o">=</span><span class="m">0x28</span>
+    <span class="m">0x0000</span> <span class="m">00000</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">TEXT</span>    <span class="s">""</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">SB</span><span class="p">),</span> <span class="err">$</span><span class="m">40</span><span class="o">-</span><span class="m">0</span>
+    <span class="m">0x0000</span> <span class="m">00000</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="p">(</span><span class="n">TLS</span><span class="p">),</span> <span class="n">CX</span>
+    <span class="m">0x0009</span> <span class="m">00009</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">CMPQ</span>    <span class="n">SP</span><span class="p">,</span> <span class="m">16</span><span class="p">(</span><span class="n">CX</span><span class="p">)</span>
+    <span class="m">0x000d</span> <span class="m">00013</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">JLS</span>    <span class="m">95</span>
+    <span class="m">0x000f</span> <span class="m">00015</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">SUBQ</span>    <span class="err">$</span><span class="m">40</span><span class="p">,</span> <span class="n">SP</span>
+    <span class="m">0x0013</span> <span class="m">00019</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="n">BP</span><span class="p">,</span> <span class="m">32</span><span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x0018</span> <span class="m">00024</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">LEAQ</span>    <span class="m">32</span><span class="p">(</span><span class="n">SP</span><span class="p">),</span> <span class="n">BP</span>
+    <span class="m">0x001d</span> <span class="m">00029</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">FUNCDATA</span>    <span class="err">$</span><span class="m">0</span><span class="p">,</span> <span class="n">gclocals</span><span class="err">·</span><span class="m">33</span><span class="n">cdeccccebe80329f1fdbee7f5874cb</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x001d</span> <span class="m">00029</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">FUNCDATA</span>    <span class="err">$</span><span class="m">1</span><span class="p">,</span> <span class="n">gclocals</span><span class="err">·</span><span class="m">33</span><span class="n">cdeccccebe80329f1fdbee7f5874cb</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x001d</span> <span class="m">00029</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">3</span><span class="p">)</span>    <span class="n">FUNCDATA</span>    <span class="err">$</span><span class="m">3</span><span class="p">,</span> <span class="n">gclocals</span><span class="err">·</span><span class="m">9</span><span class="n">fb7f0986f647f17cb53dda1484e0f7a</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x001d</span> <span class="m">00029</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">4</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">0</span>
+    <span class="m">0x001d</span> <span class="m">00029</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">4</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">0</span><span class="p">,</span> <span class="err">$</span><span class="m">0</span>
+    <span class="m">0x001d</span> <span class="m">00029</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">4</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="err">$</span><span class="m">0</span><span class="p">,</span> <span class="s">""</span><span class="o">.</span><span class="n">a</span><span class="o">+</span><span class="m">24</span><span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x0026</span> <span class="m">00038</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">CALL</span>    <span class="n">runtime</span><span class="o">.</span><span class="n">printlock</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x002b</span> <span class="m">00043</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">1</span>
+    <span class="m">0x002b</span> <span class="m">00043</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">LEAQ</span>    <span class="s">""</span><span class="o">.</span><span class="n">a</span><span class="o">+</span><span class="m">24</span><span class="p">(</span><span class="n">SP</span><span class="p">),</span> <span class="n">AX</span>
+    <span class="m">0x0030</span> <span class="m">00048</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">PCDATA</span>    <span class="err">$</span><span class="m">2</span><span class="p">,</span> <span class="err">$</span><span class="m">0</span>
+    <span class="m">0x0030</span> <span class="m">00048</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="n">AX</span><span class="p">,</span> <span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x0034</span> <span class="m">00052</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="err">$</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x003d</span> <span class="m">00061</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">MOVQ</span>    <span class="err">$</span><span class="m">1</span><span class="p">,</span> <span class="m">16</span><span class="p">(</span><span class="n">SP</span><span class="p">)</span>
+    <span class="m">0x0046</span> <span class="m">00070</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">CALL</span>    <span class="n">runtime</span><span class="o">.</span><span class="n">printslice</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x004b</span> <span class="m">00075</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">CALL</span>    <span class="n">runtime</span><span class="o">.</span><span class="n">printnl</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+    <span class="m">0x0050</span> <span class="m">00080</span> <span class="p">(</span><span class="n">main</span><span class="o">.</span><span class="k">go</span><span class="o">:</span><span class="m">6</span><span class="p">)</span>    <span class="n">CALL</span>    <span class="n">runtime</span><span class="o">.</span><span class="n">printunlock</span><span class="p">(</span><span class="n">SB</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>没有发现调用newobject，这段代码a是在堆栈上分配的。</p>
+
+<p>结论：</p>
+
+<p>Go 编译器自行决定变量分配在堆栈或堆上，以保证程序的正确性。</p>
+
+<h3 id="引用">引用</h3>
+
+<ul>
+  <li>[1] <a href="https://www.ardanlabs.com/blog/2015/01/stack-traces-in-go.html">Stack Traces In Go</a></li>
+  <li>[2] <a href="https://segmentfault.com/a/1190000017498101">Go堆栈的理解</a></li>
+</ul>
+:ET
