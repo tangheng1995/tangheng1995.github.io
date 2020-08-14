@@ -147,6 +147,14 @@ Registry Mirrors:
   https://reg-mirror.qiniu.com/
 ```
 
+### 普通用户运行
+
+```shell
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
+sudo systemctl restart docker
+```
+
 ### 安装Portainer
 
 创建卷：
