@@ -33,4 +33,4 @@ $sudo fc-cache -f -v
 
 `editor.fontFamily` 第一项设置 `'Menlo for Powerline'` 即可恢复editor字体显示。
 
-`terminal.integrated.fontFamily` 设置 `terminal.integrated.fontFamily` 即可回复terminal字体显示
+`terminal.integrated.fontFamily` 设置 `Menlo for Powerline` 即可恢复terminal字体显示
