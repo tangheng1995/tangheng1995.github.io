@@ -51,3 +51,11 @@ VSCode 插件列表（欢迎大家补充）：
 |插件名称|插件描述|
 |----|----|
 |navicat|连接MySQL客户端工具|
+
+## ZSH
+
+|插件名称|插件描述|
+|----|----|
+|zsh-autosuggestions|历史命令补全|
+|zsh-syntax-highlighting|语法高亮|
+|git|git命令缩写|
