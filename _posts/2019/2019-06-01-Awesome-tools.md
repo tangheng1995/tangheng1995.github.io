@@ -90,3 +90,7 @@ author: Archer
 
 - [IDM](http://www.internetdownloadmanager.com/)
 - [Motrix](https://github.com/agalwood/Motrix/releases)
+
+### 设计画图
+
+- [Sketch](https://www.sketch.com/)
