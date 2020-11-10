@@ -99,3 +99,9 @@ git config --global --unset http.https://github.com.proxy
 ```text
 git config --global -e
 ```
+
+## 配置commit编辑器
+
+```text
+git config --global core.editor "vim"
+```
