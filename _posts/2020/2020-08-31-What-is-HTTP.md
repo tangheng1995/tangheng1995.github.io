@@ -163,3 +163,21 @@ HTTP，在整个协议里没有规定任何的“状态”，客户端和服务�
 UDP 协议，不过它是无连接也无状态的，顺序发包乱序收包，数据包发出去后就不管了，收到后也不会顺序整理。而 HTTP 是有连接无状态，顺序发包顺序收包，按照收发的顺序管理报文。
 
 > Cookie实现HTTP的"有状态"。
+
+### PATCH 与 PUT 区别
+
+PUT比較正确的定义是 Replace (Create or Update)，
+例如 PUT /items/1 的意思是替换 /items/1 ，如果已经存在就替换，沒有就新增；
+因此，PUT方法一般会用来更新一个已知资源，除非在创建前，你完全知道自己要创建的对象的URI
+
+PATCH方法是新引入的，是对PUT方法的补充，用来对已知资源进行**局部更新**
+HTTP PATCH method require a feature to do partial resource modification.
+The existing HTTP PUT method only allows a complete replacement of a document.
+
+假设我们有一个UserInfo，里面有userId， userName， userGender等10个字段。可你的编辑功能因为需求，在某个特别的页面里只能修改userName，这时候的更新怎么做？
+
+人们通常(为徒省事)把一个包含了修改后userName的完整userInfo对象传给后端，做完整更新。但仔细想想，这种做法感觉有点二，而且真心浪费带宽(纯技术上讲，你不关心带宽那是你土豪)。
+
+于是patch诞生，只传一个userName到指定资源去，表示该请求是一个局部更新，后端仅更新接收到的字段。
+
+而put虽然也是更新资源，但要求前端提供的一定是一个完整的资源对象，理论上说，如果你用了put，但却没有提供完整的UserInfo，那么缺了的那些字段应该被清空
