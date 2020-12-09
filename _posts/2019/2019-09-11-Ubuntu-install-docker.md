@@ -171,6 +171,14 @@ docker run -d -p 8000:8000 -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.
 
 访问端口9000，进入Portainer配置页面
 
+### 删除none标签镜像
+
+```shell
+docker rmi $(docker images | grep "none" | awk '{print $3}')
+
+docker rmi $(docker images -f "dangling=true" -q)
+```
+
 ### 引用
 
 - [1] [How To Install and Use Docker on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
