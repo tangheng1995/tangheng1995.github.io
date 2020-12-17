@@ -96,7 +96,7 @@ PATCH含对资源的一些“一般更改”，因此我们不仅仅应进行典
 
 1. PATCH 是对资源的部分修改
 
-2. PATCH 能实现幂等和非幂等操作，看具体patch document操作指令，通常说不是幂等操作
+2. PATCH 是非幂等，但是能实现幂等操作，看具体patch document操作指令
 
 ## 引用
 
@@ -104,3 +104,4 @@ PATCH含对资源的一些“一般更改”，因此我们不仅仅应进行典
 * [2] [REST API - PUT与PATCH的实例](https://www.itranslater.com/qa/details/2103002937847972864)
 * [3] [为什么 HTTP PATCH 方法不是幂等的及其延伸](https://juejin.cn/post/6844903813799739399)
 * [4] [Use of PUT vs PATCH methods in REST API real life scenarios](https://stackoverflow.com/questions/28459418/use-of-put-vs-patch-methods-in-rest-api-real-life-scenarios/39338329#39338329)
+* [5] [MDN web-PATCH](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/PATCH)
