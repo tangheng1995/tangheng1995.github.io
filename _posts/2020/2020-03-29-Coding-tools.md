@@ -59,3 +59,11 @@ VSCode 插件列表（欢迎大家补充）：
 |zsh-autosuggestions|历史命令补全|
 |zsh-syntax-highlighting|语法高亮|
 |git|git命令缩写|
+
+## Goland
+
+|插件名称|插件描述|
+|----|----|
+|Statistic|统计代码行数|
+|GitToolBox|git提交信息|
+|highlihgtBracketPair|代码块高亮|
