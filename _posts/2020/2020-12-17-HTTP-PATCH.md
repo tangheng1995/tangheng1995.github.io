@@ -9,6 +9,13 @@ author: Archer
 * content
 {:toc}
 
+## 介绍
+
+PATCH 非幂等，但是能以幂等形式发送请求。
+
+
+
+
 ## 幂等性
 
 幂等性，根据 rfc2616(Hypertext Transfer Protocol -- HTTP/1.1) 文档第 50 页底部对 Idempotent Methods 的定义：
