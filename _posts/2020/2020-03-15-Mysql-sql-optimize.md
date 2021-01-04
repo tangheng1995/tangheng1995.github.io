@@ -49,6 +49,10 @@ Slow_queries：慢查询的次数
 
 ### 通过EXPLAIN分析慢SQL
 
+type结果值从好到坏依次是：
+
+system > const > eq_ref > ref > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL
+
 语法：EXPLAIN SQL语句
 
 - select_type：表示SELECT的类型，常见的取值有SIMPLE(简单表，即不使用表连接或者子查询)、PRIMARY(主查询，即外层的查询)、UNION(UNION中的第二个或者后面的查询语句)、SUBQUERY(子查询中的第一个SELECT)等。
