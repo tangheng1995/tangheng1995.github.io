@@ -2,8 +2,8 @@
 layout: post
 title: "MySQL 联合索引"
 date: "2021-01-05 12:00:00"
-category: docker
-tags: docker
+category: mysql
+tags: mysql
 author: Archer
 ---
 * content
