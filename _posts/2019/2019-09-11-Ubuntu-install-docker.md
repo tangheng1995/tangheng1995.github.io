@@ -179,6 +179,17 @@ docker rmi $(docker images | grep "none" | awk '{print $3}')
 docker rmi $(docker images -f "dangling=true" -q)
 ```
 
+### 卸载docker
+
+```shell
+# 卸载Docker CE
+sudo apt-get purge docker-ce
+# 卸载Docker EE
+sudo apt-get purge docker-ee
+# 删除Docker镜像、容器、数据卷等文件
+sudo rm -rf /var/lib/docker
+```
+
 ### 引用
 
 - [1] [How To Install and Use Docker on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
