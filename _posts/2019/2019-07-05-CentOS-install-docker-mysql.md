@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Linux 安装 Docker mysql"
+title: "Linux CentOS 安装 Docker mysql"
 date: "2019-07-05 12:00:00"
-category: docker
-tags: docker
+category: linux
+tags: linux,docker
 author: Archer
 ---
 * content
@@ -11,7 +11,7 @@ author: Archer
 
 ## 介绍
 
-Linux 安装 Docker Mysql 常用配置。
+Linux CentOS 安装 Docker Mysql 常用配置。
 
 
 
@@ -48,7 +48,7 @@ MYSQL_ROOT_PASSWORD：设置root密码为root
 ```
 
 ```shell
-docker run --name mysql -p 3306:3306 --restart=always -e MYSQL_ROOT_PASSWORD=qaqa123456 -v "$PWD/data":/var/lib/mysql -d mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+docker run --name mysql -p 3306:3306 --restart=always -e MYSQL_ROOT_PASSWORD=123456 -v "$PWD/data":/var/lib/mysql -d mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
 ### 进入mysql容器
@@ -68,7 +68,7 @@ mysql -u root -p my_password
 ```sql
 use mysql;
 
-alter user 'root'@'localhost' identified with mysql_native_password by 'my_password';
+alter user 'root'@'%' identified with mysql_native_password by 'my_password';
 
 flush privileges;
 ```
