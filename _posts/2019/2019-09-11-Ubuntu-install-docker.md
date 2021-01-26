@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Linux 安装 docker - Ubuntu"
+title: "Linux Ubuntu 安装 docker"
 date: "2019-09-11 12:00:00"
 category: linux
-tags: linux
+tags: linux,docker
 author: Archer
 ---
 * content
