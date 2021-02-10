@@ -63,6 +63,7 @@ Docker for Linux 不支持构建 arm 架构镜像，我们可以运行一个新�
 
 ```shell
 docker run --rm --privileged tonistiigi/binfmt:latest --install all
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ```
 
 ```shell
