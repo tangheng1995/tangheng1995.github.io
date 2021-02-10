@@ -94,6 +94,7 @@ Endpoint:  unix:///var/run/docker.sock
 Status:    running
 Platforms: linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, linux/386, linux/arm/v7, linux/arm/v6
 ```
+> 全平台支持查看目录： `/proc/sys/fs/binfmt_misc`
 
 ## 构建镜像
 
